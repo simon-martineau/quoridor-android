@@ -1,0 +1,73 @@
+package simon.app.quoridor;
+
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+public class ServerAPI {
+	public static final String apiBaseUrl = "https://python.gel.ulaval.ca/quoridor/api/";
+	private final OkHttpClient httpClient = new OkHttpClient();
+	private static final String TAG = "ServerAPI";
+
+	public static JSONObject beginGame(String targetURL, String idul) {
+
+		OkHttpClient client = new OkHttpClient().newBuilder()
+				.build();
+		MediaType mediaType = MediaType.parse("text/plain");
+		RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+				.addFormDataPart("idul", idul)
+				.build();
+		Request request = new Request.Builder()
+				.url(targetURL)
+				.method("POST", body)
+				.build();
+
+		try {
+			Response response = client.newCall(request).execute();
+			return new JSONObject(response.body().string());
+		} catch (IOException | JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public static JSONObject makeMove(String targetURL, String gameID, String moveType, String position) {
+		OkHttpClient client = new OkHttpClient().newBuilder()
+				.build();
+		MediaType mediaType = MediaType.parse("text/plain");
+		RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+				.addFormDataPart("id", gameID)
+				.addFormDataPart("type", moveType)
+				.addFormDataPart("pos", position)
+				.build();
+		Request request = new Request.Builder()
+				.url(targetURL)
+				.method("POST", body)
+				.build();
+
+		try {
+			Response response = client.newCall(request).execute();
+			return new JSONObject(response.body().string());
+		} catch (IOException | JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+}

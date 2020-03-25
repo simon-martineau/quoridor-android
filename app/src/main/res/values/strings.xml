@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Quoridor</string>
+    <string name="main_activity_title">Quoridor game</string>
 </resources>
