@@ -26,10 +26,8 @@ public class ServerAPI {
 	private final OkHttpClient httpClient = new OkHttpClient();
 	private static final String TAG = "ServerAPI";
 
-	public static JSONObject beginGame(String targetURL, String idul) {
+	public JSONObject beginGame(String targetURL, String idul) {
 
-		OkHttpClient client = new OkHttpClient().newBuilder()
-				.build();
 		MediaType mediaType = MediaType.parse("text/plain");
 		RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
 				.addFormDataPart("idul", idul)
@@ -40,7 +38,7 @@ public class ServerAPI {
 				.build();
 
 		try {
-			Response response = client.newCall(request).execute();
+			Response response = httpClient.newCall(request).execute();
 			return new JSONObject(response.body().string());
 		} catch (IOException | JSONException e) {
 			e.printStackTrace();
@@ -48,9 +46,8 @@ public class ServerAPI {
 		}
 	}
 
-	public static JSONObject makeMove(String targetURL, String gameID, String moveType, String position) {
-		OkHttpClient client = new OkHttpClient().newBuilder()
-				.build();
+	public JSONObject makeMove(String targetURL, String gameID, String moveType, String position) {
+
 		MediaType mediaType = MediaType.parse("text/plain");
 		RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
 				.addFormDataPart("id", gameID)
@@ -63,7 +60,7 @@ public class ServerAPI {
 				.build();
 
 		try {
-			Response response = client.newCall(request).execute();
+			Response response = httpClient.newCall(request).execute();
 			return new JSONObject(response.body().string());
 		} catch (IOException | JSONException e) {
 			e.printStackTrace();

@@ -15,14 +15,16 @@ import static org.junit.Assert.*;
 public class ServerApiTest {
 	@Test
 	public void beginGameRequest() {
+		ServerAPI serverAPI = new ServerAPI();
 
-		assertNotNull(ServerAPI.beginGame(ServerAPI.apiBaseUrl + "débuter/", "simar86"));
+		assertNotNull(serverAPI.beginGame(ServerAPI.apiBaseUrl + "débuter/", "simar86"));
 
 	}
 
 	@Test
 	public void makeMoveRequest() {
-		assertNotNull(ServerAPI.makeMove(ServerAPI.apiBaseUrl + "jouer/",
+		ServerAPI serverAPI = new ServerAPI();
+		assertNotNull(serverAPI.makeMove(ServerAPI.apiBaseUrl + "jouer/",
 				"4cd7a0e3-256a-4245-b88e-62e250e11754", "MH", "(4, 4)"));
 	}
 }
