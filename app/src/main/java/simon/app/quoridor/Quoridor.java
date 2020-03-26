@@ -43,13 +43,8 @@ public class Quoridor {
 	}
 
 
-	public Quoridor(@Nullable String gameID) {
-		mGameID = gameID;
-		assignPlayerPosition(1, 5, 1);
-		assignPlayerPosition(2, 5, 9);
-	}
 
-	public Quoridor(@Nullable String gameID, JSONObject initialGameState) {
+	public Quoridor(String gameID, JSONObject initialGameState) {
 		mGameID = gameID;
 		putGameState(initialGameState);
 	}
@@ -331,7 +326,12 @@ public class Quoridor {
 				if (playerX == otherPlayerX && playerY + 1 == otherPlayerY) {
 					// Other player is there
 					if (!ignoreOtherPlayerJump) {
-						possibleNextCoordinates.addAll(getPossibleNextCoordinates(otherPlayerNumber, true));
+						List<int[]> otherPlayerMoves = getPossibleNextCoordinates(otherPlayerNumber, true);
+						if (positionIncluded(new int[]{otherPlayerX, otherPlayerY + 1}, otherPlayerMoves)) {
+							possibleNextCoordinates.add(new int[]{otherPlayerX, otherPlayerY + 1});
+						} else {
+							possibleNextCoordinates.addAll(otherPlayerMoves);
+						}
 					} // Else do nothing
 
 				} else {
@@ -348,7 +348,12 @@ public class Quoridor {
 				if (playerX == otherPlayerX && playerY - 1 == otherPlayerY) {
 					// Other player is there
 					if (!ignoreOtherPlayerJump) {
-						possibleNextCoordinates.addAll(getPossibleNextCoordinates(otherPlayerNumber, true));
+						List<int[]> otherPlayerMoves = getPossibleNextCoordinates(otherPlayerNumber, true);
+						if (positionIncluded(new int[]{otherPlayerX, otherPlayerY - 1}, otherPlayerMoves)) {
+							possibleNextCoordinates.add(new int[]{otherPlayerX, otherPlayerY - 1});
+						} else {
+							possibleNextCoordinates.addAll(otherPlayerMoves);
+						}
 					} // Else do nothing
 				} else {
 					// Other player is not there, add position
@@ -364,7 +369,12 @@ public class Quoridor {
 				if (playerY == otherPlayerY && playerX - 1 == otherPlayerX) {
 					// Other player is there
 					if (!ignoreOtherPlayerJump) {
-						possibleNextCoordinates.addAll(getPossibleNextCoordinates(otherPlayerNumber, true));
+						List<int[]> otherPlayerMoves = getPossibleNextCoordinates(otherPlayerNumber, true);
+						if (positionIncluded(new int[]{otherPlayerX - 1, otherPlayerY}, otherPlayerMoves)) {
+							possibleNextCoordinates.add(new int[]{otherPlayerX - 1, otherPlayerY});
+						} else {
+							possibleNextCoordinates.addAll(otherPlayerMoves);
+						}
 					} // Else do nothing
 				} else {
 					// Other player is not there, add position
@@ -380,7 +390,12 @@ public class Quoridor {
 				if (playerY == otherPlayerY && playerX + 1 == otherPlayerX) {
 					// Other player is there
 					if (!ignoreOtherPlayerJump) {
-						possibleNextCoordinates.addAll(getPossibleNextCoordinates(otherPlayerNumber, true));
+						List<int[]> otherPlayerMoves = getPossibleNextCoordinates(otherPlayerNumber, true);
+						if (positionIncluded(new int[]{otherPlayerX + 1, otherPlayerY}, otherPlayerMoves)) {
+							possibleNextCoordinates.add(new int[]{otherPlayerX + 1, otherPlayerY});
+						} else {
+							possibleNextCoordinates.addAll(otherPlayerMoves);
+						}
 					} // Else do nothing
 				} else {
 					// Other player is not there, add position
@@ -417,6 +432,12 @@ public class Quoridor {
 		}
 
 		return included;
+	}
+
+	public int getWinnerPlayerNumberOrZero() {
+		if (mPlayerOnePosition[1] == 9) return 1;
+		if (mPlayerTwoPosition[1] == 1) return 2;
+		return 0;
 	}
 
 }

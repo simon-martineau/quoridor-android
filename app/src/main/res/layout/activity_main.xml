@@ -5,8 +5,8 @@
     android:id="@+id/main_activity_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0A062C"
-    tools:context=".MainActivity" >
+    android:background="#000000"
+    tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/txtTitle"
@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="@string/main_activity_title"
-        android:textColor="#8ACBED"
+        android:textColor="#3EFF1C"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,13 +22,12 @@
 
     <LinearLayout
         android:id="@+id/surfaceViewContainer"
-        android:layout_width="350dp"
-        android:layout_height="500dp"
-        android:layout_marginTop="36dp"
+        android:layout_width="match_parent"
+        android:layout_height="650dp"
         android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtTitle"></LinearLayout>
+        app:layout_constraintStart_toStartOf="parent"></LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

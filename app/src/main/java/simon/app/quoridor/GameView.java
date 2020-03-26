@@ -8,10 +8,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
+
+import androidx.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,16 +41,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	public GameThread mGameThread;
 
 	// Logic
-	public Quoridor mGame;	// TODO: Implement wall placement (drag and drop)
-										 // TODO: Implement button onclick event
+	public Quoridor mGame;
 
 	// For wall placement
 	private final float wallUpdateStep = 100;
 	private float mLastTouchX;
-	private float mPosX; // TODO: Remove (debug)
 	private float mLastTouchY;
 	private int mWallPreviewType;
-	public boolean placingWall = false;
 
 
 	// Graphics
@@ -60,7 +61,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	GButton mToggleWallTypeButton;
 	GButton mPlaceWallButton;
 	GButton mConfirmWallButton;
+	GButton mNewGameButton;
 	List<GButton> mGButtons = new ArrayList<>();
+
+	// State
+	public boolean placingWall = false;
+	public boolean gamePaused = false;
 
 	// Temp
 	String message = "";
@@ -79,7 +85,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		}
 
 		mGame = new Quoridor();
-		mGameThread = new GameThread(getHolder(), this);
+		setFocusable(true);
+	}
+
+	public GameView(Context context, String id, String state) {
+		super(context);
+
+		getHolder().addCallback(this);
+
+		JSONObject stateJSON;
+		try {
+			stateJSON = new JSONObject(state);
+			mGame = new Quoridor(id, stateJSON);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
 		setFocusable(true);
 	}
 
@@ -92,15 +113,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
 
+		if (gamePaused) mQuoridorDrawer.setBlink(false);
+		else mQuoridorDrawer.setBlink(true);
+
 		mQuoridorDrawer.draw(canvas, mGame);
 
 		// Temp
 		Paint textPaint = new Paint();
 		textPaint.setColor(Color.WHITE);
 		textPaint.setTextSize(48);
-		canvas.drawText("DEBUG: mPosX = " + mPosX, 400, mSurfaceHeight - 150, textPaint);
-		canvas.drawText("DEBUG: mLastTouchX = " + mLastTouchX, 400, mSurfaceHeight - 100, textPaint);
-		canvas.drawText("DEBUG: message = " + message, 400, mSurfaceHeight - 50, textPaint);
+		// canvas.drawText("DEBUG: gamePause = " + gamePaused, 400, mSurfaceHeight - 150, textPaint);
+		// canvas.drawText("DEBUG: message = " + message, 400, mSurfaceHeight - 50, textPaint);
 
 		for (GButton gButton : mGButtons) {
 			gButton.draw(canvas);
@@ -169,19 +192,31 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		});
 		mConfirmWallButton.setVisible(false);
 
+		mNewGameButton = new GButton("New Game", 300, 150, mSurfaceWidth - 450, mSurfaceHeight - 300, mButtonBackgroundColor, Color.GREEN);
+		mNewGameButton.setOnClickAction(new GButton.onClickAction() {
+			@Override
+			public void onClick(GameView gameView) {
+				gameView.startNewGame();
+				mNewGameButton.setVisible(false);
+			}
+		});
+		mNewGameButton.setVisible(false);
+
+
 		// Register buttons
 		mGButtons.add(mPlaceWallButton);
 		mGButtons.add(mToggleWallTypeButton);
 		mGButtons.add(mConfirmWallButton);
+		mGButtons.add(mNewGameButton);
 
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
+		mGameThread = new GameThread(getHolder(), this);
 		mGameThread.setRunning(true);
 		mGameThread.start();
 
-		mGame = new Quoridor(null);
 	}
 
 	@Override
@@ -191,10 +226,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			try {
 				mGameThread.setRunning(false);
 				mGameThread.join();
+				retry = false;
+				Log.i("GameThread", "surfaceDestroyed: thread killed");
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			retry = false;
 		}
 	}
 
@@ -209,14 +245,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
 				// Check if button is pressed
-				if (mPlaceWallButton.isInRect(x, y)) {
+				if (mPlaceWallButton.isInRect(x, y) && !gamePaused) {
 					mPlaceWallButton.mOnClickAction.onClick(this);
 				} else if (mToggleWallTypeButton.isInRect(x, y)) {
 					mToggleWallTypeButton.mOnClickAction.onClick(this);
 				} else if (mConfirmWallButton.isInRect(x, y)) {
 					mConfirmWallButton.mOnClickAction.onClick(this);
+				} else if (mNewGameButton.isInRect(x, y)) {
+					mNewGameButton.mOnClickAction.onClick(this);
 				} else {
-					if (!placingWall) {
+					if (!placingWall && !gamePaused) {
 						int[] possibleCellCoordinates;
 						possibleCellCoordinates = mQuoridorDrawer.getCellCorrespondingToTouch(x, y);
 						if (possibleCellCoordinates != null)
@@ -233,8 +271,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			case MotionEvent.ACTION_MOVE: {
 				float posX = event.getX();
 				float posY = event.getY();
-				mPosX = posX;
-
 
 				if (posX - mLastTouchX > wallUpdateStep) {
 					mQuoridorDrawer.offsetWallPreview(mWallPreviewType, 1, 0);
@@ -256,8 +292,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 
 		}
-
-
 		return true;
 	}
 
@@ -265,15 +299,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		// Logic
 		try {
 			mGame.requestPlayerMovement(playerNumber, x, y);
+			gamePaused = true;
 			postMoveAndGetNewState(apiBaseUrl + "jouer/", mGame.mGameID, mGame.mLastMoveType, mGame.mLastMoveCoordinates);
 		} catch (QuoridorException | IOException e) {
 			message = e.getMessage();
 			return;
 		}
-		// Display
+	}
+
+	public void refreshHover() {
 		mQuoridorDrawer.resetHoverPositions();
 		mQuoridorDrawer.hoverCells(mGame.getPossibleNextCoordinates(1, false));
-
 	}
 
 	public void initiateWallPlacement(int wallType) {
@@ -282,16 +318,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mQuoridorDrawer.setWallPreview(wallType, 5, 5);
 	}
 
-	public String postMoveAndGetResponse() {
-		return "";
-	}
-
 	public void finalizeWallPlacement() {
 
 		int[] coordinates = mQuoridorDrawer.getWallPreviewCoordinates();
 
 		try {
 			tryToPlaceWall(1, mWallPreviewType,coordinates[0], coordinates[1]);
+			gamePaused = true;
 			postMoveAndGetNewState(apiBaseUrl + "jouer/", mGame.mGameID, mGame.mLastMoveType, mGame.mLastMoveCoordinates);
 		} catch (QuoridorException | IOException e) {
 			message = "Could not place wall";
@@ -370,6 +403,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 						}
 						String data =  response.body().string();
 						setNewGame(data);
+						gamePaused = false;
+						refreshHover();
 					}
 				});
 	}
@@ -400,10 +435,46 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 						}
 						String data =  response.body().string();
 						setGameState(data);
+						gamePaused = false;
+						refreshHover();
+						checkForWin();
 					}
 				});
 	}
 
+	public void checkForWin() {
+		int possibleWinner = mGame.getWinnerPlayerNumberOrZero();
+		if (possibleWinner == 1) initGameWin();
+		else if (possibleWinner == 2) initGameLoss();
+	}
+
+	public void initGameLoss() {
+		gamePaused = true;
+		mQuoridorDrawer.setConsoleMessageColor(Color.RED);
+		mQuoridorDrawer.setConsoleMessage("YOU LOST!!");
+		mNewGameButton.setVisible(true);
+
+	}
+
+	public void initGameWin() {
+		gamePaused = true;
+		mQuoridorDrawer.setConsoleMessageColor(Color.GREEN);
+		mQuoridorDrawer.setConsoleMessage("YOU WON!");
+		mNewGameButton.setVisible(true);
+	}
+
+	public void startNewGame() {
+		try {
+			fetchNewGameFromServer(apiBaseUrl + "débuter/", "simar86");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		mQuoridorDrawer.setConsoleMessage("");
+	}
+
+	public String getGameStateJSONString() {
+		return mGame.getGameStateJSON().toString();
+	}
 
 
 }

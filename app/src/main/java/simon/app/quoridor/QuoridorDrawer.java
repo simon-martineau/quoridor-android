@@ -25,9 +25,14 @@ public class QuoridorDrawer {
 	private boolean drawWallPreview = false;
 	private final int wallBlinkDelay = 8;
 
+	// Console
+	private String mConsoleMessage = "";
+	private boolean isConsoleMessageTimed = false;
+	private int consoleMessageTimer = 0;
 
 
 	//// Colors
+	public int consoleMessageColor = Color.GREEN;
 	public int wallPreviewColor = Color.GREEN;
 	public int hoverColor = 0x3f001eff;
 	public int wrapperColor = Color.WHITE;
@@ -91,20 +96,37 @@ public class QuoridorDrawer {
 		canvas.drawText("Walls left: " + quoridorGame.mPlayerOneWallsLeft, mX + 24, mY + 128, playerOneInfoPaint);
 		canvas.drawText("Walls left: " + quoridorGame.mPlayerTwoWallsLeft, mX + getWidth() - 24, mY + 128, playerTwoInfoPaint);
 
+		Paint consolePaint = new Paint();
+		consolePaint.setColor(consoleMessageColor);
+		consolePaint.setTextSize(84);
+		consolePaint.setTextAlign(Paint.Align.CENTER);
+		canvas.drawText(mConsoleMessage, mX + getWidth() / 2.0f, mY + 192, consolePaint);
+		if (isConsoleMessageTimed) {
+			consoleMessageTimer--;
+			if (consoleMessageTimer <= 0) {
+				consoleMessageTimer = 0;
+				isConsoleMessageTimed = false;
+				mConsoleMessage = "";
+			}
+		}
+
+
 		// Players
 		drawPlayer(canvas, 1, quoridorGame.mPlayerOnePosition[0], quoridorGame.mPlayerOnePosition[1]);
 		drawPlayer(canvas, 2, quoridorGame.mPlayerTwoPosition[0], quoridorGame.mPlayerTwoPosition[1]);
 
 		// Hover cells
-		if (drawHover) {
-			for (int[] coordinates : hoverPositions) {
-				drawHover(canvas, coordinates[0], coordinates[1]);
+		if (blink) {
+			if (drawHover) {
+				for (int[] coordinates : hoverPositions) {
+					drawHover(canvas, coordinates[0], coordinates[1]);
+				}
 			}
-		}
-		blinkTimer--;
-		if (blinkTimer <= 0) {
-			blinkTimer = blinkDelay;
-			drawHover = !drawHover;
+			blinkTimer--;
+			if (blinkTimer <= 0) {
+				blinkTimer = blinkDelay;
+				drawHover = !drawHover;
+			}
 		}
 
 		// Grid
@@ -349,5 +371,19 @@ public class QuoridorDrawer {
 		} else {
 			return null;
 		}
+	}
+
+	public void setConsoleMessage(String message) {
+		mConsoleMessage = message;
+	}
+
+	public void setConsoleMessageColor(int color) {
+		consoleMessageColor = color;
+	}
+
+	public void setConsoleMessageWithDuration(String message, int duration) {
+		mConsoleMessage = message;
+		consoleMessageTimer = duration;
+		isConsoleMessageTimed = true;
 	}
 }
