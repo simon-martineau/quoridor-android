@@ -11,10 +11,25 @@ import java.util.List;
 public class QuoridorDrawer {
 
 	//// Logic
-	public List<int[]> hoverPositions = new ArrayList<>();
+	// Hover cells and blinking
+	private List<int[]> hoverPositions = new ArrayList<>();
+	private boolean drawHover = false; // If true, hover is drawn (used for blinking)
+	private final int blinkDelay = 30;
+	private int blinkTimer = 0;
+	private boolean blink = true;
+
+	// Wall preview (wall placement)
+	public int[] verticalWallPreview = null;
+	public int[] horizontalWallPreview = null;
+	private int wallBlinkTimer = 0;
+	private boolean drawWallPreview = false;
+	private final int wallBlinkDelay = 8;
+
+
 
 	//// Colors
-	public int hoverColor = 0x6A347836;
+	public int wallPreviewColor = Color.GREEN;
+	public int hoverColor = 0x3f001eff;
 	public int wrapperColor = Color.WHITE;
 	public int backgroundColor = Color.BLACK;
 	public int gridColor = Color.rgb(50, 50, 50);
@@ -81,8 +96,15 @@ public class QuoridorDrawer {
 		drawPlayer(canvas, 2, quoridorGame.mPlayerTwoPosition[0], quoridorGame.mPlayerTwoPosition[1]);
 
 		// Hover cells
-		for (int[] coordinates : hoverPositions) {
-			drawHover(canvas, coordinates[0], coordinates[1]);
+		if (drawHover) {
+			for (int[] coordinates : hoverPositions) {
+				drawHover(canvas, coordinates[0], coordinates[1]);
+			}
+		}
+		blinkTimer--;
+		if (blinkTimer <= 0) {
+			blinkTimer = blinkDelay;
+			drawHover = !drawHover;
 		}
 
 		// Grid
@@ -92,6 +114,31 @@ public class QuoridorDrawer {
 		drawWalls(canvas, quoridorGame.mHorizontalWalls, Quoridor.HORIZONTAL);
 		drawWalls(canvas, quoridorGame.mVerticalWalls, Quoridor.VERTICAL);
 
+		// Wall preview
+		if (verticalWallPreview != null) {
+			if (drawWallPreview)
+				drawWallPreview(canvas, verticalWallPreview, Quoridor.VERTICAL);
+			wallBlinkTimer--;
+			if (wallBlinkTimer < 0) {
+				drawWallPreview = !drawWallPreview;
+				wallBlinkTimer = wallBlinkDelay;
+			}
+		} else if (horizontalWallPreview != null) {
+			if (drawWallPreview)
+				drawWallPreview(canvas, horizontalWallPreview, Quoridor.HORIZONTAL);
+			wallBlinkTimer--;
+			if (wallBlinkTimer < 0) {
+				drawWallPreview = !drawWallPreview;
+				wallBlinkTimer = wallBlinkDelay;
+			}
+		}
+
+	}
+
+	public void hoverCells(List<int[]> positions) {
+		for (int[] coordinates : positions) {
+			addHoverPosition(coordinates[0],coordinates[1]);
+		}
 	}
 
 	public void addHoverPosition(int x, int y) {
@@ -125,15 +172,15 @@ public class QuoridorDrawer {
 
 		if (wallType == Quoridor.HORIZONTAL) {
 			for (int[] coordinates : walls) {
-				canvas.drawLine(beginX + (coordinates[0] - 1)*cellSize, beginY +(coordinates[1] - 1)*cellSize,
-						beginX + (coordinates[0] + 1)*cellSize, beginY + (coordinates[1] - 1)*cellSize, wallPaint);
+				canvas.drawLine(beginX + (coordinates[0] - 1)*cellSize, beginY +(10 - coordinates[1])*cellSize,
+						beginX + (coordinates[0] + 1)*cellSize, beginY + (10 - coordinates[1])*cellSize, wallPaint);
 			}
 		}
 
 		if (wallType == Quoridor.VERTICAL) {
 			for (int[] coordinates : walls) {
-				canvas.drawLine(beginX + (coordinates[0] - 1)*cellSize, beginY + (coordinates[1] - 1)*cellSize,
-						beginX + (coordinates[0] - 1)*cellSize, beginY + (coordinates[1] + 1)*cellSize, wallPaint);
+				canvas.drawLine(beginX + (coordinates[0] - 1)*cellSize, beginY + (9 - (coordinates[1] - 1))*cellSize,
+						beginX + (coordinates[0] - 1)*cellSize, beginY + (9 - (coordinates[1] + 1))*cellSize, wallPaint);
 			}
 		}
 
@@ -194,5 +241,113 @@ public class QuoridorDrawer {
 		canvas.drawLine(beginX + 9*cellSize, beginY, beginX + 9*cellSize, beginY + 9*cellSize, borderGridPaint);
 		canvas.drawLine(beginX, beginY, beginX + 9*cellSize, beginY, borderGridPaint);
 		canvas.drawLine(beginX, beginY + 9*cellSize, beginX + 9*cellSize, beginY + 9*cellSize, borderGridPaint);
+	}
+
+	public void setBlink(boolean blink) {
+		this.blink = blink;
+	}
+
+	private void drawWallPreview(Canvas canvas, int[] coordinates, int wallType) {
+		float beginX = mX + gridMargin;
+		float beginY = mY + headerHeight;
+
+		Paint PreviewWallPaint = new Paint();
+		PreviewWallPaint.setColor(wallPreviewColor);
+		PreviewWallPaint.setAlpha(150);
+		PreviewWallPaint.setStrokeWidth(cellBorderWidth);
+
+		if (wallType == Quoridor.HORIZONTAL) {
+			canvas.drawLine(beginX + (coordinates[0] - 1)*cellSize, beginY +(10 - coordinates[1])*cellSize,
+					beginX + (coordinates[0] + 1)*cellSize, beginY + (10 - coordinates[1])*cellSize, PreviewWallPaint);
+		}
+
+		if (wallType == Quoridor.VERTICAL) {
+				canvas.drawLine(beginX + (coordinates[0] - 1)*cellSize, beginY + (9 - (coordinates[1] - 1))*cellSize,
+						beginX + (coordinates[0] - 1)*cellSize, beginY + (9 - (coordinates[1] + 1))*cellSize, PreviewWallPaint);
+			}
+
+
+	}
+
+	public void clearWallPreview() {
+		horizontalWallPreview = null;
+		verticalWallPreview = null;
+	}
+
+	public void offsetWallPreview(int wallType, int xOffset, int yOffset) {
+		if (wallType == Quoridor.HORIZONTAL) {
+			if (horizontalWallPreview != null) {
+				int nextXValue = horizontalWallPreview[0] + xOffset;
+				int nextYValue = horizontalWallPreview[1] + yOffset;
+
+				if (nextXValue < 1) nextXValue = 1;
+				if (nextXValue > 8) nextXValue = 8;
+				if (nextYValue < 2) nextYValue = 2;
+				if (nextYValue > 9) nextYValue = 9;
+
+				horizontalWallPreview[0] = nextXValue;
+				horizontalWallPreview[1] = nextYValue;
+			}
+		} else if (wallType == Quoridor.VERTICAL) {
+			if (verticalWallPreview != null) {
+				int nextXValue = verticalWallPreview[0] + xOffset;
+				int nextYValue = verticalWallPreview[1] + yOffset;
+
+				if (nextXValue < 2) nextXValue = 2;
+				if (nextXValue > 9) nextXValue = 9;
+				if (nextYValue < 1) nextYValue = 1;
+				if (nextYValue > 8) nextYValue = 8;
+
+				verticalWallPreview[0] = nextXValue;
+				verticalWallPreview[1] = nextYValue;
+			}
+		}
+		// Reset blink timer
+		wallBlinkTimer = wallBlinkDelay;
+		drawWallPreview = true;
+	}
+
+	public void setWallPreview(int wallType, int x, int y) {
+		if (wallType == Quoridor.HORIZONTAL) {
+			verticalWallPreview = null;
+			horizontalWallPreview = new int[]{x, y};
+		}
+		if (wallType == Quoridor.VERTICAL) {
+			horizontalWallPreview = null;
+			verticalWallPreview = new int[]{x, y};
+		}
+		wallBlinkTimer = wallBlinkDelay;
+		drawWallPreview = true;
+	}
+
+	public int[] getCellCorrespondingToTouch(int x, int y) {
+		float beginX = mX + gridMargin;
+		float beginY = mY + headerHeight;
+		float endX = beginX + cellSize*9;
+		float endY = beginY + cellSize*9;
+
+		if (x < beginX || x > endX || y < beginY || y > endY) {
+			return null;
+		} else {
+			int[] cellCoordinates = new int[2];
+			cellCoordinates[0] = 1 + (x - (int) beginX) / cellSize;
+			cellCoordinates[1] = 9 - (y - (int) beginY) / cellSize;
+			return cellCoordinates;
+		}
+
+	}
+
+	public int getBottom() {
+		return (int) (mY + getHeight());
+	}
+
+	public int[] getWallPreviewCoordinates() {
+		if (horizontalWallPreview != null) {
+			return horizontalWallPreview;
+		} else if (verticalWallPreview != null) {
+			return verticalWallPreview;
+		} else {
+			return null;
+		}
 	}
 }

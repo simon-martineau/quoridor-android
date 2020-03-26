@@ -9,7 +9,7 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 
 public class MainActivity extends Activity {
-	private GameView mGameView;
+	public GameView mGameView;
 
 	@SuppressLint("SourceLockedOrientationActivity")
 	@Override

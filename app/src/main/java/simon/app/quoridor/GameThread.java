@@ -10,16 +10,28 @@ public class GameThread extends Thread {
 	private boolean running;
 	private static Canvas mCanvas;
 
+	double averageFPS;
+	int mTargetFPS = 30;
+
 
 	public GameThread(SurfaceHolder holder, GameView gameView) {
+		super();
 		mSurfaceHolder = holder;
 		mGameView = gameView;
 	}
 
 	@Override
 	public void run() {
+		long startTime;
+		long timeMillis;
+		long waitTime;
+		long totalTime = 0;
+		int frameCount = 0;
+		long targetTime = 1000 / mTargetFPS;
 
 		while (running) {
+
+			startTime = System.nanoTime();
 
 			mCanvas = null;
 			try {
@@ -36,6 +48,24 @@ public class GameThread extends Thread {
 						e.printStackTrace();
 					}
 				}
+			}
+
+
+
+
+			timeMillis = (System.nanoTime() - startTime) / 1000000;
+			waitTime = targetTime - timeMillis;
+
+			try {
+				this.sleep(waitTime);
+			} catch (Exception e) { }
+
+			totalTime += System.nanoTime() - startTime;
+			frameCount++;
+			if (frameCount == mTargetFPS) {
+				averageFPS = 1000 / ((totalTime / (float) frameCount) / 1000000f);
+				frameCount = 0;
+				totalTime = 0;
 			}
 
 

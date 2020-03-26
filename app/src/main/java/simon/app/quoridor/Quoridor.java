@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +35,12 @@ public class Quoridor {
 	String mPlayerTwoName = "";
 	List<int[]> mHorizontalWalls = new ArrayList<>();
 	List<int[]> mVerticalWalls = new ArrayList<>();
+	String mLastMoveType = "";
+	String mLastMoveCoordinates = "";
+
+	public Quoridor() {
+
+	}
 
 
 	public Quoridor(@Nullable String gameID) {
@@ -49,6 +56,15 @@ public class Quoridor {
 
 	public void setGameID(String gameID) {
 		mGameID = gameID;
+	}
+
+	public void movePlayer(int playerNumber, int x, int y) {
+		if (playerNumber == 1)
+			mPlayerOnePosition = new int[]{x, y};
+		else
+			mPlayerTwoPosition = new int[]{x, y};
+		mLastMoveType = "D";
+		mLastMoveCoordinates = "(" + x + ", " + y + ")";
 	}
 
 	public void placeWall(int player, int type, int x, int y) {
@@ -68,6 +84,12 @@ public class Quoridor {
 		} else if (player == 2) {
 			mPlayerTwoWallsLeft--;
 		}
+		if (type == HORIZONTAL)
+			mLastMoveType = "MH";
+		else
+			mLastMoveType = "MV";
+		mLastMoveCoordinates = "(" + x + ", " + y + ")";
+
 
 	}
 
@@ -176,7 +198,7 @@ public class Quoridor {
 			}
 
 		} catch	(Exception e) {
-			Log.e(TAG, "parseJSON: Error parsing players");
+			Log.e(TAG, "parseJSON: Error parsing players. Object: " + gameState.toString());
 			e.printStackTrace();
 		}
 
@@ -231,5 +253,170 @@ public class Quoridor {
 		}
 	}
 
+	public void requestPlayerMovement(int playerNumber, int x, int y) throws QuoridorException {
+		int[] coordinates = new int[]{x, y};
+		List<int[]> possibleNextCoordinates = getPossibleNextCoordinates(playerNumber, false);
+		if (positionIncluded(coordinates, possibleNextCoordinates)) {
+			movePlayer(playerNumber, x, y);
+		} else {
+			throw new QuoridorException("Invalid movement request at (" + x + ", " + y + ")");
+		}
+
+	}
+
+	public void requestWallPlacement(int playerNumber, int wallType, int x, int y) throws QuoridorException {
+		int[] coordinates = new int[]{x, y};
+		List<int[]> invalidWallCoordinates = getInvalidWallCoordinates(wallType);
+
+		if (!positionIncluded(coordinates, invalidWallCoordinates)) {
+			placeWall(playerNumber, wallType, x, y);
+		} else {
+			throw new QuoridorException("Invalid wall placement request");
+		}
+	}
+
+	public List<int[]> getInvalidWallCoordinates(int wallType) {
+		List<int[]> invalidWallCoordinates = new ArrayList<>();
+
+		if (wallType == HORIZONTAL) {
+			for (int[] coordinates : mHorizontalWalls) {
+				invalidWallCoordinates.add(new int[]{coordinates[0] - 1, coordinates[1]});
+				invalidWallCoordinates.add(new int[]{coordinates[0], coordinates[1]});
+				invalidWallCoordinates.add(new int[]{coordinates[0] + 1, coordinates[1]});
+			}
+			for (int[] coordinates : mVerticalWalls) {
+				invalidWallCoordinates.add(new int[]{coordinates[0] - 1, coordinates[1] + 1});
+			}
+		} else {
+			for (int[] coordinates : mVerticalWalls) {
+				invalidWallCoordinates.add(new int[]{coordinates[0], coordinates[1] - 1});
+				invalidWallCoordinates.add(new int[]{coordinates[0], coordinates[1]});
+				invalidWallCoordinates.add(new int[]{coordinates[0], coordinates[1] + 1});
+			}
+			for (int[] coordinates : mHorizontalWalls) {
+				invalidWallCoordinates.add(new int[]{coordinates[0] + 1, coordinates[1] - 1});
+			}
+		}
+
+		return invalidWallCoordinates;
+	}
+
+	public List<int[]> getPossibleNextCoordinates(int playerNumber, boolean ignoreOtherPlayerJump) {
+		List<int[]> possibleNextCoordinates = new ArrayList<>();
+		int playerX;
+		int playerY;
+		int otherPlayerX;
+		int otherPlayerY;
+		int otherPlayerNumber;
+
+		if (playerNumber == 1) {
+			playerX = mPlayerOnePosition[0];
+			playerY = mPlayerOnePosition[1];
+			otherPlayerX = mPlayerTwoPosition[0];
+			otherPlayerY = mPlayerTwoPosition[1];
+			otherPlayerNumber = 2;
+
+		} else {
+			playerX = mPlayerTwoPosition[0];
+			playerY = mPlayerTwoPosition[1];
+			otherPlayerX = mPlayerOnePosition[0];
+			otherPlayerY = mPlayerOnePosition[1];
+			otherPlayerNumber = 1;
+		}
+
+		// Up
+		if (playerY < 9) {
+			if (!(isHorizontalWall(playerX - 1, playerY + 1) || isHorizontalWall(playerX, playerY + 1))) {
+				// There is no wall
+				if (playerX == otherPlayerX && playerY + 1 == otherPlayerY) {
+					// Other player is there
+					if (!ignoreOtherPlayerJump) {
+						possibleNextCoordinates.addAll(getPossibleNextCoordinates(otherPlayerNumber, true));
+					} // Else do nothing
+
+				} else {
+					// Other player is not there, add position
+					possibleNextCoordinates.add(new int[]{playerX, playerY + 1});
+				}
+			}
+		}
+
+		// Down
+		if (playerY > 1) {
+			if (!(isHorizontalWall(playerX - 1, playerY) || isHorizontalWall(playerX, playerY))) {
+				// There is no wall
+				if (playerX == otherPlayerX && playerY - 1 == otherPlayerY) {
+					// Other player is there
+					if (!ignoreOtherPlayerJump) {
+						possibleNextCoordinates.addAll(getPossibleNextCoordinates(otherPlayerNumber, true));
+					} // Else do nothing
+				} else {
+					// Other player is not there, add position
+					possibleNextCoordinates.add(new int[]{playerX, playerY - 1});
+				}
+			}
+		}
+
+		// Left
+		if (playerX > 1) {
+			if (!(isVerticalWall(playerX, playerY) || isVerticalWall(playerX, playerY - 1))) {
+				// There is no wall
+				if (playerY == otherPlayerY && playerX - 1 == otherPlayerX) {
+					// Other player is there
+					if (!ignoreOtherPlayerJump) {
+						possibleNextCoordinates.addAll(getPossibleNextCoordinates(otherPlayerNumber, true));
+					} // Else do nothing
+				} else {
+					// Other player is not there, add position
+					possibleNextCoordinates.add(new int[]{playerX - 1, playerY});
+				}
+			}
+		}
+
+		// Right
+		if (playerX < 9) {
+			if (!(isVerticalWall(playerX + 1, playerY) || isVerticalWall(playerX + 1, playerY - 1))) {
+				// There is no wall
+				if (playerY == otherPlayerY && playerX + 1 == otherPlayerX) {
+					// Other player is there
+					if (!ignoreOtherPlayerJump) {
+						possibleNextCoordinates.addAll(getPossibleNextCoordinates(otherPlayerNumber, true));
+					} // Else do nothing
+				} else {
+					// Other player is not there, add position
+					possibleNextCoordinates.add(new int[]{playerX + 1, playerY});
+				}
+			}
+		}
+
+		return possibleNextCoordinates;
+	}
+
+
+	private boolean isHorizontalWall(int x, int y) {
+		boolean isWall = false;
+		for (int[] wall : mHorizontalWalls) {
+			if (wall[0] == x && wall[1] == y) isWall = true;
+		}
+		return isWall;
+	}
+
+	private boolean isVerticalWall(int x, int y) {
+		boolean isWall = false;
+		for (int[] wall : mVerticalWalls) {
+			if (wall[0] == x && wall[1] == y) isWall = true;
+		}
+		return isWall;
+	}
+
+	private static boolean positionIncluded(int[] position, List<int[]> positionArrayList) {
+		boolean included = false;
+
+		for (int[] positionInArray : positionArrayList) {
+			if (position[0] == positionInArray[0] && position[1] == positionInArray[1]) included = true;
+		}
+
+		return included;
+	}
 
 }
