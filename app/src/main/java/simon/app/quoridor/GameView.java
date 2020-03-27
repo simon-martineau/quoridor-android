@@ -188,9 +188,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false));
 
 		mPlaceWallButton = new GButton("Place a wall", 300, 150, 100, mQuoridorView.getBottom() + 64, mButtonBackgroundColor, Color.GREEN);
-		mPlaceWallButton.setOnClickAction(new GButton.onClickAction() {
+		mPlaceWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(GameView gameView) {
+			public void onClick(GameView gameView, int x, int y) {
 				if (!gamePaused) {
 					if (!gameView.placingWall) {
 						mToggleWallTypeButton.setVisible(true);
@@ -211,9 +211,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		});
 
 		mToggleWallTypeButton = new GButton("Horizontal", 300, 150, 475, mQuoridorView.getBottom() + 64, mButtonBackgroundColor, Color.WHITE);
-		mToggleWallTypeButton.setOnClickAction(new GButton.onClickAction() {
+		mToggleWallTypeButton.setOnClickAction(new GView.onClickAction() {
+
 			@Override
-			public void onClick(GameView gameView) {
+			public void onClick(GameView gameView, int x, int y) {
 				gameView.cancelWallPlacement();
 				if (mToggleWallTypeButton.getText().equals("Horizontal"))
 				{
@@ -229,9 +230,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 
 		mConfirmWallButton = new GButton("Confirm", 300, 150, 850, mQuoridorView.getBottom() + 64, mButtonBackgroundColor, Color.GREEN);
-		mConfirmWallButton.setOnClickAction(new GButton.onClickAction() {
+		mConfirmWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(GameView gameView) {
+			public void onClick(GameView gameView, int x, int y) {
 				gameView.finalizeWallPlacement();
 				mToggleWallTypeButton.setVisible(false);
 				mConfirmWallButton.setVisible(false);
@@ -243,9 +244,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mConfirmWallButton.setVisible(false);
 
 		mNewGameButton = new GButton("New Game", 300, 150, mSurfaceWidth - 450, mSurfaceHeight - 300, mButtonBackgroundColor, Color.GREEN);
-		mNewGameButton.setOnClickAction(new GButton.onClickAction() {
+		mNewGameButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(GameView gameView) {
+			public void onClick(GameView gameView, int x, int y) {
 				gameView.startNewGame();
 				mNewGameButton.setVisible(false);
 			}
@@ -288,7 +289,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	private void dispatchTouchToViews(int x, int y) {
 		for (GButton b : mGButtons) {
 			if (b.isInRect(x, y)) {
-				b.mOnClickAction.onClick(this);
+				b.performClick(this, x, y);
 				return;
 			}
 		}

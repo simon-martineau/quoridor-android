@@ -72,9 +72,9 @@ public class MainActivity extends Activity {
 	}
 }
 
-// TODO: Implement better touch event routing
-// TODO: Add "Abandon" button
+// TODO: Merge all custom views in mother class
 // TODO: Add modal prompt class
+// TODO: Add "Abandon" button
 // TODO: Use modal prompt to confirm choice on abandon button
 
 
