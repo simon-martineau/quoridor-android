@@ -56,7 +56,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 
 	// Graphics
-	private int mSurfaceWidth, mSurfaceHeight;
 	public QuoridorView mQuoridorView;
 
 	// Colors
@@ -150,13 +149,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		if (gamePaused) mQuoridorView.setBlink(false);
 		else mQuoridorView.setBlink(true);
 
-		mQuoridorView.draw(canvas, mGame);
+		mQuoridorView.draw(canvas);
 
 		// Temp
 		Paint textPaint = new Paint();
 		textPaint.setColor(Color.WHITE);
 		textPaint.setTextSize(48);
-		// canvas.drawText("DEBUG: gamePause = " + gamePaused, 400, mSurfaceHeight - 150, textPaint);
+		canvas.drawText("DEBUG: newGameButton.isVisible() = " + mNewGameButton.isVisible(), 400, getHeight() - 150, textPaint);
 		// canvas.drawText("DEBUG: message = " + message, 400, mSurfaceHeight - 50, textPaint);
 
 		for (GButton gButton : mGButtons) {
@@ -169,10 +168,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		mBackgroundMusicPlayer.start();
 
-		mSurfaceWidth = width;
-		mSurfaceHeight = height;
-
-		mQuoridorView = new QuoridorView(mSurfaceWidth);
+		mQuoridorView = new QuoridorView(mGame, 50, 50, width);
 		mQuoridorView.setOnClickAction(new QuoridorView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
@@ -184,7 +180,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 				}
 			}
 		});
-
 		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false));
 
 		mPlaceWallButton = new GButton("Place a wall", 300, 150, 100, mQuoridorView.getBottom() + 64, mButtonBackgroundColor, Color.GREEN);
@@ -243,7 +238,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		});
 		mConfirmWallButton.setVisible(false);
 
-		mNewGameButton = new GButton("New Game", 300, 150, mSurfaceWidth - 450, mSurfaceHeight - 300, mButtonBackgroundColor, Color.GREEN);
+		mNewGameButton = new GButton("New Game", 300, 150, getWidth() - 450, getHeight() - 300, mButtonBackgroundColor, Color.GREEN);
 		mNewGameButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
@@ -294,10 +289,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		}
 		if (mQuoridorView.isInRect(x, y)) {
-			mQuoridorView.mOnClickAction.onClick(this, x, y);
+			mQuoridorView.performClick(this, x, y);
 		}
 	}
-
 
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
@@ -415,6 +409,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		}
 
 		mGame = new Quoridor(gameID, state);
+		// TODO: verify the need of this
+		mQuoridorView.linkQuoridorGame(mGame);
 	}
 
 	private void setGameState(String serverResponse) {

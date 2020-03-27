@@ -8,9 +8,12 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuoridorView {
+public class QuoridorView extends GView {
+	// TODO: Change colors into constants
 
-	//// Logic
+	// Linked quoridorGame
+	private Quoridor mQuoridor;
+
 	// Hover cells and blinking
 	private List<int[]> hoverPositions = new ArrayList<>();
 	private boolean drawHover = false; // If true, hover is drawn (used for blinking)
@@ -30,13 +33,6 @@ public class QuoridorView {
 	private boolean isConsoleMessageTimed = false;
 	private int consoleMessageTimer = 0;
 
-	// Action
-	public onClickAction mOnClickAction;
-
-	// Visible
-	public boolean visible = true;
-
-
 	//// Colors
 	public int consoleMessageColor = Color.GREEN;
 	public int wallPreviewColor = Color.GREEN;
@@ -49,42 +45,45 @@ public class QuoridorView {
 	public int playerOneColor = Color.BLUE;
 	public int playerTwoColor = Color.RED;
 
-	//// Dimensions
 	// Margins
 	public int gridMargin = 64;
-
 	public int headerHeight = 250;
-
 	public int cellSize;
 	public int cellBorderWidth = 12;
 	public int wrapperWidth = 5;
-	public float mX = 50;
-	public float mY = 50;
 
-	public QuoridorView(int width) {
+
+
+	// TODO: Implement flexibility in constructor
+	public QuoridorView(Quoridor quoridor, int x, int y, int width) {
+		super(x, y);
+		mQuoridor = quoridor;
 		cellSize = (int) ((width - (gridMargin*2 + wrapperWidth*2 + cellBorderWidth*10)) / 9.0);
 	}
 
+	@Override
 	public int getWidth() {
 		return cellSize * 9 + gridMargin * 2 + wrapperWidth * 2;
 	}
 
+	@Override
 	public int getHeight() {
 		return cellSize * 9 + gridMargin * 2 + wrapperWidth * 2 + headerHeight;
 	}
 
-	public void draw(Canvas canvas, Quoridor quoridorGame) {
+	@Override
+	public void draw(Canvas canvas) {
 		// Background
 		Paint backgroundPaint = new Paint();
 		backgroundPaint.setColor(backgroundColor);
-		canvas.drawRect(mX, mY, mX + getWidth(), mY + getHeight(), backgroundPaint);
+		canvas.drawRect(getLeft(), getTop(), getRight(), getBottom(), backgroundPaint);
 
 		// Wrapper
 		Paint wrapperPaint = new Paint();
 		wrapperPaint.setColor(wrapperColor);
 		wrapperPaint.setStyle(Paint.Style.STROKE);
 		wrapperPaint.setStrokeWidth(wrapperWidth);
-		canvas.drawRect(mX, mY, mX + getWidth(), mY + getHeight(), wrapperPaint);
+		canvas.drawRect(getLeft(), getTop(), getRight(), getBottom(), wrapperPaint);
 
 		// Header
 		Paint playerOneInfoPaint = new Paint();
@@ -97,16 +96,16 @@ public class QuoridorView {
 		playerTwoInfoPaint.setTextSize(48);
 		playerTwoInfoPaint.setTextAlign(Paint.Align.RIGHT);
 
-		canvas.drawText("Player 1: " + quoridorGame.mPlayerOneName, mX + 24, mY + 64, playerOneInfoPaint);
-		canvas.drawText("Player 2: " + quoridorGame.mPlayerTwoName, mX + getWidth() - 24, mY + 64, playerTwoInfoPaint);
-		canvas.drawText("Walls left: " + quoridorGame.mPlayerOneWallsLeft, mX + 24, mY + 128, playerOneInfoPaint);
-		canvas.drawText("Walls left: " + quoridorGame.mPlayerTwoWallsLeft, mX + getWidth() - 24, mY + 128, playerTwoInfoPaint);
+		canvas.drawText("Player 1: " + mQuoridor.mPlayerOneName, getLeft() + 24, getTop() + 64, playerOneInfoPaint);
+		canvas.drawText("Player 2: " + mQuoridor.mPlayerTwoName, getRight() - 24, getTop() + 64, playerTwoInfoPaint);
+		canvas.drawText("Walls left: " + mQuoridor.mPlayerOneWallsLeft, getLeft() + 24, getTop() + 128, playerOneInfoPaint);
+		canvas.drawText("Walls left: " + mQuoridor.mPlayerTwoWallsLeft, getRight() - 24, getTop() + 128, playerTwoInfoPaint);
 
 		Paint consolePaint = new Paint();
 		consolePaint.setColor(consoleMessageColor);
 		consolePaint.setTextSize(84);
 		consolePaint.setTextAlign(Paint.Align.CENTER);
-		canvas.drawText(mConsoleMessage, mX + getWidth() / 2.0f, mY + 192, consolePaint);
+		canvas.drawText(mConsoleMessage, getRight() / 2.0f, getTop() + 192, consolePaint);
 		if (isConsoleMessageTimed) {
 			consoleMessageTimer--;
 			if (consoleMessageTimer <= 0) {
@@ -118,8 +117,8 @@ public class QuoridorView {
 
 
 		// Players
-		drawPlayer(canvas, 1, quoridorGame.mPlayerOnePosition[0], quoridorGame.mPlayerOnePosition[1]);
-		drawPlayer(canvas, 2, quoridorGame.mPlayerTwoPosition[0], quoridorGame.mPlayerTwoPosition[1]);
+		drawPlayer(canvas, 1, mQuoridor.mPlayerOnePosition[0], mQuoridor.mPlayerOnePosition[1]);
+		drawPlayer(canvas, 2, mQuoridor.mPlayerTwoPosition[0], mQuoridor.mPlayerTwoPosition[1]);
 
 		// Hover cells
 		if (blink) {
@@ -139,8 +138,8 @@ public class QuoridorView {
 		drawGrid(canvas);
 
 		// Walls
-		drawWalls(canvas, quoridorGame.mHorizontalWalls, Quoridor.HORIZONTAL);
-		drawWalls(canvas, quoridorGame.mVerticalWalls, Quoridor.VERTICAL);
+		drawWalls(canvas, mQuoridor.mHorizontalWalls, Quoridor.HORIZONTAL);
+		drawWalls(canvas, mQuoridor.mVerticalWalls, Quoridor.VERTICAL);
 
 		// Wall preview
 		if (verticalWallPreview != null) {
@@ -183,16 +182,16 @@ public class QuoridorView {
 	private void drawHover(Canvas canvas, int x, int y) {
 		Paint hoverPaint = new Paint();
 		hoverPaint.setColor(hoverColor);
-		float left = mX + gridMargin + (x - 1)*cellSize;
-		float top = mY + headerHeight + (9 - y)*cellSize;
+		float left = getLeft() + gridMargin + (x - 1)*cellSize;
+		float top = getTop() + headerHeight + (9 - y)*cellSize;
 
 		canvas.drawRect(left, top, left + cellSize, top + cellSize, hoverPaint);
 	}
 
 
 	private void drawWalls(Canvas canvas, List<int[]> walls, int wallType) {
-		float beginX = mX + gridMargin;
-		float beginY = mY + headerHeight;
+		float beginX = getLeft() + gridMargin;
+		float beginY = getTop() + headerHeight;
 
 		Paint wallPaint = new Paint();
 		wallPaint.setColor(wallColor);
@@ -222,8 +221,8 @@ public class QuoridorView {
 			playerPaint.setColor(playerTwoColor);
 		}
 
-		float beginX = mX + gridMargin;
-		float beginY = mY + headerHeight;
+		float beginX = getLeft() + gridMargin;
+		float beginY = getTop() + headerHeight;
 		float circleX = beginX + (posX - 1)*cellSize + cellSize / 2.0f;
 		float circleY = beginY + (9 - posY)*cellSize + cellSize / 2.0f;
 		canvas.drawCircle(circleX, circleY, cellSize/4.0f, playerPaint);
@@ -238,8 +237,8 @@ public class QuoridorView {
 		gridPaint.setTextSize(48);
 
 
-		float beginX = mX + gridMargin;
-		float beginY = mY + headerHeight;
+		float beginX = getLeft() + gridMargin;
+		float beginY = getTop() + headerHeight;
 
 		// Horizontal
 		gridPaint.setTextAlign(Paint.Align.RIGHT);
@@ -276,8 +275,8 @@ public class QuoridorView {
 	}
 
 	private void drawWallPreview(Canvas canvas, int[] coordinates, int wallType) {
-		float beginX = mX + gridMargin;
-		float beginY = mY + headerHeight;
+		float beginX = getLeft() + gridMargin;
+		float beginY = getTop() + headerHeight;
 
 		Paint PreviewWallPaint = new Paint();
 		PreviewWallPaint.setColor(wallPreviewColor);
@@ -349,8 +348,8 @@ public class QuoridorView {
 	}
 
 	public int[] getCellCorrespondingToTouch(int x, int y) {
-		float beginX = mX + gridMargin;
-		float beginY = mY + headerHeight;
+		float beginX = getLeft() + gridMargin;
+		float beginY = getTop() + headerHeight;
 		float endX = beginX + cellSize*9;
 		float endY = beginY + cellSize*9;
 
@@ -365,18 +364,6 @@ public class QuoridorView {
 
 	}
 
-	public int getBottom() {
-		return (int) (mY + getHeight());
-	}
-	public int getTop() {
-		return (int) (mY);
-	}
-	public int getLeft() {
-		return (int) (mX);
-	}
-	public int getRight() {
-		return (int) (mX + getWidth());
-	}
 
 	public int[] getWallPreviewCoordinates() {
 		if (horizontalWallPreview != null) {
@@ -402,20 +389,12 @@ public class QuoridorView {
 		isConsoleMessageTimed = true;
 	}
 
-	public interface onClickAction {
-		void onClick(GameView gameView, int x, int y);
+	public void linkQuoridorGame(Quoridor quoridor) {
+		mQuoridor = quoridor;
 	}
 
-	public void setOnClickAction(onClickAction action) {
-		mOnClickAction = action;
-	}
-
-	public void setVisible(boolean isVisible) {
-		visible = isVisible;
-	}
-
-	public boolean isInRect(int x, int y) {
-		// Does not consume the event if button is visible
-		return (getLeft() < x && x < getRight() && getTop() < y && y < getBottom() && visible);
-	}
 }
+
+// TODO: Link game on new quoridor instance in GameView
+// TODO: Change click dispatch to performClick in GameView
+
