@@ -365,6 +365,14 @@ public class QuoridorView extends GView {
 				verticalWallPreview[1] = nextYValue;
 			}
 		}
+
+
+
+
+		if (isWallPreviewInvalid()) wallPreviewColor = Color.RED;
+		else wallPreviewColor = Color.GREEN;
+
+
 		// Reset blink timer
 		wallBlinkTimer = wallBlinkDelay;
 		drawWallPreview = true;
@@ -379,8 +387,29 @@ public class QuoridorView extends GView {
 			horizontalWallPreview = null;
 			verticalWallPreview = new int[]{x, y};
 		}
+		if (isWallPreviewInvalid()) wallPreviewColor = Color.RED;
+		else wallPreviewColor = Color.GREEN;
 		wallBlinkTimer = wallBlinkDelay;
 		drawWallPreview = true;
+	}
+
+	public boolean isWallPreviewInvalid() {
+		// Temporary game state to perform check
+		Quoridor tempQuoridorGame = new Quoridor(mQuoridor); // Copy constructor
+		if (horizontalWallPreview != null) {
+			if (Quoridor.positionIncluded(horizontalWallPreview, tempQuoridorGame.getInvalidWallCoordinates(Quoridor.HORIZONTAL))) return true;
+			tempQuoridorGame.placeWall(1, Quoridor.HORIZONTAL, horizontalWallPreview[0], horizontalWallPreview[1]);
+		} else if (verticalWallPreview != null) {
+			if (Quoridor.positionIncluded(verticalWallPreview, tempQuoridorGame.getInvalidWallCoordinates(Quoridor.VERTICAL))) return true;
+			tempQuoridorGame.placeWall(1, Quoridor.VERTICAL, verticalWallPreview[0], verticalWallPreview[1]);
+		} else {
+			return true;
+		}
+
+		if (tempQuoridorGame.getShortestPathToVictory(1) == null) return true;
+		if (tempQuoridorGame.getShortestPathToVictory(2) == null) return true;
+
+		return false;
 	}
 
 	public int[] getCellCorrespondingToTouch(int x, int y) {

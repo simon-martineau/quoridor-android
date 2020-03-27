@@ -419,7 +419,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	public void refreshHover() {
 		mQuoridorView.resetHoverPositions();
-		mQuoridorView.hoverCells(mGame.getShortestPathToVictory(1));
+		// mQuoridorView.hoverCells(mGame.getShortestPathToVictory(1));
 		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
 	}
 

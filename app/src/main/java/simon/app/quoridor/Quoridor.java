@@ -9,12 +9,14 @@ import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Quoridor {
@@ -42,7 +44,10 @@ public class Quoridor {
 
 	}
 
-
+	/* Copy constructor*/
+	public Quoridor(Quoridor quoridor) {
+		putGameState(quoridor.getGameStateJSON());
+	}
 
 	public Quoridor(String gameID, JSONObject initialGameState) {
 		mGameID = gameID;
@@ -136,7 +141,7 @@ public class Quoridor {
 				JSONArray currentPos = new JSONArray();
 				currentPos.put(mVerticalWalls.get(i)[0]);
 				currentPos.put(mVerticalWalls.get(i)[1]);
-				horizontalWalls.put(currentPos);
+				verticalWalls.put(currentPos);
 			}
 
 			walls.put("horizontaux", horizontalWalls);
@@ -447,7 +452,7 @@ public class Quoridor {
 		return isWall;
 	}
 
-	private static boolean positionIncluded(int[] position, List<int[]> positionArrayList) {
+	static boolean positionIncluded(int[] position, List<int[]> positionArrayList) {
 		boolean included = false;
 
 		for (int[] positionInArray : positionArrayList) {
@@ -483,6 +488,12 @@ public class Quoridor {
 		public int getF() {
 			return g + h;
 		}
+
+		@NotNull
+		@Override
+		public String toString() {
+			return Arrays.toString(position);
+		}
 	}
 
 	public List<int[]> getShortestPathToVictory(int playerNumber) { // null if none
@@ -490,6 +501,7 @@ public class Quoridor {
 		ArrayList<Node> closedNodes = new ArrayList<>();
 
 		Node baseNode = new Node(null, getPlayerPosition(playerNumber));
+		baseNode.h = aStarEvaluateF(playerNumber, baseNode.position);
 		openNodes.add(baseNode);
 
 		while (!openNodes.isEmpty()) {
@@ -549,7 +561,7 @@ public class Quoridor {
 
 	private boolean aStarListContainsNodePositionWithLessF(Node node, List<Node> list) {
 		for (Node n : list) {
-			if (n.position == node.position && n.getF() <= node.getF()) return true;
+			if (n.position[0] == node.position[0] && n.position[1] == node.position[1] && n.getF() <= node.getF()) return true;
 		}
 		return false;
 	}
