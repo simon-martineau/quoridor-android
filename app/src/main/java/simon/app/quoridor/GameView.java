@@ -31,10 +31,16 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
+	// Constants
 	private static final String TAG = "GameView";
+	private static final String API_BASE_URL = "https://python.gel.ulaval.ca/quoridor/api/";
+	private static final String API_MAKE_MOVE_SUFFIX = "jouer/";
+	private static final String API_BEGIN_GAME_SUFFIX = "débuter/";
+	private static final String IDUL = "simar86";
+
 	// Network
 	private final OkHttpClient httpClient = new OkHttpClient();
-	public static final String apiBaseUrl = "https://python.gel.ulaval.ca/quoridor/api/";
+
 
 	// Threading
 	public GameThread mGameThread;
@@ -87,7 +93,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		super(context);
 
 		getHolder().addCallback(this);
-		fetchNewGameFromServer(apiBaseUrl + "débuter/", "simar86");
+		fetchNewGameFromServer(API_BASE_URL + API_BEGIN_GAME_SUFFIX, IDUL);
 
 
 		setUpAudio();
@@ -346,7 +352,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			mGame.requestPlayerMovement(playerNumber, x, y);
 			playSound(mPawnMoveSoundId, 0.5f);
 			gamePaused = true;
-			postMoveAndGetNewState(apiBaseUrl + "jouer/", mGame.mGameID, mGame.mLastMoveType, mGame.mLastMoveCoordinates);
+			postMoveAndGetNewState(API_BASE_URL + API_MAKE_MOVE_SUFFIX, mGame.mGameID, mGame.mLastMoveType, mGame.mLastMoveCoordinates);
 		} catch (QuoridorException e) {
 			message = e.getMessage();
 		}
@@ -371,7 +377,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			tryToPlaceWall(1, mWallPreviewType,coordinates[0], coordinates[1]);
 			playSound(mWallPlaceSoundId, 0.5f);
 			gamePaused = true;
-			postMoveAndGetNewState(apiBaseUrl + "jouer/", mGame.mGameID, mGame.mLastMoveType, mGame.mLastMoveCoordinates);
+			postMoveAndGetNewState(API_BASE_URL + API_MAKE_MOVE_SUFFIX, mGame.mGameID, mGame.mLastMoveType, mGame.mLastMoveCoordinates);
 		} catch (QuoridorException e) {
 			message = "Could not place wall";
 		}
@@ -513,7 +519,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	public void startNewGame() {
 
-		fetchNewGameFromServer(apiBaseUrl + "débuter/", "simar86");
+		fetchNewGameFromServer(API_BASE_URL + API_BEGIN_GAME_SUFFIX, IDUL);
 
 		mQuoridorView.setConsoleMessage("");
 	}
