@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.util.Log;
@@ -37,6 +38,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	private static final String API_MAKE_MOVE_SUFFIX = "jouer/";
 	private static final String API_BEGIN_GAME_SUFFIX = "débuter/";
 	private static final String IDUL = "simar86";
+	public final Typeface DEFAULT_TYPEFACE = Typeface.createFromAsset(getContext().getAssets(), "fonts/8_bit_style.ttf");
 
 	// Network
 	private final OkHttpClient httpClient = new OkHttpClient();
@@ -71,6 +73,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	// Modal views
 	ModalView mRestartConfirmModalView;
 
+	// Title view
+	GTitleView mGTitleView;
+
 	// Views with click actions
 	List<GView> mGViews = new ArrayList<>();
 
@@ -86,6 +91,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	private int mPawnMoveSoundId;
 	private int mWallMoveSoundId;
 	private int mWallPlaceSoundId;
+	private int mSwitchWallTypeSoundId;
+	private int mBeginPlaceWallSoundId;
+	private int mAbandonButtonSoundId;
 
 	private MediaPlayer mBackgroundMusicPlayer;
 
@@ -142,6 +150,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mPawnMoveSoundId = mSoundPool.load(getContext(), R.raw.pawn_move, 1);
 		mWallMoveSoundId = mSoundPool.load(getContext(), R.raw.move_wall, 1);
 		mWallPlaceSoundId = mSoundPool.load(getContext(), R.raw.place_wall, 1);
+		mSwitchWallTypeSoundId = mSoundPool.load(getContext(), R.raw.switch_wall_type, 1);
+		mBeginPlaceWallSoundId = mSoundPool.load(getContext(), R.raw.begin_place_wall, 1);
+		mAbandonButtonSoundId = mSoundPool.load(getContext(), R.raw.abandon_button_sound, 1);
 
 	}
 
@@ -153,13 +164,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
 
-		// TODO: Put this elsewhere
-		if (gamePaused) mQuoridorView.setBlink(false);
-		else mQuoridorView.setBlink(true);
-
 		for (GView gView : mGViews) {
 			gView.draw(canvas);
 		}
+
+		if (gamePaused)
+			mQuoridorView.setBlink(false);
+		else
+			mQuoridorView.setBlink(true);
+
 
 		// Temp
 //		Paint textPaint = new Paint();
@@ -174,7 +187,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		mBackgroundMusicPlayer.start();
 
-		mQuoridorView = new QuoridorView(mGame, 50, 50, width);
+		mGTitleView = new GTitleView("8 bit Quoridor", Color.GREEN, 184f, getWidth());
+		mGTitleView.setTypeFace(DEFAULT_TYPEFACE);
+		mGTitleView.setY(128);
+
+		mQuoridorView = new QuoridorView(mGame, 50, mGTitleView.getBottom() + 128, width);
 		mQuoridorView.setOnClickAction(new QuoridorView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
@@ -194,6 +211,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			public void onClick(GameView gameView, int x, int y) {
 				if (!gamePaused) {
 					if (!gameView.placingWall) {
+						playSound(mBeginPlaceWallSoundId, 0.5f);
 						mToggleWallTypeButton.setVisible(true);
 						mConfirmWallButton.setVisible(true);
 						gameView.initiateWallPlacement(Quoridor.HORIZONTAL);
@@ -217,6 +235,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
 				gameView.cancelWallPlacement();
+				playSound(mSwitchWallTypeSoundId, 0.3f);
 				if (mToggleWallTypeButton.getText().equals("Horizontal"))
 				{
 					mToggleWallTypeButton.setText("Vertical");
@@ -248,6 +267,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mAbandonButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
+				playSound(mAbandonButtonSoundId, 0.5f);
 				mRestartConfirmModalView.setVisible(true);
 				modal = true;
 			}
@@ -264,10 +284,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mNewGameButton.setVisible(false);
 
 		mRestartConfirmModalView = new ModalView("Confirm match forfeit?", 100, 600);
+		mRestartConfirmModalView.setFreezeView(new GFreezeView(0, 0, getWidth(), getHeight(), Color.WHITE, 50));
 		mRestartConfirmModalView.addGButton(Color.RED, mButtonBackgroundColor, 400, 150, "Yes",
 				new GView.onClickAction() {
 					@Override
 					public void onClick(GameView gameView, int x, int y) {
+						playSound(mLoseSoundId, 0.5f);
 						startNewGame();
 						modal = false;
 						mRestartConfirmModalView.setVisible(false);
@@ -278,6 +300,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 				new GView.onClickAction() {
 					@Override
 					public void onClick(GameView gameView, int x, int y) {
+						playSound(mWallMoveSoundId, 0.5f);
 						modal = false;
 						mRestartConfirmModalView.setVisible(false);
 					}
@@ -289,6 +312,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 
 		// Register views
+		mGViews.add(mGTitleView);
 		mGViews.add(mPlaceWallButton);
 		mGViews.add(mToggleWallTypeButton);
 		mGViews.add(mConfirmWallButton);
@@ -402,6 +426,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		placingWall = true;
 		mWallPreviewType = wallType;
 		mQuoridorView.setWallPreview(wallType, 5, 5);
+
 	}
 
 	public void finalizeWallPlacement() {
@@ -410,7 +435,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 		try {
 			tryToPlaceWall(1, mWallPreviewType,coordinates[0], coordinates[1]);
-			playSound(mWallPlaceSoundId, 0.5f);
+			playSound(mWallPlaceSoundId, 0.8f);
 			gamePaused = true;
 			postMoveAndGetNewState(API_BASE_URL + API_MAKE_MOVE_SUFFIX, mGame.mGameID, mGame.mLastMoveType, mGame.mLastMoveCoordinates);
 		} catch (QuoridorException e) {
@@ -449,7 +474,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		}
 
 		mGame = new Quoridor(gameID, state);
-		// TODO: verify the need of this
 		mQuoridorView.linkQuoridorGame(mGame);
 	}
 

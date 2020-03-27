@@ -4,9 +4,12 @@ package simon.app.quoridor;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
@@ -23,6 +26,10 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.i(TAG, "onCreate: called");
 		super.onCreate(savedInstanceState);
+
+		Window window = getWindow();
+		window.setStatusBarColor(Color.BLACK); // Redundant
+
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		// getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -72,7 +79,8 @@ public class MainActivity extends Activity {
 	}
 }
 
-// TODO: Add background white alpha layer while modal is active
+
+// TODO: Change wall preview color depending on if position is good or not
 // TODO: Add z-axis for drawing order
 // TODO (Long term): Add home screen
 

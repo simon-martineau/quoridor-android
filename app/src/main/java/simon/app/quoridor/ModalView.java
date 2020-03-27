@@ -22,6 +22,7 @@ public class ModalView extends GView {
 	private static final int BORDER_SIZE = 3;
 	private static final int TEXT_COLOR = Color.GREEN;
 
+	private GFreezeView mGFreezeView = null;
 	private ArrayList<GView> mGViews = new ArrayList<>();
 	private String mPromptString;
 
@@ -42,6 +43,10 @@ public class ModalView extends GView {
 				}
 			}
 		});
+	}
+
+	public void setFreezeView(GFreezeView gFreezeView) {
+		mGFreezeView = gFreezeView;
 	}
 
 	public void addGButton(int foreGroundColor, int backgroundColor, int width, int height, String text, onClickAction action) {
@@ -98,6 +103,9 @@ public class ModalView extends GView {
 	public void draw(Canvas canvas) {
 		if (isVisible()) {
 			Rect viewRect = new Rect(getLeft(), getTop(), getRight(), getBottom());
+
+			// Draw freeze view if any
+			if (mGFreezeView != null) mGFreezeView.draw(canvas);
 
 			// Draw background
 			Paint backgroundPaint = new Paint();
