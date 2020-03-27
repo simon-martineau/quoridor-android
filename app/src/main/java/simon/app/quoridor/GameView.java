@@ -66,7 +66,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	GButton mPlaceWallButton;
 	GButton mConfirmWallButton;
 	GButton mNewGameButton;
-	List<GButton> mGButtons = new ArrayList<>();
+
+	// Views with click actions
+	List<GView> mGViews = new ArrayList<>();
 
 	// State
 	public boolean placingWall = false;
@@ -152,14 +154,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mQuoridorView.draw(canvas);
 
 		// Temp
-		Paint textPaint = new Paint();
-		textPaint.setColor(Color.WHITE);
-		textPaint.setTextSize(48);
-		canvas.drawText("DEBUG: newGameButton.isVisible() = " + mNewGameButton.isVisible(), 400, getHeight() - 150, textPaint);
-		// canvas.drawText("DEBUG: message = " + message, 400, mSurfaceHeight - 50, textPaint);
+//		Paint textPaint = new Paint();
+//		textPaint.setColor(Color.WHITE);
+//		textPaint.setTextSize(48);
+//		canvas.drawText("DEBUG: newGameButton.isVisible() = " + mNewGameButton.isVisible(), 400, getHeight() - 150, textPaint);
+//		canvas.drawText("DEBUG: message = " + message, 400, mSurfaceHeight - 50, textPaint);
 
-		for (GButton gButton : mGButtons) {
-			gButton.draw(canvas);
+		for (GView gView : mGViews) {
+			gView.draw(canvas);
 		}
 
 	}
@@ -249,11 +251,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mNewGameButton.setVisible(false);
 
 
-		// Register buttons
-		mGButtons.add(mPlaceWallButton);
-		mGButtons.add(mToggleWallTypeButton);
-		mGButtons.add(mConfirmWallButton);
-		mGButtons.add(mNewGameButton);
+		// Register views
+		mGViews.add(mPlaceWallButton);
+		mGViews.add(mToggleWallTypeButton);
+		mGViews.add(mConfirmWallButton);
+		mGViews.add(mNewGameButton);
+		mGViews.add(mQuoridorView);
 
 	}
 
@@ -282,9 +285,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	private void dispatchTouchToViews(int x, int y) {
-		for (GButton b : mGButtons) {
-			if (b.isInRect(x, y)) {
-				b.performClick(this, x, y);
+		for (GView gView : mGViews) {
+			if (gView.isInRect(x, y)) {
+				gView.performClick(this, x, y);
 				return;
 			}
 		}
