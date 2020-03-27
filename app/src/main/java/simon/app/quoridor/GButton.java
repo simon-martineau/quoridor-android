@@ -80,11 +80,10 @@ public class GButton {
 		}
 	}
 
-	public void onClick(GameView gameView) {
-		gameView.initiateWallPlacement(Quoridor.HORIZONTAL); // TODO: parametrisation
-	}
+
 
 	public boolean isInRect(int x, int y) {
+		// Does not consume the event if button is visible
 		return (mRect.left < x && x < mRect.right && mRect.top < y && y < mRect.bottom && visible);
 	}
 

@@ -4,6 +4,7 @@ package simon.app.quoridor;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
@@ -22,6 +23,7 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.i(TAG, "onCreate: called");
 		super.onCreate(savedInstanceState);
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		// getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_main);
@@ -37,6 +39,7 @@ public class MainActivity extends Activity {
 		super.onStart();
 
 		Log.i(TAG, "onStart: called");
+		if (mGameView == null) Log.i(TAG, "onStart: mGameView is null");
 
 		if (mGameKey != null) {
 			mGameView = new GameView(this, mGameKey, mGameState);
@@ -46,10 +49,10 @@ public class MainActivity extends Activity {
 
 	@Override
 	protected void onStop() {
-		Log.i(TAG, "onStop: called");
+//		Log.i(TAG, "onStop: called");
 		super.onStop();
-		mGameKey = mGameView.mGame.mGameID;
-		mGameState = mGameView.getGameStateJSONString();
+//		mGameKey = mGameView.mGame.mGameID;
+//		mGameState = mGameView.getGameStateJSONString();
 	}
 
 	@Override
@@ -68,3 +71,11 @@ public class MainActivity extends Activity {
 		super.onResume();
 	}
 }
+
+// TODO: Implement better touch event routing
+// TODO: Add "Abandon" button
+// TODO: Add modal prompt class
+// TODO: Use modal prompt to confirm choice on abandon button
+
+
+

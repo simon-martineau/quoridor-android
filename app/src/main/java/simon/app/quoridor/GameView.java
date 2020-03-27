@@ -1,21 +1,16 @@
 package simon.app.quoridor;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.os.Parcelable;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
-
-import androidx.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +28,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
+	private static final String TAG = "GameView";
 	// Network
 	private final OkHttpClient httpClient = new OkHttpClient();
 	public static final String apiBaseUrl = "https://python.gel.ulaval.ca/quoridor/api/";
@@ -52,7 +48,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	// Graphics
 	private int mSurfaceWidth, mSurfaceHeight;
-	public QuoridorDrawer mQuoridorDrawer;
+	public QuoridorView mQuoridorView;
 
 	// Colors
 	private int mButtonBackgroundColor = Color.rgb(40, 40, 40);
@@ -67,6 +63,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	// State
 	public boolean placingWall = false;
 	public boolean gamePaused = false;
+
+	// Audio
+	private SoundPool mSoundPool;
+	private int mWinSoundId;
+	private int mLoseSoundId;
+	private int mPawnMoveSoundId;
+	private int mWallMoveSoundId;
+	private int mWallPlaceSoundId;
+
+	private MediaPlayer mBackgroundMusicPlayer;
 
 	// Temp
 	String message = "";
@@ -83,6 +89,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		setUpAudio();
 
 		mGame = new Quoridor();
 		setFocusable(true);
@@ -101,9 +109,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			e.printStackTrace();
 		}
 
+		setUpAudio();
+
 		setFocusable(true);
 	}
 
+	private void playSound(int soundId, float intensity) {
+		mSoundPool.play(soundId, intensity, intensity, 1, 0, 1f);
+	}
+
+	private void setUpAudio() {
+		mBackgroundMusicPlayer = MediaPlayer.create(getContext(), R.raw.game_track);
+		mBackgroundMusicPlayer.setLooping(true);
+
+		mSoundPool = new SoundPool.Builder()
+				.setMaxStreams(10)
+				.build();
+		mWinSoundId = mSoundPool.load(getContext(), R.raw.win, 1);
+		mLoseSoundId = mSoundPool.load(getContext(), R.raw.lose, 1);
+		mPawnMoveSoundId = mSoundPool.load(getContext(), R.raw.pawn_move, 1);
+		mWallMoveSoundId = mSoundPool.load(getContext(), R.raw.move_wall, 1);
+		mWallPlaceSoundId = mSoundPool.load(getContext(), R.raw.place_wall, 1);
+
+	}
 
 	public void update() {
 
@@ -113,10 +141,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
 
-		if (gamePaused) mQuoridorDrawer.setBlink(false);
-		else mQuoridorDrawer.setBlink(true);
+		if (gamePaused) mQuoridorView.setBlink(false);
+		else mQuoridorView.setBlink(true);
 
-		mQuoridorDrawer.draw(canvas, mGame);
+		mQuoridorView.draw(canvas, mGame);
 
 		// Temp
 		Paint textPaint = new Paint();
@@ -133,34 +161,54 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+		// FIXME: Verify this
+
+
+		Log.i(TAG, "surfaceChanged: called");
+		mBackgroundMusicPlayer.start();
+
 		mSurfaceWidth = width;
 		mSurfaceHeight = height;
 
-		mQuoridorDrawer = new QuoridorDrawer(mSurfaceWidth);
-		mQuoridorDrawer.hoverCells(mGame.getPossibleNextCoordinates(1, false));
-
-		mPlaceWallButton = new GButton("Place a wall", 300, 150, 100, mQuoridorDrawer.getBottom() + 64, mButtonBackgroundColor, Color.GREEN);
-		mPlaceWallButton.setOnClickAction(new GButton.onClickAction() {
+		mQuoridorView = new QuoridorView(mSurfaceWidth);
+		mQuoridorView.setOnClickAction(new QuoridorView.onClickAction() {
 			@Override
-			public void onClick(GameView gameView) {
-				if (!gameView.placingWall) {
-					mToggleWallTypeButton.setVisible(true);
-					mConfirmWallButton.setVisible(true);
-					gameView.initiateWallPlacement(Quoridor.HORIZONTAL);
-					mPlaceWallButton.setText("Cancel");
-					mPlaceWallButton.setTextColor(Color.RED);
-				} else {
-					mToggleWallTypeButton.setVisible(false);
-					mConfirmWallButton.setVisible(false);
-					gameView.cancelWallPlacement();
-					mPlaceWallButton.setTextColor(Color.GREEN);
-					mPlaceWallButton.setText("Place a wall");
-					mToggleWallTypeButton.setText("Horizontal");
+			public void onClick(GameView gameView, int x, int y) {
+				if (!gamePaused && !placingWall) {
+					int[] possibleCellCoordinates;
+					possibleCellCoordinates = mQuoridorView.getCellCorrespondingToTouch(x, y);
+					if (possibleCellCoordinates != null)
+						tryToMovePlayer(1, possibleCellCoordinates[0], possibleCellCoordinates[1]);
 				}
 			}
 		});
 
-		mToggleWallTypeButton = new GButton("Horizontal", 300, 150, 475, mQuoridorDrawer.getBottom() + 64, mButtonBackgroundColor, Color.WHITE);
+		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false));
+
+		mPlaceWallButton = new GButton("Place a wall", 300, 150, 100, mQuoridorView.getBottom() + 64, mButtonBackgroundColor, Color.GREEN);
+		mPlaceWallButton.setOnClickAction(new GButton.onClickAction() {
+			@Override
+			public void onClick(GameView gameView) {
+				if (!gamePaused) {
+					if (!gameView.placingWall) {
+						mToggleWallTypeButton.setVisible(true);
+						mConfirmWallButton.setVisible(true);
+						gameView.initiateWallPlacement(Quoridor.HORIZONTAL);
+						mPlaceWallButton.setText("Cancel");
+						mPlaceWallButton.setTextColor(Color.RED);
+					} else {
+						mToggleWallTypeButton.setVisible(false);
+						mConfirmWallButton.setVisible(false);
+						gameView.cancelWallPlacement();
+						mPlaceWallButton.setTextColor(Color.GREEN);
+						mPlaceWallButton.setText("Place a wall");
+						mToggleWallTypeButton.setText("Horizontal");
+					}
+				}
+			}
+		});
+
+		mToggleWallTypeButton = new GButton("Horizontal", 300, 150, 475, mQuoridorView.getBottom() + 64, mButtonBackgroundColor, Color.WHITE);
 		mToggleWallTypeButton.setOnClickAction(new GButton.onClickAction() {
 			@Override
 			public void onClick(GameView gameView) {
@@ -178,7 +226,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mToggleWallTypeButton.setVisible(false);
 
 
-		mConfirmWallButton = new GButton("Confirm", 300, 150, 850, mQuoridorDrawer.getBottom() + 64, mButtonBackgroundColor, Color.GREEN);
+		mConfirmWallButton = new GButton("Confirm", 300, 150, 850, mQuoridorView.getBottom() + 64, mButtonBackgroundColor, Color.GREEN);
 		mConfirmWallButton.setOnClickAction(new GButton.onClickAction() {
 			@Override
 			public void onClick(GameView gameView) {
@@ -221,6 +269,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
+		mBackgroundMusicPlayer.pause();
 		boolean retry = true;
 		while (retry) {
 			try {
@@ -234,6 +283,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		}
 	}
 
+	private void dispatchTouchToViews(int x, int y) {
+		for (GButton b : mGButtons) {
+			if (b.isInRect(x, y)) {
+				b.mOnClickAction.onClick(this);
+				return;
+			}
+		}
+		if (mQuoridorView.isInRect(x, y)) {
+			mQuoridorView.mOnClickAction.onClick(this, x, y);
+		}
+	}
+
 
 
 	@Override
@@ -244,50 +305,37 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 		switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
-				// Check if button is pressed
-				if (mPlaceWallButton.isInRect(x, y) && !gamePaused) {
-					mPlaceWallButton.mOnClickAction.onClick(this);
-				} else if (mToggleWallTypeButton.isInRect(x, y)) {
-					mToggleWallTypeButton.mOnClickAction.onClick(this);
-				} else if (mConfirmWallButton.isInRect(x, y)) {
-					mConfirmWallButton.mOnClickAction.onClick(this);
-				} else if (mNewGameButton.isInRect(x, y)) {
-					mNewGameButton.mOnClickAction.onClick(this);
-				} else {
-					if (!placingWall && !gamePaused) {
-						int[] possibleCellCoordinates;
-						possibleCellCoordinates = mQuoridorDrawer.getCellCorrespondingToTouch(x, y);
-						if (possibleCellCoordinates != null)
-							tryToMovePlayer(1, possibleCellCoordinates[0], possibleCellCoordinates[1]);
-					} else {
-						mLastTouchX = event.getX();
-						mLastTouchY = event.getY();
-						message = "snap";
-						break;
-					}
-				}
+				dispatchTouchToViews(x, y);
+				mLastTouchX = x;
+				mLastTouchY = y;
 				break;
 
 			case MotionEvent.ACTION_MOVE: {
-				float posX = event.getX();
-				float posY = event.getY();
+				if (placingWall) {
+					float posX = event.getX();
+					float posY = event.getY();
 
-				if (posX - mLastTouchX > wallUpdateStep) {
-					mQuoridorDrawer.offsetWallPreview(mWallPreviewType, 1, 0);
-					mLastTouchX = posX - 10;
+					if (posX - mLastTouchX > wallUpdateStep) {
+						mQuoridorView.offsetWallPreview(mWallPreviewType, 1, 0);
+						mLastTouchX = posX - 10;
+						playSound(mWallMoveSoundId, 0.3f);
 
-				} else if (posX - mLastTouchX < wallUpdateStep*-1) {
-					mQuoridorDrawer.offsetWallPreview(mWallPreviewType, -1, 0);
-					mLastTouchX = posX + 10;
+					} else if (posX - mLastTouchX < wallUpdateStep * -1) {
+						mQuoridorView.offsetWallPreview(mWallPreviewType, -1, 0);
+						mLastTouchX = posX + 10;
+						playSound(mWallMoveSoundId, 0.3f);
+					}
+					if (posY - mLastTouchY > wallUpdateStep) {
+						mQuoridorView.offsetWallPreview(mWallPreviewType, 0, -1);
+						mLastTouchY = posY - 10;
+						playSound(mWallMoveSoundId, 0.3f);
+					} else if (posY - mLastTouchY < wallUpdateStep * -1) {
+						mQuoridorView.offsetWallPreview(mWallPreviewType, 0, 1);
+						mLastTouchY = posY + 10;
+						playSound(mWallMoveSoundId, 0.3f);
+					}
+					message = null;
 				}
-				if (posY - mLastTouchY > wallUpdateStep) {
-					mQuoridorDrawer.offsetWallPreview(mWallPreviewType, 0, -1);
-					mLastTouchY = posY - 10;
-				} else if (posY - mLastTouchY < wallUpdateStep*-1) {
-					mQuoridorDrawer.offsetWallPreview(mWallPreviewType, 0, 1);
-					mLastTouchY = posY + 10;
-				}
-				message = null;
 				break;
 			}
 
@@ -299,6 +347,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		// Logic
 		try {
 			mGame.requestPlayerMovement(playerNumber, x, y);
+			playSound(mPawnMoveSoundId, 0.5f);
 			gamePaused = true;
 			postMoveAndGetNewState(apiBaseUrl + "jouer/", mGame.mGameID, mGame.mLastMoveType, mGame.mLastMoveCoordinates);
 		} catch (QuoridorException | IOException e) {
@@ -308,22 +357,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	public void refreshHover() {
-		mQuoridorDrawer.resetHoverPositions();
-		mQuoridorDrawer.hoverCells(mGame.getPossibleNextCoordinates(1, false));
+		mQuoridorView.resetHoverPositions();
+		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false));
 	}
 
 	public void initiateWallPlacement(int wallType) {
 		placingWall = true;
 		mWallPreviewType = wallType;
-		mQuoridorDrawer.setWallPreview(wallType, 5, 5);
+		mQuoridorView.setWallPreview(wallType, 5, 5);
 	}
 
 	public void finalizeWallPlacement() {
 
-		int[] coordinates = mQuoridorDrawer.getWallPreviewCoordinates();
+		int[] coordinates = mQuoridorView.getWallPreviewCoordinates();
 
 		try {
 			tryToPlaceWall(1, mWallPreviewType,coordinates[0], coordinates[1]);
+			playSound(mWallPlaceSoundId, 0.5f);
 			gamePaused = true;
 			postMoveAndGetNewState(apiBaseUrl + "jouer/", mGame.mGameID, mGame.mLastMoveType, mGame.mLastMoveCoordinates);
 		} catch (QuoridorException | IOException e) {
@@ -337,15 +387,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 		mGame.requestWallPlacement(playerNumber, wallType, x, y);
 
-		mQuoridorDrawer.resetHoverPositions();
-		mQuoridorDrawer.hoverCells(mGame.getPossibleNextCoordinates(1, false));
+		mQuoridorView.resetHoverPositions();
+		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false));
 
 	}
 
 	public void cancelWallPlacement() {
 		placingWall = false;
 		mWallPreviewType = 0;
-		mQuoridorDrawer.clearWallPreview();
+		mQuoridorView.clearWallPreview();
 	}
 
 	private void setNewGame(String serverResponse) {
@@ -450,16 +500,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	public void initGameLoss() {
 		gamePaused = true;
-		mQuoridorDrawer.setConsoleMessageColor(Color.RED);
-		mQuoridorDrawer.setConsoleMessage("YOU LOST!!");
+		playSound(mLoseSoundId, 0.6f);
+		mQuoridorView.setConsoleMessageColor(Color.RED);
+		mQuoridorView.setConsoleMessage("YOU LOST!!");
 		mNewGameButton.setVisible(true);
 
 	}
 
 	public void initGameWin() {
 		gamePaused = true;
-		mQuoridorDrawer.setConsoleMessageColor(Color.GREEN);
-		mQuoridorDrawer.setConsoleMessage("YOU WON!");
+		playSound(mWinSoundId, 0.6f);
+		mQuoridorView.setConsoleMessageColor(Color.GREEN);
+		mQuoridorView.setConsoleMessage("YOU WON!");
 		mNewGameButton.setVisible(true);
 	}
 
@@ -469,7 +521,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		mQuoridorDrawer.setConsoleMessage("");
+		mQuoridorView.setConsoleMessage("");
 	}
 
 	public String getGameStateJSONString() {
