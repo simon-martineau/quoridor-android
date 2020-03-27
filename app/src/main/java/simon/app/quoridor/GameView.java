@@ -1,5 +1,6 @@
 package simon.app.quoridor;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,12 +13,14 @@ import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -84,11 +87,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		super(context);
 
 		getHolder().addCallback(this);
-		try {
-			fetchNewGameFromServer(apiBaseUrl + "débuter/", "simar86");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		fetchNewGameFromServer(apiBaseUrl + "débuter/", "simar86");
+
 
 		setUpAudio();
 
@@ -161,10 +161,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-		// FIXME: Verify this
-
-
-		Log.i(TAG, "surfaceChanged: called");
 		mBackgroundMusicPlayer.start();
 
 		mSurfaceWidth = width;
@@ -296,7 +292,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 
-
+	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		int x = (int) event.getX();
@@ -340,6 +336,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 
 		}
+
 		return true;
 	}
 
@@ -350,9 +347,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			playSound(mPawnMoveSoundId, 0.5f);
 			gamePaused = true;
 			postMoveAndGetNewState(apiBaseUrl + "jouer/", mGame.mGameID, mGame.mLastMoveType, mGame.mLastMoveCoordinates);
-		} catch (QuoridorException | IOException e) {
+		} catch (QuoridorException e) {
 			message = e.getMessage();
-			return;
 		}
 	}
 
@@ -376,7 +372,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			playSound(mWallPlaceSoundId, 0.5f);
 			gamePaused = true;
 			postMoveAndGetNewState(apiBaseUrl + "jouer/", mGame.mGameID, mGame.mLastMoveType, mGame.mLastMoveCoordinates);
-		} catch (QuoridorException | IOException e) {
+		} catch (QuoridorException e) {
 			message = "Could not place wall";
 		}
 
@@ -428,7 +424,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mGame.putGameState(state);
 	}
 
-	public void fetchNewGameFromServer(String targetURL, String idul) throws IOException {
+	public void fetchNewGameFromServer(String targetURL, String idul) {
 
 		RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
 				.addFormDataPart("idul", idul)
@@ -442,16 +438,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		httpClient.newCall(request)
 				.enqueue(new Callback() {
 					@Override
-					public void onFailure(Call call, IOException e) {
+					public void onFailure(@NotNull Call call, @NotNull IOException e) {
 						e.printStackTrace();
 					}
 
 					@Override
-					public void onResponse(Call call, Response response) throws IOException {
+					public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
 						if (!response.isSuccessful()) {
 							throw new IOException("Error : " + response);
 						}
-						String data =  response.body().string();
+						String data =  Objects.requireNonNull(response.body()).string();
 						setNewGame(data);
 						gamePaused = false;
 						refreshHover();
@@ -459,7 +455,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 				});
 	}
 
-	public void postMoveAndGetNewState(String targetURL, String gameID, String moveType, String position) throws IOException{
+	public void postMoveAndGetNewState(String targetURL, String gameID, String moveType, String position) {
 
 		RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
 				.addFormDataPart("id", gameID)
@@ -474,16 +470,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		httpClient.newCall(request)
 				.enqueue(new Callback() {
 					@Override
-					public void onFailure(Call call, IOException e) {
+					public void onFailure(@NotNull Call call, @NotNull IOException e) {
 						e.printStackTrace();
 					}
 
 					@Override
-					public void onResponse(Call call, Response response) throws IOException {
+					public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
 						if (!response.isSuccessful()) {
 							throw new IOException("Error : " + response);
 						}
-						String data =  response.body().string();
+						String data =  Objects.requireNonNull(response.body()).string();
 						setGameState(data);
 						gamePaused = false;
 						refreshHover();
@@ -516,17 +512,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	public void startNewGame() {
-		try {
-			fetchNewGameFromServer(apiBaseUrl + "débuter/", "simar86");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		fetchNewGameFromServer(apiBaseUrl + "débuter/", "simar86");
+
 		mQuoridorView.setConsoleMessage("");
 	}
-
-	public String getGameStateJSONString() {
-		return mGame.getGameStateJSON().toString();
-	}
-
 
 }
