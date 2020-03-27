@@ -66,6 +66,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	GButton mPlaceWallButton;
 	GButton mConfirmWallButton;
 	GButton mNewGameButton;
+	GButton mAbandonButton;
+
+	// Modal views
+	ModalView mRestartConfirmModalView;
 
 	// Views with click actions
 	List<GView> mGViews = new ArrayList<>();
@@ -73,6 +77,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	// State
 	public boolean placingWall = false;
 	public boolean gamePaused = false;
+	public boolean modal = false;
 
 	// Audio
 	private SoundPool mSoundPool;
@@ -148,10 +153,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
 
+		// TODO: Put this elsewhere
 		if (gamePaused) mQuoridorView.setBlink(false);
 		else mQuoridorView.setBlink(true);
 
-		mQuoridorView.draw(canvas);
+		for (GView gView : mGViews) {
+			gView.draw(canvas);
+		}
 
 		// Temp
 //		Paint textPaint = new Paint();
@@ -159,10 +167,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 //		textPaint.setTextSize(48);
 //		canvas.drawText("DEBUG: newGameButton.isVisible() = " + mNewGameButton.isVisible(), 400, getHeight() - 150, textPaint);
 //		canvas.drawText("DEBUG: message = " + message, 400, mSurfaceHeight - 50, textPaint);
-
-		for (GView gView : mGViews) {
-			gView.draw(canvas);
-		}
 
 	}
 
@@ -240,6 +244,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		});
 		mConfirmWallButton.setVisible(false);
 
+		mAbandonButton = new GButton("Abandon", 300, 150, getWidth() - 450, getHeight() - 300, mButtonBackgroundColor, Color.RED);
+		mAbandonButton.setOnClickAction(new GView.onClickAction() {
+			@Override
+			public void onClick(GameView gameView, int x, int y) {
+				mRestartConfirmModalView.setVisible(true);
+				modal = true;
+			}
+		});
+
 		mNewGameButton = new GButton("New Game", 300, 150, getWidth() - 450, getHeight() - 300, mButtonBackgroundColor, Color.GREEN);
 		mNewGameButton.setOnClickAction(new GView.onClickAction() {
 			@Override
@@ -250,13 +263,39 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		});
 		mNewGameButton.setVisible(false);
 
+		mRestartConfirmModalView = new ModalView("Confirm match forfeit?", 100, 600);
+		mRestartConfirmModalView.addGButton(Color.RED, mButtonBackgroundColor, 400, 150, "Yes",
+				new GView.onClickAction() {
+					@Override
+					public void onClick(GameView gameView, int x, int y) {
+						startNewGame();
+						modal = false;
+						mRestartConfirmModalView.setVisible(false);
+					}
+				});
+
+		mRestartConfirmModalView.addGButton(Color.GREEN, mButtonBackgroundColor, 400, 150, "No",
+				new GView.onClickAction() {
+					@Override
+					public void onClick(GameView gameView, int x, int y) {
+						modal = false;
+						mRestartConfirmModalView.setVisible(false);
+					}
+				});
+		mRestartConfirmModalView.setX(getWidth() / 2 - mRestartConfirmModalView.getWidth() / 2);
+		mRestartConfirmModalView.setY(getHeight() / 2 - mRestartConfirmModalView.getHeight() / 2 - 200);
+		mRestartConfirmModalView.setVisible(false);
+
+
 
 		// Register views
 		mGViews.add(mPlaceWallButton);
 		mGViews.add(mToggleWallTypeButton);
 		mGViews.add(mConfirmWallButton);
 		mGViews.add(mNewGameButton);
+		mGViews.add(mAbandonButton);
 		mGViews.add(mQuoridorView);
+		mGViews.add(mRestartConfirmModalView);
 
 	}
 
@@ -286,13 +325,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	private void dispatchTouchToViews(int x, int y) {
 		for (GView gView : mGViews) {
-			if (gView.isInRect(x, y)) {
+
+			if ((gView.isInRect(x, y) && !modal) || (gView instanceof ModalView)) {
 				gView.performClick(this, x, y);
 				return;
 			}
-		}
-		if (mQuoridorView.isInRect(x, y)) {
-			mQuoridorView.performClick(this, x, y);
 		}
 	}
 
@@ -505,6 +542,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		playSound(mLoseSoundId, 0.6f);
 		mQuoridorView.setConsoleMessageColor(Color.RED);
 		mQuoridorView.setConsoleMessage("YOU LOST!!");
+		mAbandonButton.setVisible(false);
 		mNewGameButton.setVisible(true);
 
 	}
@@ -514,6 +552,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		playSound(mWinSoundId, 0.6f);
 		mQuoridorView.setConsoleMessageColor(Color.GREEN);
 		mQuoridorView.setConsoleMessage("YOU WON!");
+		mAbandonButton.setVisible(false);
 		mNewGameButton.setVisible(true);
 	}
 

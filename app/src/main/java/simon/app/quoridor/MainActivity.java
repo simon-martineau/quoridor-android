@@ -72,10 +72,11 @@ public class MainActivity extends Activity {
 	}
 }
 
-// TODO: Handle all touch events in one call
-// TODO: Add modal prompt class
-// TODO: Add "Abandon" button
-// TODO: Use modal prompt to confirm choice on abandon button
+// TODO: Add background white alpha layer while modal is active
+// TODO: Add z-axis for drawing order
+// TODO (Long term): Add home screen
+
+
 
 
 
