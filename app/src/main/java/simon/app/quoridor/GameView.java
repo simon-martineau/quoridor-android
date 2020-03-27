@@ -203,7 +203,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 				}
 			}
 		});
-		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false));
+		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
 
 		mPlaceWallButton = new GButton("Place a wall", 300, 150, 100, mQuoridorView.getBottom() + 64, mButtonBackgroundColor, Color.GREEN);
 		mPlaceWallButton.setOnClickAction(new GView.onClickAction() {
@@ -419,7 +419,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	public void refreshHover() {
 		mQuoridorView.resetHoverPositions();
-		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false));
+		mQuoridorView.hoverCells(mGame.getShortestPathToVictory(1));
+		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
 	}
 
 	public void initiateWallPlacement(int wallType) {
@@ -450,7 +451,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mGame.requestWallPlacement(playerNumber, wallType, x, y);
 
 		mQuoridorView.resetHoverPositions();
-		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false));
+		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
 
 	}
 
@@ -565,7 +566,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		gamePaused = true;
 		playSound(mLoseSoundId, 0.6f);
 		mQuoridorView.setConsoleMessageColor(Color.RED);
-		mQuoridorView.setConsoleMessage("YOU LOST!!");
+		mQuoridorView.setConsoleMessage("YOU LOST!");
+		mQuoridorView.setBorderBlink(Color.RED, 8, 5);
 		mAbandonButton.setVisible(false);
 		mNewGameButton.setVisible(true);
 
@@ -576,6 +578,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		playSound(mWinSoundId, 0.6f);
 		mQuoridorView.setConsoleMessageColor(Color.GREEN);
 		mQuoridorView.setConsoleMessage("YOU WON!");
+		mQuoridorView.setBorderBlink(Color.GREEN, 8, 3);
 		mAbandonButton.setVisible(false);
 		mNewGameButton.setVisible(true);
 	}
@@ -583,7 +586,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	public void startNewGame() {
 
 		fetchNewGameFromServer(API_BASE_URL + API_BEGIN_GAME_SUFFIX, IDUL);
-
+		mAbandonButton.setVisible(true);
 		mQuoridorView.setConsoleMessage("");
 	}
 

@@ -250,7 +250,7 @@ public class Quoridor {
 
 	public void requestPlayerMovement(int playerNumber, int x, int y) throws QuoridorException {
 		int[] coordinates = new int[]{x, y};
-		List<int[]> possibleNextCoordinates = getPossibleNextCoordinates(playerNumber, false);
+		List<int[]> possibleNextCoordinates = getPossibleNextCoordinates(playerNumber, false, null);
 		if (positionIncluded(coordinates, possibleNextCoordinates)) {
 			movePlayer(playerNumber, x, y);
 		} else {
@@ -296,22 +296,37 @@ public class Quoridor {
 		return invalidWallCoordinates;
 	}
 
-	public List<int[]> getPossibleNextCoordinates(int playerNumber, boolean ignoreOtherPlayerJump) {
+	public List<int[]> getPossibleNextCoordinates(int playerNumber, boolean ignoreOtherPlayerJump, @Nullable int[] virtualPosition) {
 		List<int[]> possibleNextCoordinates = new ArrayList<>();
+
+
 		int playerX;
 		int playerY;
+
 		int otherPlayerX;
 		int otherPlayerY;
 		int otherPlayerNumber;
 
+		int[] savedPlayerPosition = new int[2];
+
+
 		if (playerNumber == 1) {
+			if (virtualPosition != null) {
+				savedPlayerPosition = new int[]{mPlayerOnePosition[0], mPlayerOnePosition[1]};
+				mPlayerOnePosition = virtualPosition;
+			}
 			playerX = mPlayerOnePosition[0];
 			playerY = mPlayerOnePosition[1];
 			otherPlayerX = mPlayerTwoPosition[0];
 			otherPlayerY = mPlayerTwoPosition[1];
 			otherPlayerNumber = 2;
 
+
 		} else {
+			if (virtualPosition != null) {
+				savedPlayerPosition = new int[]{mPlayerTwoPosition[0], mPlayerTwoPosition[1]};
+				mPlayerTwoPosition = virtualPosition;
+			}
 			playerX = mPlayerTwoPosition[0];
 			playerY = mPlayerTwoPosition[1];
 			otherPlayerX = mPlayerOnePosition[0];
@@ -326,7 +341,7 @@ public class Quoridor {
 				if (playerX == otherPlayerX && playerY + 1 == otherPlayerY) {
 					// Other player is there
 					if (!ignoreOtherPlayerJump) {
-						List<int[]> otherPlayerMoves = getPossibleNextCoordinates(otherPlayerNumber, true);
+						List<int[]> otherPlayerMoves = getPossibleNextCoordinates(otherPlayerNumber, true, null);
 						if (positionIncluded(new int[]{otherPlayerX, otherPlayerY + 1}, otherPlayerMoves)) {
 							possibleNextCoordinates.add(new int[]{otherPlayerX, otherPlayerY + 1});
 						} else {
@@ -348,7 +363,7 @@ public class Quoridor {
 				if (playerX == otherPlayerX && playerY - 1 == otherPlayerY) {
 					// Other player is there
 					if (!ignoreOtherPlayerJump) {
-						List<int[]> otherPlayerMoves = getPossibleNextCoordinates(otherPlayerNumber, true);
+						List<int[]> otherPlayerMoves = getPossibleNextCoordinates(otherPlayerNumber, true, null);
 						if (positionIncluded(new int[]{otherPlayerX, otherPlayerY - 1}, otherPlayerMoves)) {
 							possibleNextCoordinates.add(new int[]{otherPlayerX, otherPlayerY - 1});
 						} else {
@@ -369,7 +384,7 @@ public class Quoridor {
 				if (playerY == otherPlayerY && playerX - 1 == otherPlayerX) {
 					// Other player is there
 					if (!ignoreOtherPlayerJump) {
-						List<int[]> otherPlayerMoves = getPossibleNextCoordinates(otherPlayerNumber, true);
+						List<int[]> otherPlayerMoves = getPossibleNextCoordinates(otherPlayerNumber, true, null);
 						if (positionIncluded(new int[]{otherPlayerX - 1, otherPlayerY}, otherPlayerMoves)) {
 							possibleNextCoordinates.add(new int[]{otherPlayerX - 1, otherPlayerY});
 						} else {
@@ -390,7 +405,7 @@ public class Quoridor {
 				if (playerY == otherPlayerY && playerX + 1 == otherPlayerX) {
 					// Other player is there
 					if (!ignoreOtherPlayerJump) {
-						List<int[]> otherPlayerMoves = getPossibleNextCoordinates(otherPlayerNumber, true);
+						List<int[]> otherPlayerMoves = getPossibleNextCoordinates(otherPlayerNumber, true, null);
 						if (positionIncluded(new int[]{otherPlayerX + 1, otherPlayerY}, otherPlayerMoves)) {
 							possibleNextCoordinates.add(new int[]{otherPlayerX + 1, otherPlayerY});
 						} else {
@@ -401,6 +416,14 @@ public class Quoridor {
 					// Other player is not there, add position
 					possibleNextCoordinates.add(new int[]{playerX + 1, playerY});
 				}
+			}
+		}
+
+		if (virtualPosition != null) {
+			if (playerNumber == 1) {
+				mPlayerOnePosition = savedPlayerPosition;
+			} else {
+				mPlayerTwoPosition = savedPlayerPosition;
 			}
 		}
 
@@ -439,5 +462,112 @@ public class Quoridor {
 		if (mPlayerTwoPosition[1] == 1) return 2;
 		return 0;
 	}
+
+	private class Node {
+		int g = 0;
+		int h = 0;
+
+		int[] position;
+		Node parent;
+		List<Node> successors = new ArrayList<>();
+
+		public Node(Node parent, int[] position) {
+			this.position = position;
+			this.parent = parent;
+		}
+
+		public void addSuccessor(Node node) {
+			successors.add(node);
+		}
+
+		public int getF() {
+			return g + h;
+		}
+	}
+
+	public List<int[]> getShortestPathToVictory(int playerNumber) { // null if none
+		ArrayList<Node> openNodes = new ArrayList<>();
+		ArrayList<Node> closedNodes = new ArrayList<>();
+
+		Node baseNode = new Node(null, getPlayerPosition(playerNumber));
+		openNodes.add(baseNode);
+
+		while (!openNodes.isEmpty()) {
+			// Find node with the least f
+			int leastFNodeIndex = 0;
+			int leastF = 100;
+			for (int i = 0; i < openNodes.size(); i++) {
+				if (openNodes.get(i).getF() < leastF) {
+					leastF = openNodes.get(i).getF();
+					leastFNodeIndex = i;
+				}
+			}
+
+			Node q = openNodes.remove(leastFNodeIndex);
+			for (int[] position : getPossibleNextCoordinates(playerNumber, false, q.position)) {
+				q.addSuccessor(new Node(q, position));
+			}
+
+			// Loop through successors
+			for (Node successor : q.successors) {
+
+				// Set successor h
+				successor.h = aStarEvaluateF(playerNumber, successor.position);
+
+				// If it is goal
+				if (successor.getF() == 0) {
+					return getPathToNode(successor);
+				}
+
+				if (aStarListContainsNodePositionWithLessF(successor, openNodes)) {
+					// Do nothing
+				}
+
+				else if (!aStarListContainsNodePositionWithLessF(successor, closedNodes)) {
+					openNodes.add(successor);
+				}
+
+			}
+
+			closedNodes.add(q);
+
+		}
+
+		return null;
+	}
+
+	private List<int[]> getPathToNode(Node n) {
+		List<int[]> path = new ArrayList<>();
+		path.add(0, n.position);
+		Node currentNode = n;
+		while (currentNode.parent != null) {
+			path.add(0, currentNode.parent.position);
+			currentNode = currentNode.parent;
+		}
+		return path;
+	}
+
+	private boolean aStarListContainsNodePositionWithLessF(Node node, List<Node> list) {
+		for (Node n : list) {
+			if (n.position == node.position && n.getF() <= node.getF()) return true;
+		}
+		return false;
+	}
+
+	private int aStarEvaluateF(int playerNumber, int[] position) {
+		if (playerNumber == 1) {
+			return 9 - position[1];
+		} else {
+			return Math.abs(1 - position[1]);
+		}
+	}
+
+	public int[] getPlayerPosition(int playerNumber) {
+		if (playerNumber == 1)
+			return mPlayerOnePosition;
+		else
+			return mPlayerTwoPosition;
+	}
+
 
 }

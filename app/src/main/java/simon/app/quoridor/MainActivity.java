@@ -82,7 +82,7 @@ public class MainActivity extends Activity {
 
 // TODO: Change wall preview color depending on if position is good or not
 // TODO: Add z-axis for drawing order
-// TODO (Long term): Add home screen
+// TODO: Add home screen
 
 
 

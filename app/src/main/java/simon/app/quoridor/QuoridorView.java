@@ -33,6 +33,14 @@ public class QuoridorView extends GView {
 	private boolean isConsoleMessageTimed = false;
 	private int consoleMessageTimer = 0;
 
+	// Border blink
+	private boolean isBorderBlink = false;
+	private boolean drawBorderBlink = false;
+	private int mBorderBlinkTimer;
+	private int mBorderBlinkDelay;
+	private int mBorderBlinkColor;
+	private int mBorderBlinksLeft = 0;
+
 	//// Colors
 	public int consoleMessageColor = Color.GREEN;
 	public int wallPreviewColor = Color.GREEN;
@@ -81,6 +89,25 @@ public class QuoridorView extends GView {
 		// Wrapper
 		Paint wrapperPaint = new Paint();
 		wrapperPaint.setColor(wrapperColor);
+		if (isBorderBlink) {
+			if (drawBorderBlink) {
+				wrapperPaint.setColor(mBorderBlinkColor);
+				mBorderBlinkTimer--;
+				if (mBorderBlinkTimer <= 0) {
+					drawBorderBlink = false;
+					mBorderBlinkTimer = mBorderBlinkDelay;
+					mBorderBlinksLeft--;
+				}
+			} else {
+				mBorderBlinkTimer--;
+				if (mBorderBlinkTimer <= 0) {
+					drawBorderBlink = true;
+					mBorderBlinkTimer = mBorderBlinkDelay;
+				}
+			}
+
+			if (mBorderBlinksLeft <= 0) isBorderBlink = false;
+		}
 		wrapperPaint.setStyle(Paint.Style.STROKE);
 		wrapperPaint.setStrokeWidth(wrapperWidth);
 		canvas.drawRect(getLeft(), getTop(), getRight(), getBottom(), wrapperPaint);
@@ -159,6 +186,16 @@ public class QuoridorView extends GView {
 				wallBlinkTimer = wallBlinkDelay;
 			}
 		}
+
+	}
+
+	public void setBorderBlink(int color, int blinkDelay, int repetitions) {
+		isBorderBlink = true;
+		drawBorderBlink = true;
+		mBorderBlinkColor = color;
+		mBorderBlinkDelay = blinkDelay;
+		mBorderBlinkTimer = blinkDelay;
+		mBorderBlinksLeft = repetitions;
 
 	}
 
@@ -262,7 +299,6 @@ public class QuoridorView extends GView {
 		Paint borderGridPaint = new Paint();
 		borderGridPaint.setColor(gridBorderColor);
 		borderGridPaint.setStrokeWidth(cellBorderWidth);
-
 
 		canvas.drawLine(beginX, beginY, beginX, beginY + 9*cellSize, borderGridPaint);
 		canvas.drawLine(beginX + 9*cellSize, beginY, beginX + 9*cellSize, beginY + 9*cellSize, borderGridPaint);
