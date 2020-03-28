@@ -4,15 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.SurfaceHolder;
-
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -31,8 +28,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class GameView extends SurfaceView implements SurfaceHolder.Callback {
-	// Constants
+public class LayerView {
+
 	private static final String TAG = "GameView";
 	private static final String API_BASE_URL = "https://python.gel.ulaval.ca/quoridor/api/";
 	private static final String API_MAKE_MOVE_SUFFIX = "jouer/";
@@ -367,7 +364,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	@SuppressLint("ClickableViewAccessibility")
-	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		int x = (int) event.getX();
 		int y = (int) event.getY();
@@ -602,5 +598,4 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mAbandonButton.setVisible(true);
 		mQuoridorView.setConsoleMessage("");
 	}
-
 }

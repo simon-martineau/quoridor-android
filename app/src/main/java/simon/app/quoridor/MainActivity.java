@@ -80,10 +80,9 @@ public class MainActivity extends Activity {
 }
 
 
-// TODO: Change wall preview color depending on if position is good or not
-// TODO: Add z-axis for drawing order
 // TODO: Add home screen
 // TODO: Cancel wall placement on abandon match
+// TODO: Add z-axis for drawing order
 
 
 

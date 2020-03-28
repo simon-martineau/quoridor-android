@@ -30,8 +30,16 @@ public class QuoridorView extends GView {
 
 	// Console
 	private String mConsoleMessage = "";
-	private boolean isConsoleMessageTimed = false;
-	private int consoleMessageTimer = 0;
+
+	// Border blink
+	private boolean isBlinkingConsoleMessage = false;
+	private boolean drawCustomConsoleMessage = false;
+	private int mConsoleMessageTextSize = 0;
+	private int mConsoleMessageBlinkTimer;
+	private int mConsoleMessageBlinkDelay;
+	private int mConsoleMessageBlinkColor;
+	private int mConsoleMessageBlinksLeft = 0;
+	private String mConsoleMessageBlinkMessage;
 
 	// Border blink
 	private boolean isBorderBlink = false;
@@ -132,16 +140,32 @@ public class QuoridorView extends GView {
 		consolePaint.setColor(consoleMessageColor);
 		consolePaint.setTextSize(84);
 		consolePaint.setTextAlign(Paint.Align.CENTER);
-		canvas.drawText(mConsoleMessage, getRight() / 2.0f, getTop() + 192, consolePaint);
-		if (isConsoleMessageTimed) {
-			consoleMessageTimer--;
-			if (consoleMessageTimer <= 0) {
-				consoleMessageTimer = 0;
-				isConsoleMessageTimed = false;
-				mConsoleMessage = "";
-			}
-		}
 
+		if (isBlinkingConsoleMessage) {
+			if (drawCustomConsoleMessage) {
+				consolePaint.setColor(mConsoleMessageBlinkColor);
+				consolePaint.setTextSize(mConsoleMessageTextSize);
+				canvas.drawText(mConsoleMessageBlinkMessage, getRight() / 2.0f, getTop() + 192, consolePaint);
+				mConsoleMessageBlinkTimer--;
+				if (mConsoleMessageBlinkTimer <= 0) {
+					drawCustomConsoleMessage = false;
+					mConsoleMessageBlinkTimer = mConsoleMessageBlinkDelay;
+					mConsoleMessageBlinksLeft--;
+				}
+			} else {
+				mConsoleMessageBlinkTimer--;
+				if (mConsoleMessageBlinkTimer <= 0) {
+					drawCustomConsoleMessage = true;
+					mConsoleMessageBlinkTimer = mConsoleMessageBlinkDelay;
+				}
+			}
+
+			if (mConsoleMessageBlinksLeft <= 0) {
+				isBlinkingConsoleMessage = false;
+			}
+		} else {
+			canvas.drawText(mConsoleMessage, getRight() / 2.0f, getTop() + 192, consolePaint);
+		}
 
 		// Players
 		drawPlayer(canvas, 1, mQuoridor.mPlayerOnePosition[0], mQuoridor.mPlayerOnePosition[1]);
@@ -197,6 +221,17 @@ public class QuoridorView extends GView {
 		mBorderBlinkTimer = blinkDelay;
 		mBorderBlinksLeft = repetitions;
 
+	}
+
+	public void setCustomMessageBlink(String message, int color, int textSize, int blinkDelay, int repetitions) {
+		isBlinkingConsoleMessage = true;
+		drawCustomConsoleMessage = true;
+		mConsoleMessageTextSize = textSize;
+		mConsoleMessageBlinkTimer = blinkDelay;
+		mConsoleMessageBlinkDelay = blinkDelay;
+		mConsoleMessageBlinkColor = color;
+		mConsoleMessageBlinksLeft = repetitions;
+		mConsoleMessageBlinkMessage = message;
 	}
 
 	public void hoverCells(List<int[]> positions) {
@@ -316,7 +351,7 @@ public class QuoridorView extends GView {
 
 		Paint PreviewWallPaint = new Paint();
 		PreviewWallPaint.setColor(wallPreviewColor);
-		PreviewWallPaint.setAlpha(150);
+		// PreviewWallPaint.setAlpha(150);
 		PreviewWallPaint.setStrokeWidth(cellBorderWidth);
 
 		if (wallType == Quoridor.HORIZONTAL) {
@@ -448,11 +483,7 @@ public class QuoridorView extends GView {
 		consoleMessageColor = color;
 	}
 
-	public void setConsoleMessageWithDuration(String message, int duration) {
-		mConsoleMessage = message;
-		consoleMessageTimer = duration;
-		isConsoleMessageTimed = true;
-	}
+
 
 	public void linkQuoridorGame(Quoridor quoridor) {
 		mQuoridor = quoridor;
@@ -460,6 +491,4 @@ public class QuoridorView extends GView {
 
 }
 
-// TODO: Link game on new quoridor instance in GameView
-// TODO: Change click dispatch to performClick in GameView
 
