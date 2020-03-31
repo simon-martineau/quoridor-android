@@ -19,6 +19,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+
+/**
+ * Logical implementation of the Quoridor game
+ */
 public class Quoridor {
 	// Debug
 	private static final String TAG = "QUORIDOR";
@@ -40,7 +44,12 @@ public class Quoridor {
 	String mLastMoveType = "";
 	String mLastMoveCoordinates = "";
 
+	/**
+	 * Default constructor. Initialises an empty game
+	 */
+	public Quoridor() {
 
+	}
 
 	/**
 	 * Copy constructor
@@ -691,7 +700,6 @@ public class Quoridor {
 		else
 			return mPlayerTwoPosition;
 	}
-
 
 }
 

@@ -57,7 +57,7 @@ public class GameThread extends Thread {
 			waitTime = targetTime - timeMillis;
 
 			try {
-				this.sleep(waitTime);
+				sleep(waitTime);
 			} catch (Exception e) { }
 
 			totalTime += System.nanoTime() - startTime;

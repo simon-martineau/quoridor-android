@@ -135,6 +135,13 @@ public class ModalView extends GView {
 		}
 	}
 
+	/**
+	 * Override of the isInRect method from GView
+	 * @see GView#isInRect(int x, int y)
+	 * @param x The x coordinate (pixels)
+	 * @param y The y coordinate (pixels)
+	 * @return True if the modal view is set to visible, false otherwise
+	 */
 	@Override
 	public boolean isInRect(int x, int y) {
 		return isVisible();

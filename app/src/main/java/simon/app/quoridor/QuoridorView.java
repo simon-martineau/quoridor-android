@@ -442,9 +442,7 @@ public class QuoridorView extends GView {
 		}
 
 		if (tempQuoridorGame.getShortestPathToVictory(1) == null) return true;
-		if (tempQuoridorGame.getShortestPathToVictory(2) == null) return true;
-
-		return false;
+		return tempQuoridorGame.getShortestPathToVictory(2) == null;
 	}
 
 	public int[] getCellCorrespondingToTouch(int x, int y) {

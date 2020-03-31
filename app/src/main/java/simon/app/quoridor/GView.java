@@ -124,8 +124,6 @@ public abstract class GView {
 		mY = y;
 	}
 
-	// Visibility
-
 	/**
 	 * Checks if the position is included in the view's rectangle. If mIsVisible is set to false,
 	 * will always return false

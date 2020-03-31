@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
@@ -32,76 +31,222 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
+	//==============================================================================================
 	// Constants
-	private static final String TAG = "GameView";
-	private static final String API_BASE_URL = "https://python.gel.ulaval.ca/quoridor/api/";
-	private static final String API_MAKE_MOVE_SUFFIX = "jouer/";
-	private static final String API_BEGIN_GAME_SUFFIX = "débuter/";
-	private static final String IDUL = "simar86";
-	public final Typeface DEFAULT_TYPEFACE = Typeface.createFromAsset(getContext().getAssets(), "fonts/8_bit_style.ttf");
+	//==============================================================================================
 
-	// Network
+	/**
+	 * Tag for logging
+	 */
+	private static final String TAG = "GameView";
+
+	/**
+	 * Base URL for the quoridor APi. Used by the OKHttp client
+	 */
+	private static final String API_BASE_URL = "https://python.gel.ulaval.ca/quoridor/api/";
+
+	/**
+	 * Suffix to the base url to play a move
+	 */
+	private static final String API_MAKE_MOVE_SUFFIX = "jouer/";
+
+	/**
+	 * Suffix to the base url to begin a game
+	 */
+	private static final String API_BEGIN_GAME_SUFFIX = "débuter/";
+
+	/**
+	 * Used as identification for the quoridor api
+	 */
+	private static final String IDUL = "simar86";
+
+	/**
+	 * In a wall placement, how far the finger has to move on the screen to move the wall by one
+	 * unit
+	 */
+	private static final float WALL_UPDATE_STEP = 100;
+
+	/**
+	 * The default color to use for button background
+	 */
+	private static int DEFAULT_BUTTON_BACKGROUND_COLOR = Color.rgb(40, 40, 40);
+
+	/**
+	 * Default typeface used in drawText calls TODO: Actually implement default in views
+	 */
+	public static Typeface DEFAULT_TYPEFACE;
+
+	/**
+	 * Client used for server requests
+	 */
 	private final OkHttpClient httpClient = new OkHttpClient();
 
-
 	// Threading
+	/**
+	 * Thread from which to run the game
+	 */
 	public GameThread mGameThread;
 
-	// Logic
+	/**
+	 * Logical implementation of Quoridor. The game that is drawn to the canvas
+	 */
 	public Quoridor mGame;
 
-	// For wall placement
-	private final float wallUpdateStep = 100;
+
+
+
+	//==============================================================================================
+	// Wall placement logic
+	//==============================================================================================
+	/**
+	 * Wall placement: the last x coordinate of the finger in an ACTION_MOVE touch event.
+	 */
 	private float mLastTouchX;
+
+	/**
+	 * Wall placement: the last y coordinate of the finger in an ACTION_MOVE touch event.
+	 */
 	private float mLastTouchY;
+
+	/**
+	 * Wall placement: the current type of wall (HORIZONTAL or VERTICAL) to draw in the preview by
+	 * the QuoridorView.
+	 */
 	private int mWallPreviewType;
 
+	//==============================================================================================
+	// Views
+	//==============================================================================================
 
-	// Graphics
+	/**
+	 * This is where all the views are registered. TODO: Automatically register the views
+	 */
+	List<GView> mGViews = new ArrayList<>();
+
+	// Quoridor
+	/**
+	 * View in charge of drawing the Quoridor game on the canvas. Also handles some logic regarding
+	 * the user placing a wall. Has to be linked to mGame.
+	 * @see QuoridorView#linkQuoridorGame(Quoridor quoridor)
+	 */
 	public QuoridorView mQuoridorView;
 
-	// Colors
-	private int mButtonBackgroundColor = Color.rgb(40, 40, 40);
-
 	// Buttons
+	/**
+	 * Button to toggle between vertical/horizontal wall type during a wall placement
+	 */
 	GButton mToggleWallTypeButton;
+
+	/**
+	 * Button to begin a wall placement maneuver. Changes to a Cancel button during the wall placement
+	 */
 	GButton mPlaceWallButton;
+
+	/**
+	 * Button to confirm a wall placement maneuver
+	 */
 	GButton mConfirmWallButton;
+
+	/**
+	 * Button to begin a new game
+	 */
 	GButton mNewGameButton;
+
+	/**
+	 * Button to abandon the current match
+	 */
 	GButton mAbandonButton;
 
 	// Modal views
+	/**
+	 * Prompt to confirm match forfeiting
+	 */
 	ModalView mRestartConfirmModalView;
 
 	// Title view
+	/**
+	 * Name of the app at the top of the screen
+	 */
 	GTitleView mGTitleView;
 
-	// Views with click actions
-	List<GView> mGViews = new ArrayList<>();
-
-	// State
-	public boolean placingWall = false;
-	public boolean gamePaused = false;
-	public boolean modal = false;
-
+	//==============================================================================================
 	// Audio
-	private SoundPool mSoundPool;
-	private int mWinSoundId;
-	private int mLoseSoundId;
-	private int mPawnMoveSoundId;
-	private int mWallMoveSoundId;
-	private int mWallPlaceSoundId;
-	private int mSwitchWallTypeSoundId;
-	private int mBeginPlaceWallSoundId;
-	private int mAbandonButtonSoundId;
-	private int mInvalidWallSoundId;
+	//==============================================================================================
 
+	/**
+	 * Media player for the main track
+	 */
 	private MediaPlayer mBackgroundMusicPlayer;
 
-	// Temp
-	String message = "";
+	/**
+	 * Sound pool used to play all the sound effects (excluding the main track)
+	 * @see	#setUpAudio()
+	 */
+	private SoundPool mSoundPool;
+
+	/**
+	 * Sound played when the player wins
+	 */
+	private int mWinSoundId;
+
+	/**
+	 * Sound played when the player loses
+	 */
+	private int mLoseSoundId;
+
+	/**
+	 * Sound played when the moves his pawn
+	 */
+	private int mPawnMoveSoundId;
+
+	/**
+	 * Sound played the wall preview changes coordinates during a wall placement
+	 */
+	private int mWallMoveSoundId;
+
+	/**
+	 * Sound played when the wall is placed on the grid after a wall placement
+	 */
+	private int mWallPlaceSoundId;
+
+	/**
+	 * Sound played when toggling horizontal/vertical wall placement
+	 */
+	private int mSwitchWallTypeSoundId;
+
+	/**
+	 * Sound played when the "Place wall" button is pressed
+	 */
+	private int mBeginPlaceWallSoundId;
+
+	/**
+	 * Sound played when the abandon button is pressed
+	 */
+	private int mAbandonButtonSoundId;
+
+	/**
+	 * Sound played when the user tries to place a wall at an invalid location during wall placement
+	 */
+	private int mInvalidWallSoundId;
 
 
+	//==============================================================================================
+	// State logic
+	//==============================================================================================
+	/**
+	 * Whether or not a wall placement is occuring
+	 */
+	public boolean placingWall = false;
+
+	/**
+	 * Whether or not the game is "paused". Used while waiting for server response.
+	 */
+	public boolean gamePaused = false;
+
+	/**
+	 * Whether or not a ModalView is active (visible)
+	 */
+	public boolean modal = false;
 
 
 	public GameView(Context context) {
@@ -110,6 +255,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		getHolder().addCallback(this);
 		fetchNewGameFromServer(API_BASE_URL + API_BEGIN_GAME_SUFFIX, IDUL);
 
+		DEFAULT_TYPEFACE = Typeface.createFromAsset(getContext().getAssets(), "fonts/8_bit_style.ttf");
 
 		setUpAudio();
 
@@ -176,13 +322,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			mQuoridorView.setBlink(true);
 
 
-		// Temp
-//		Paint textPaint = new Paint();
-//		textPaint.setColor(Color.WHITE);
-//		textPaint.setTextSize(48);
-//		canvas.drawText("DEBUG: newGameButton.isVisible() = " + mNewGameButton.isVisible(), 400, getHeight() - 150, textPaint);
-//		canvas.drawText("DEBUG: message = " + message, 400, mSurfaceHeight - 50, textPaint);
-
 	}
 
 	@Override
@@ -207,7 +346,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		});
 		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
 
-		mPlaceWallButton = new GButton("Place a wall", 300, 150, 100, mQuoridorView.getBottom() + 64, mButtonBackgroundColor, Color.GREEN);
+		mPlaceWallButton = new GButton("Place a wall", 300, 150, 100, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mPlaceWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
@@ -231,7 +370,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		});
 
-		mToggleWallTypeButton = new GButton("Horizontal", 300, 150, 475, mQuoridorView.getBottom() + 64, mButtonBackgroundColor, Color.WHITE);
+		mToggleWallTypeButton = new GButton("Horizontal", 300, 150, 475, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
 		mToggleWallTypeButton.setOnClickAction(new GView.onClickAction() {
 
 			@Override
@@ -251,7 +390,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mToggleWallTypeButton.setVisible(false);
 
 
-		mConfirmWallButton = new GButton("Confirm", 300, 150, 850, mQuoridorView.getBottom() + 64, mButtonBackgroundColor, Color.GREEN);
+		mConfirmWallButton = new GButton("Confirm", 300, 150, 850, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mConfirmWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
@@ -272,7 +411,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		});
 		mConfirmWallButton.setVisible(false);
 
-		mAbandonButton = new GButton("Abandon", 300, 150, getWidth() - 450, getHeight() - 300, mButtonBackgroundColor, Color.RED);
+		mAbandonButton = new GButton("Abandon", 300, 150, getWidth() - 450, getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.RED);
 		mAbandonButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
@@ -282,7 +421,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		});
 
-		mNewGameButton = new GButton("New Game", 300, 150, getWidth() - 450, getHeight() - 300, mButtonBackgroundColor, Color.GREEN);
+		mNewGameButton = new GButton("New Game", 300, 150, getWidth() - 450, getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mNewGameButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
@@ -294,7 +433,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 		mRestartConfirmModalView = new ModalView("Confirm match forfeit?", 100, 600);
 		mRestartConfirmModalView.setFreezeView(new GFreezeView(0, 0, getWidth(), getHeight(), Color.WHITE, 50));
-		mRestartConfirmModalView.addGButton(Color.RED, mButtonBackgroundColor, 400, 150, "Yes",
+		mRestartConfirmModalView.addGButton(Color.RED, DEFAULT_BUTTON_BACKGROUND_COLOR, 400, 150, "Yes",
 				new GView.onClickAction() {
 					@Override
 					public void onClick(GameView gameView, int x, int y) {
@@ -305,7 +444,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 					}
 				});
 
-		mRestartConfirmModalView.addGButton(Color.GREEN, mButtonBackgroundColor, 400, 150, "No",
+		mRestartConfirmModalView.addGButton(Color.GREEN, DEFAULT_BUTTON_BACKGROUND_COLOR, 400, 150, "No",
 				new GView.onClickAction() {
 					@Override
 					public void onClick(GameView gameView, int x, int y) {
@@ -385,26 +524,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 					float posX = event.getX();
 					float posY = event.getY();
 
-					if (posX - mLastTouchX > wallUpdateStep) {
+					if (posX - mLastTouchX > WALL_UPDATE_STEP) {
 						mQuoridorView.offsetWallPreview(mWallPreviewType, 1, 0);
 						mLastTouchX = posX - 10;
 						playSound(mWallMoveSoundId, 0.3f);
 
-					} else if (posX - mLastTouchX < wallUpdateStep * -1) {
+					} else if (posX - mLastTouchX < WALL_UPDATE_STEP * -1) {
 						mQuoridorView.offsetWallPreview(mWallPreviewType, -1, 0);
 						mLastTouchX = posX + 10;
 						playSound(mWallMoveSoundId, 0.3f);
 					}
-					if (posY - mLastTouchY > wallUpdateStep) {
+					if (posY - mLastTouchY > WALL_UPDATE_STEP) {
 						mQuoridorView.offsetWallPreview(mWallPreviewType, 0, -1);
 						mLastTouchY = posY - 10;
 						playSound(mWallMoveSoundId, 0.3f);
-					} else if (posY - mLastTouchY < wallUpdateStep * -1) {
+					} else if (posY - mLastTouchY < WALL_UPDATE_STEP * -1) {
 						mQuoridorView.offsetWallPreview(mWallPreviewType, 0, 1);
 						mLastTouchY = posY + 10;
 						playSound(mWallMoveSoundId, 0.3f);
 					}
-					message = null;
 				}
 				break;
 			}
@@ -422,7 +560,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			gamePaused = true;
 			postMoveAndGetNewState(API_BASE_URL + API_MAKE_MOVE_SUFFIX, mGame.mGameID, mGame.mLastMoveType, mGame.mLastMoveCoordinates);
 		} catch (QuoridorException e) {
-			message = e.getMessage();
+			Log.i(TAG, "tryToMovePlayer: QuoridorException");
 		}
 	}
 

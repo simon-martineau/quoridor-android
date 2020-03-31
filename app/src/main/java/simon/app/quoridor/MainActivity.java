@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
@@ -35,7 +36,7 @@ public class MainActivity extends Activity {
 		// getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_main);
 
-		LinearLayout surface = (LinearLayout) findViewById(R.id.surfaceViewContainer);
+		LinearLayout surface = findViewById(R.id.surfaceViewContainer);
 		mGameView = new GameView(this);
 		surface.addView(mGameView);
 		Log.i(TAG, "onCreate: view added");
@@ -80,9 +81,10 @@ public class MainActivity extends Activity {
 }
 
 
+// TODO: Add z-axis for drawing order
 // TODO: Add home screen
 // TODO: Cancel wall placement on abandon match
-// TODO: Add z-axis for drawing order
+
 
 
 
