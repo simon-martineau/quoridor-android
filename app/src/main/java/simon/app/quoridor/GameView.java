@@ -122,7 +122,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	//==============================================================================================
 
 	/**
-	 * This is where all the views are registered. TODO: Automatically register the views
+	 * This is where all the views are registered.
 	 */
 	List<GView> mGViews = new ArrayList<>();
 
@@ -245,11 +245,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	 * Whether or not the game is "paused". Used while waiting for server response.
 	 */
 	public boolean gamePaused = false;
-
-	/**
-	 * Whether or not a ModalView is active (visible)
-	 */
-	public boolean modal = false;
 
 
 	//==============================================================================================
@@ -435,7 +430,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			public void onClick(GameView gameView, int x, int y) {
 				playSound(mAbandonButtonSoundId, 0.5f);
 				mRestartConfirmModalView.setVisible(true);
-				modal = true;
 			}
 		});
 
@@ -456,7 +450,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 					public void onClick(GameView gameView, int x, int y) {
 						playSound(mLoseSoundId, 0.5f);
 						startNewGame();
-						modal = false;
 						mRestartConfirmModalView.setVisible(false);
 					}
 				});
@@ -466,7 +459,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 					@Override
 					public void onClick(GameView gameView, int x, int y) {
 						playSound(mWallMoveSoundId, 0.5f);
-						modal = false;
 						mRestartConfirmModalView.setVisible(false);
 					}
 				});

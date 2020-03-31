@@ -60,12 +60,10 @@ public class ModalView extends GView {
 		mGFreezeView.setZIndex(-1);
 	}
 
-	// TODO: Add ModalView's own z-index system ?
 	public void addGButton(int foreGroundColor, int backgroundColor, int width, int height, String text, onClickAction action) {
 		GButton newButton = new GButton(this, text, width, height, getNextButtonX(),
 				getTop() + TOP_MARGIN + MESSAGE_SECTION_HEIGHT + TEXT_TO_GVIEW_SEPARATION, backgroundColor, foreGroundColor, true);
 		newButton.setOnClickAction(action);
-//		mGViews.add(newButton);
 	}
 
 	/**
