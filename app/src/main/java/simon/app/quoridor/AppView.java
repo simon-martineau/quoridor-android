@@ -19,7 +19,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import okhttp3.Call;
@@ -51,11 +53,11 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	public GameThread mGameThread;
 
 	//==============================================================================================
-	// Views
+	// WindowViews
 	//==============================================================================================
 
-
-
+	private HashMap<String, WindowView> mWindowViews = new HashMap<>();
+	private String mActiveWindowView = "";
 
 	//==============================================================================================
 	// Constructors
@@ -69,9 +71,13 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 		super(context);
 		getHolder().addCallback(this);
 
+
 		setFocusable(true);
 	}
 
+	//==============================================================================================
+	// Methods
+	//==============================================================================================
 	/**
 	 * Draws the app to the canvas
 	 * @param canvas The canvas to draw on
@@ -80,6 +86,29 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
 
+		WindowView currentWindowView = mWindowViews.get(mActiveWindowView);
+		if (currentWindowView != null) {
+			currentWindowView.draw(canvas);
+		} else {
+			Log.e(TAG, "draw: ActiveWindowView not found");
+		}
+	}
+
+	/**
+	 * Touch event routing
+	 * @see SurfaceView#onTouchEvent(MotionEvent)
+	 */
+	@SuppressLint("ClickableViewAccessibility")
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		WindowView currentWindowView = mWindowViews.get(mActiveWindowView);
+		if (currentWindowView != null) {
+			currentWindowView.onTouchEvent(event);
+		} else {
+			Log.e(TAG, "onTouchEvent: ActiveWindowView not found");
+		}
+
+		return true;
 	}
 
 	/**
@@ -87,7 +116,9 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	 */
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+		for (Map.Entry<String, WindowView> pair: mWindowViews.entrySet()) {
+			pair.getValue().surfaceChanged(holder, format, width, height);
+		}
 	}
 
 	/**
@@ -99,6 +130,10 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 		mGameThread.setRunning(true);
 		mGameThread.start();
 
+		for (Map.Entry<String, WindowView> pair: mWindowViews.entrySet()) {
+			pair.getValue().surfaceCreated(holder);
+		}
+
 	}
 
 	/**
@@ -106,6 +141,10 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	 */
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
+		for (Map.Entry<String, WindowView> pair: mWindowViews.entrySet()) {
+			pair.getValue().surfaceDestroyed(holder);
+		}
+
 		boolean retry = true;
 		while (retry) {
 			try {
@@ -119,16 +158,6 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 		}
 	}
 
-	/**
-	 * Touch event routing
-	 * @see SurfaceView#onTouchEvent(MotionEvent)
-	 */
-	@SuppressLint("ClickableViewAccessibility")
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
 
-
-		return true;
-	}
 
 }
