@@ -348,7 +348,7 @@ public class Quoridor {
 	 *                           	Should be false if called from outside the method
 	 * @param virtualPosition If not null, the player is considered to be at that position (x, y).
 	 *                        Used for analysing different scenarios
-	 * @return
+	 * @return A list containing all the coordinates the player can move to (size-2 arrays)
 	 */
 	public List<int[]> getPossibleNextCoordinates(int playerNumber, boolean ignoreOtherPlayerJump, @Nullable int[] virtualPosition) {
 		List<int[]> possibleNextCoordinates = new ArrayList<>();
@@ -493,7 +493,10 @@ public class Quoridor {
 	private boolean isHorizontalWall(int x, int y) {
 		boolean isWall = false;
 		for (int[] wall : mHorizontalWalls) {
-			if (wall[0] == x && wall[1] == y) isWall = true;
+			if (wall[0] == x && wall[1] == y) {
+				isWall = true;
+				break;
+			}
 		}
 		return isWall;
 	}
@@ -507,7 +510,10 @@ public class Quoridor {
 	private boolean isVerticalWall(int x, int y) {
 		boolean isWall = false;
 		for (int[] wall : mVerticalWalls) {
-			if (wall[0] == x && wall[1] == y) isWall = true;
+			if (wall[0] == x && wall[1] == y) {
+				isWall = true;
+				break;
+			}
 		}
 		return isWall;
 	}
@@ -523,7 +529,10 @@ public class Quoridor {
 		boolean included = false;
 
 		for (int[] positionInArray : positionArrayList) {
-			if (position[0] == positionInArray[0] && position[1] == positionInArray[1]) included = true;
+			if (position[0] == positionInArray[0] && position[1] == positionInArray[1]) {
+				included = true;
+				break;
+			}
 		}
 
 		return included;
@@ -611,10 +620,6 @@ public class Quoridor {
 				// If it is goal
 				if (successor.getF() == 0) {
 					return getPathToNode(successor);
-				}
-
-				if (aStarListContainsNodePositionWithLessF(successor, openNodes)) {
-					// Do nothing
 				}
 
 				else if (!aStarListContainsNodePositionWithLessF(successor, closedNodes)) {
