@@ -12,7 +12,7 @@ public abstract class GView implements Comparable<GView> {
 	private int mX;
 	private int mY;
 
-	private GameView mGameView;
+	private WindowView mWindowView;
 	private ModalView mModalView;
 
 	private onClickAction mOnClickAction;
@@ -28,11 +28,11 @@ public abstract class GView implements Comparable<GView> {
 	 * @param x The x coordinate (in pixels) for the view
 	 * @param y The y coordinate (in pixels) for the view
 	 */
-	public GView(GameView gameView, int x, int y) {
+	public GView(WindowView windowView, int x, int y) {
 		mX = x;
 		mY = y;
-		mGameView = gameView;
-		registerView(gameView);
+		mWindowView = windowView;
+		registerView(windowView);
 	}
 
 	/**
@@ -62,8 +62,8 @@ public abstract class GView implements Comparable<GView> {
 	 */
 	public void setZIndex(int index) {
 		mZIndex = index;
-		if (mGameView != null) {
-			mGameView.sortViews();
+		if (mWindowView != null) {
+			mWindowView.sortViews();
 		} else if (mModalView != null) {
 			mModalView.sortViews();
 		}
@@ -71,10 +71,10 @@ public abstract class GView implements Comparable<GView> {
 
 	/**
 	 * Register the view in the parent GameView
-	 * @param gameView The parent GameView
+	 * @param windowView The parent GameView
 	 */
-	private void registerView(GameView gameView) {
-		gameView.registerGView(this);
+	private void registerView(WindowView windowView) {
+		windowView.registerGView(this);
 	}
 
 	/**
@@ -88,13 +88,13 @@ public abstract class GView implements Comparable<GView> {
 
 	/**
 	 * Perform the view's method associated with its mOnClickAction interface
-	 * @param gameView A reference to the GameView in which the view resides
+	 * @param windowView A reference to the WindowView in which the view resides
 	 * @param x The x coordinate of the touch event
 	 * @param y The y coordinate of the touch event
 	 */
-	public void performClick(GameView gameView, int x, int y) {
+	public void performClick(WindowView windowView, int x, int y) {
 		if (hasOnClick) {
-			mOnClickAction.onClick(gameView, x, y);
+			mOnClickAction.onClick(windowView, x, y);
 		}
 	}
 
@@ -112,7 +112,7 @@ public abstract class GView implements Comparable<GView> {
 	 * routed to the view
 	 */
 	public interface onClickAction {
-		void onClick(GameView gameView, int x, int y);
+		void onClick(WindowView windowView, int x, int y);
 	}
 
 	// Abstract methods

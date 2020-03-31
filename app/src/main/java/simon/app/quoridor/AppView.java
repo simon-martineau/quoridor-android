@@ -57,7 +57,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	//==============================================================================================
 
 	private HashMap<String, WindowView> mWindowViews = new HashMap<>();
-	private String mActiveWindowView = "";
+	private String mActiveWindowView = null;
 
 	//==============================================================================================
 	// Constructors
@@ -71,12 +71,27 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 		super(context);
 		getHolder().addCallback(this);
 
+		mWindowViews.put("game", new GameView(this));
+		setActiveWindowView("game");
 
 		setFocusable(true);
 	}
 
 	//==============================================================================================
-	// Methods
+	// WindowView methods
+	//==============================================================================================
+
+	private void setActiveWindowView(String key) {
+		if (mActiveWindowView != null) {
+			mWindowViews.get(mActiveWindowView).onDeactivate();
+		}
+
+		mWindowViews.get(key).onActivate();
+		mActiveWindowView = key;
+	}
+
+	//==============================================================================================
+	// Overrode methods
 	//==============================================================================================
 	/**
 	 * Draws the app to the canvas
@@ -157,7 +172,5 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		}
 	}
-
-
 
 }

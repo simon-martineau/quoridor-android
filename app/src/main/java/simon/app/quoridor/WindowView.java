@@ -1,5 +1,6 @@
 package simon.app.quoridor;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.Log;
@@ -14,6 +15,23 @@ import java.util.List;
  * Abstract class representing a Window, child of AppView
  */
 public abstract class WindowView {
+
+	/**
+	 * Reference to the AppView containing the WindowView
+	 */
+	protected AppView mAppView;
+
+	//==============================================================================================
+	// Constructor
+	//==============================================================================================
+
+	/**
+	 * Constructor holding a reference to the AppView
+	 * @param appView The AppView from which the WindowView is created
+	 */
+	public WindowView(AppView appView) {
+		mAppView = appView;
+	}
 
 	//==============================================================================================
 	// Views
@@ -59,17 +77,14 @@ public abstract class WindowView {
 	 * @param event The touch event routed from the AppView
 	 * @return True, the event is always considered to be handled
 	 */
-	public boolean onTouchEvent(MotionEvent event) {
-		dispatchTouchToViews((int) event.getX(), (int) event.getY());
-		return true;
-	}
+	public abstract boolean onTouchEvent(MotionEvent event);
 
 	/**
 	 * Dispatch the touch event to the children views until it is handled
 	 * @param x The x coordinate (pixels) of the event
 	 * @param y The y coordinate (pixels) of the event
 	 */
-	private void dispatchTouchToViews(int x, int y) {
+	protected void dispatchTouchToViews(int x, int y) {
 		for (GView gView : mGViews) {
 
 			if (gView.isInRect(x, y)) {
@@ -101,4 +116,15 @@ public abstract class WindowView {
 	 * @see android.view.SurfaceHolder.Callback#surfaceDestroyed(SurfaceHolder)
 	 */
 	public abstract void surfaceDestroyed(SurfaceHolder holder);
+
+	/**
+	 * Actions to perform when the WindowView gets activated by the AppView
+	 */
+	public void onActivate() {}
+
+	/**
+	 * Actions to perform when the WindowView gets deactivated by the AppView
+	 */
+	public void onDeactivate() {}
+
 }

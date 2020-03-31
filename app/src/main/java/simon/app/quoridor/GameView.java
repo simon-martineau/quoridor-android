@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
+import android.view.Window;
 
 
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +34,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class GameView extends SurfaceView implements SurfaceHolder.Callback {
+public class GameView extends WindowView{
 	//==============================================================================================
 	// Constants
 	//==============================================================================================
@@ -84,18 +85,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	 */
 	private final OkHttpClient httpClient = new OkHttpClient();
 
-	// Threading
-	/**
-	 * Thread from which to run the game
-	 */
-	public GameThread mGameThread;
-
 	/**
 	 * Logical implementation of Quoridor. The game that is drawn to the canvas
 	 */
 	public Quoridor mGame;
-
-
 
 
 	//==============================================================================================
@@ -120,11 +113,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	//==============================================================================================
 	// Views
 	//==============================================================================================
-
-	/**
-	 * This is where all the views are registered.
-	 */
-	List<GView> mGViews = new ArrayList<>();
 
 	// Quoridor
 	/**
@@ -250,25 +238,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	//==============================================================================================
 	// Constructors
 	//==============================================================================================
+	public GameView(AppView appView) {
+		super(appView);
 
-	public GameView(Context context) {
-		super(context);
-
-		getHolder().addCallback(this);
-		fetchNewGameFromServer(API_BASE_URL + API_BEGIN_GAME_SUFFIX, IDUL);
-
-		DEFAULT_TYPEFACE = Typeface.createFromAsset(getContext().getAssets(), "fonts/8_bit_style.ttf");
+		DEFAULT_TYPEFACE = Typeface.createFromAsset(appView.getContext().getAssets(), "fonts/8_bit_style.ttf");
 
 		setUpAudio();
 
 		mGame = new Quoridor();
-		setFocusable(true);
 	}
 
-	public GameView(Context context, String id, String state) {
-		super(context);
+	public GameView(AppView appView, String id, String state) {
+		super(appView);
 
-		getHolder().addCallback(this);
+		DEFAULT_TYPEFACE = Typeface.createFromAsset(appView.getContext().getAssets(), "fonts/8_bit_style.ttf");
 
 		JSONObject stateJSON;
 		try {
@@ -279,9 +262,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		}
 
 		setUpAudio();
-
-		setFocusable(true);
 	}
+
 
 	//==============================================================================================
 	// Methods
@@ -292,21 +274,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	private void setUpAudio() {
-		mBackgroundMusicPlayer = MediaPlayer.create(getContext(), R.raw.game_track);
+		mBackgroundMusicPlayer = MediaPlayer.create(mAppView.getContext(), R.raw.game_track);
 		mBackgroundMusicPlayer.setLooping(true);
 
 		mSoundPool = new SoundPool.Builder()
 				.setMaxStreams(10)
 				.build();
-		mWinSoundId = mSoundPool.load(getContext(), R.raw.win, 1);
-		mLoseSoundId = mSoundPool.load(getContext(), R.raw.lose, 1);
-		mPawnMoveSoundId = mSoundPool.load(getContext(), R.raw.pawn_move, 1);
-		mWallMoveSoundId = mSoundPool.load(getContext(), R.raw.move_wall, 1);
-		mWallPlaceSoundId = mSoundPool.load(getContext(), R.raw.place_wall, 1);
-		mSwitchWallTypeSoundId = mSoundPool.load(getContext(), R.raw.switch_wall_type, 1);
-		mBeginPlaceWallSoundId = mSoundPool.load(getContext(), R.raw.begin_place_wall, 1);
-		mAbandonButtonSoundId = mSoundPool.load(getContext(), R.raw.abandon_button_sound, 1);
-		mInvalidWallSoundId = mSoundPool.load(getContext(), R.raw.invalid_wall, 1);
+		mWinSoundId = mSoundPool.load(mAppView.getContext(), R.raw.win, 1);
+		mLoseSoundId = mSoundPool.load(mAppView.getContext(), R.raw.lose, 1);
+		mPawnMoveSoundId = mSoundPool.load(mAppView.getContext(), R.raw.pawn_move, 1);
+		mWallMoveSoundId = mSoundPool.load(mAppView.getContext(), R.raw.move_wall, 1);
+		mWallPlaceSoundId = mSoundPool.load(mAppView.getContext(), R.raw.place_wall, 1);
+		mSwitchWallTypeSoundId = mSoundPool.load(mAppView.getContext(), R.raw.switch_wall_type, 1);
+		mBeginPlaceWallSoundId = mSoundPool.load(mAppView.getContext(), R.raw.begin_place_wall, 1);
+		mAbandonButtonSoundId = mSoundPool.load(mAppView.getContext(), R.raw.abandon_button_sound, 1);
+		mInvalidWallSoundId = mSoundPool.load(mAppView.getContext(), R.raw.invalid_wall, 1);
 
 	}
 
@@ -339,16 +321,26 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+	public void onActivate() {
+		super.onActivate();
 		mBackgroundMusicPlayer.start();
+	}
 
-		mGTitleView = new GTitleView(this, "8 bit Quoridor", Color.GREEN, 184f, getWidth());
+	@Override
+	public void onDeactivate() {
+		super.onDeactivate();
+		mBackgroundMusicPlayer.pause();
+	}
+
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+		mGTitleView = new GTitleView(this, "8 bit Quoridor", Color.GREEN, 184f, mAppView.getWidth());
 		mGTitleView.setY(128);
 
 		mQuoridorView = new QuoridorView(this, mGame, 50, mGTitleView.getBottom() + 128, width);
 		mQuoridorView.setOnClickAction(new QuoridorView.onClickAction() {
 			@Override
-			public void onClick(GameView gameView, int x, int y) {
+			public void onClick(WindowView windowView, int x, int y) {
 				if (!gamePaused && !placingWall) {
 					int[] possibleCellCoordinates;
 					possibleCellCoordinates = mQuoridorView.getCellCorrespondingToTouch(x, y);
@@ -362,19 +354,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mPlaceWallButton = new GButton(this, "Place a wall", 300, 150, 100, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mPlaceWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(GameView gameView, int x, int y) {
+			public void onClick(WindowView windowView, int x, int y) {
 				if (!gamePaused) {
-					if (!gameView.placingWall) {
+					if (!placingWall) {
 						playSound(mBeginPlaceWallSoundId, 0.5f);
 						mToggleWallTypeButton.setVisible(true);
 						mConfirmWallButton.setVisible(true);
-						gameView.initiateWallPlacement(Quoridor.HORIZONTAL);
+						initiateWallPlacement(Quoridor.HORIZONTAL);
 						mPlaceWallButton.setText("Cancel");
 						mPlaceWallButton.setTextColor(Color.RED);
 					} else {
 						mToggleWallTypeButton.setVisible(false);
 						mConfirmWallButton.setVisible(false);
-						gameView.cancelWallPlacement();
+						cancelWallPlacement();
 						mPlaceWallButton.setTextColor(Color.GREEN);
 						mPlaceWallButton.setText("Place a wall");
 						mToggleWallTypeButton.setText("Horizontal");
@@ -387,16 +379,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mToggleWallTypeButton.setOnClickAction(new GView.onClickAction() {
 
 			@Override
-			public void onClick(GameView gameView, int x, int y) {
-				gameView.cancelWallPlacement();
+			public void onClick(WindowView windowView, int x, int y) {
+				cancelWallPlacement();
 				playSound(mSwitchWallTypeSoundId, 0.3f);
 				if (mToggleWallTypeButton.getText().equals("Horizontal"))
 				{
 					mToggleWallTypeButton.setText("Vertical");
-					gameView.initiateWallPlacement(Quoridor.VERTICAL);
+					initiateWallPlacement(Quoridor.VERTICAL);
 				} else if (mToggleWallTypeButton.getText().equals("Vertical")) {
 					mToggleWallTypeButton.setText("Horizontal");
-					gameView.initiateWallPlacement(Quoridor.HORIZONTAL);
+					initiateWallPlacement(Quoridor.HORIZONTAL);
 				}
 			}
 		});
@@ -406,9 +398,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mConfirmWallButton = new GButton(this, "Confirm", 300, 150, 850, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mConfirmWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(GameView gameView, int x, int y) {
+			public void onClick(WindowView windowView, int x, int y) {
 				try {
-					gameView.finalizeWallPlacement();
+					finalizeWallPlacement();
 					mToggleWallTypeButton.setVisible(false);
 					mConfirmWallButton.setVisible(false);
 					mPlaceWallButton.setTextColor(Color.GREEN);
@@ -424,20 +416,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		});
 		mConfirmWallButton.setVisible(false);
 
-		mAbandonButton = new GButton(this, "Abandon", 300, 150, getWidth() - 450, getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.RED);
+		mAbandonButton = new GButton(this, "Abandon", 300, 150, mAppView.getWidth() - 450, mAppView.getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.RED);
 		mAbandonButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(GameView gameView, int x, int y) {
+			public void onClick(WindowView windowView, int x, int y) {
 				playSound(mAbandonButtonSoundId, 0.5f);
 				mRestartConfirmModalView.setVisible(true);
 			}
 		});
 
-		mNewGameButton = new GButton(this, "New Game", 300, 150, getWidth() - 450, getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
+		mNewGameButton = new GButton(this, "New Game", 300, 150, mAppView.getWidth() - 450, mAppView.getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mNewGameButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(GameView gameView, int x, int y) {
-				gameView.startNewGame();
+			public void onClick(WindowView windowView, int x, int y) {
+				startNewGame();
 				mNewGameButton.setVisible(false);
 			}
 		});
@@ -447,7 +439,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mRestartConfirmModalView.addGButton(Color.RED, DEFAULT_BUTTON_BACKGROUND_COLOR, 400, 150, "Yes",
 				new GView.onClickAction() {
 					@Override
-					public void onClick(GameView gameView, int x, int y) {
+					public void onClick(WindowView windowView, int x, int y) {
 						playSound(mLoseSoundId, 0.5f);
 						startNewGame();
 						mRestartConfirmModalView.setVisible(false);
@@ -457,52 +449,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mRestartConfirmModalView.addGButton(Color.GREEN, DEFAULT_BUTTON_BACKGROUND_COLOR, 400, 150, "No",
 				new GView.onClickAction() {
 					@Override
-					public void onClick(GameView gameView, int x, int y) {
+					public void onClick(WindowView windowView, int x, int y) {
 						playSound(mWallMoveSoundId, 0.5f);
 						mRestartConfirmModalView.setVisible(false);
 					}
 				});
-		mRestartConfirmModalView.setX(getWidth() / 2 - mRestartConfirmModalView.getWidth() / 2);
-		mRestartConfirmModalView.setY(getHeight() / 2 - mRestartConfirmModalView.getHeight() / 2 - 200);
+		mRestartConfirmModalView.setX(mAppView.getWidth() / 2 - mRestartConfirmModalView.getWidth() / 2);
+		mRestartConfirmModalView.setY(mAppView.getHeight() / 2 - mRestartConfirmModalView.getHeight() / 2 - 200);
 		mRestartConfirmModalView.setVisible(false);
 
 	}
 
 	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
-		mGameThread = new GameThread(getHolder(), this);
-		mGameThread.setRunning(true);
-		mGameThread.start();
-
-	}
+	public void surfaceCreated(SurfaceHolder holder) { }
 
 	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		mBackgroundMusicPlayer.pause();
-		boolean retry = true;
-		while (retry) {
-			try {
-				mGameThread.setRunning(false);
-				mGameThread.join();
-				retry = false;
-				Log.i("GameThread", "surfaceDestroyed: thread killed");
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+	public void surfaceDestroyed(SurfaceHolder holder) { }
 
-	private void dispatchTouchToViews(int x, int y) {
-		for (GView gView : mGViews) {
 
-			if (gView.isInRect(x, y)) {
-				gView.performClick(this, x, y);
-				return;
-			}
-		}
-	}
-
-	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		int x = (int) event.getX();

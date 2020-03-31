@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
 	private static final String TAG = "MainActivity";
 	private String mGameKey = null;
 	private String mGameState = null;
-	public GameView mGameView;
+	public AppView mAppView;
 
 	@SuppressLint("SourceLockedOrientationActivity")
 	@Override
@@ -37,8 +37,8 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		LinearLayout surface = findViewById(R.id.surfaceViewContainer);
-		mGameView = new GameView(this);
-		surface.addView(mGameView);
+		mAppView = new AppView(this);
+		surface.addView(mAppView);
 		Log.i(TAG, "onCreate: view added");
 	}
 
@@ -47,11 +47,11 @@ public class MainActivity extends Activity {
 		super.onStart();
 
 		Log.i(TAG, "onStart: called");
-		if (mGameView == null) Log.i(TAG, "onStart: mGameView is null");
+		if (mAppView == null) Log.i(TAG, "onStart: mGameView is null");
 
-		if (mGameKey != null) {
-			mGameView = new GameView(this, mGameKey, mGameState);
-		}
+//		if (mGameKey != null) {
+//			mGameView = new GameView(this, mGameKey, mGameState);
+//		}
 
 	}
 
