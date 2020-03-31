@@ -3,34 +3,14 @@ package simon.app.quoridor;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.media.MediaPlayer;
-import android.media.SoundPool;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 
 /**
@@ -141,7 +121,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	 */
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		// mGameThread = new GameThread(getHolder(), this); // TODO: Make GameThread control AppView
+		mGameThread = new GameThread(getHolder(), this);
 		mGameThread.setRunning(true);
 		mGameThread.start();
 

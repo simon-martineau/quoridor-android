@@ -243,6 +243,7 @@ public class GameView extends WindowView{
 
 		DEFAULT_TYPEFACE = Typeface.createFromAsset(appView.getContext().getAssets(), "fonts/8_bit_style.ttf");
 
+		fetchNewGameFromServer(API_BASE_URL + API_BEGIN_GAME_SUFFIX, IDUL);
 		setUpAudio();
 
 		mGame = new Quoridor();

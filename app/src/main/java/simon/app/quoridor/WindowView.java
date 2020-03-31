@@ -127,4 +127,22 @@ public abstract class WindowView {
 	 */
 	public void onDeactivate() {}
 
+	//==============================================================================================
+	// Other
+	//==============================================================================================
+
+	/**
+	 * @return The width of the WindowView
+	 */
+	public int getWidth() {
+		return mAppView.getWidth();
+	}
+
+	/**
+	 * @return The height of the WindowView
+	 */
+	public int getHeight() {
+		return mAppView.getHeight();
+	}
+
 }

@@ -6,7 +6,7 @@ import android.view.SurfaceHolder;
 
 public class GameThread extends Thread {
 	private final SurfaceHolder mSurfaceHolder;
-	private GameView mGameView;
+	private AppView mAppView;
 	private boolean running;
 	private static Canvas mCanvas;
 
@@ -14,10 +14,10 @@ public class GameThread extends Thread {
 	int mTargetFPS = 30;
 
 
-	public GameThread(SurfaceHolder holder, GameView gameView) {
+	public GameThread(SurfaceHolder holder, AppView appView) {
 		super();
 		mSurfaceHolder = holder;
-		mGameView = gameView;
+		mAppView = appView;
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class GameThread extends Thread {
 			try {
 				mCanvas = this.mSurfaceHolder.lockCanvas();
 				synchronized (mSurfaceHolder) {
-					this.mGameView.draw(mCanvas);
+					this.mAppView.draw(mCanvas);
 				}
 			} catch (Exception e) { e.printStackTrace(); } finally {
 				if (mCanvas != null) {

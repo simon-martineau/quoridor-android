@@ -26,12 +26,12 @@ public class ModalView extends GView {
 	private GFreezeView mGFreezeView;
 	private ArrayList<GView> mGViews = new ArrayList<>();
 	private String mPromptString;
-	private final GameView mGameView;
+	private final WindowView mWindowView;
 
 	// TODO: Implement offset button coordinates instead of absolute
 
-	public ModalView(GameView gameView, String message, int x, int y) {
-		super(gameView, x, y);
+	public ModalView(WindowView windowView, String message, int x, int y) {
+		super(windowView, x, y);
 
 		setZIndex(100);
 
@@ -39,10 +39,10 @@ public class ModalView extends GView {
 
 		setOnClickAction(new onClickAction() {
 			@Override
-			public void onClick(GameView gameView, int x, int y) {
+			public void onClick(WindowView windowView, int x, int y) {
 				for (GView gView: mGViews) {
 					if (gView.isInRect(x, y)) {
-						gView.performClick(gameView, x, y);
+						gView.performClick(windowView, x, y);
 						break;
 					}
 				}
@@ -50,9 +50,9 @@ public class ModalView extends GView {
 		});
 
 		// Default FreezeView
-		setFreezeView(new GFreezeView(this, 0, 0, gameView.getWidth(), gameView.getHeight(), Color.WHITE, 50, false));
+		setFreezeView(new GFreezeView(this, 0, 0, windowView.getWidth(), windowView.getHeight(), Color.WHITE, 50, false));
 
-		mGameView = gameView;
+		mWindowView = windowView;
 	}
 
 	public void setFreezeView(GFreezeView gFreezeView) {
