@@ -1,6 +1,7 @@
 package simon.app.quoridor;
 
 import android.graphics.Canvas;
+import android.graphics.Typeface;
 
 /**
  * Base class for custom views
@@ -10,6 +11,8 @@ public abstract class GView {
 	private int mY;
 	private onClickAction mOnClickAction;
 	private boolean mIsVisible = true;
+
+	protected Typeface mTypeFace = GameView.DEFAULT_TYPEFACE;
 
 	/**
 	 * Constructor for the GView

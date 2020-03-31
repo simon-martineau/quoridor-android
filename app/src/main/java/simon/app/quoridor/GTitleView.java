@@ -18,6 +18,7 @@ public class GTitleView extends GView {
 		mPaint.setColor(color);
 		mPaint.setTextSize(textSize);
 		mPaint.setTextAlign(Paint.Align.CENTER);
+		mPaint.setTypeface(mTypeFace);
 
 		setX(parentWidth / 2 - getTextWidth() / 2);
 	}
@@ -32,7 +33,8 @@ public class GTitleView extends GView {
 	}
 
 	public void setTypeFace(Typeface typeFace) {
-		mPaint.setTypeface(typeFace);
+		mTypeFace = typeFace;
+		mPaint.setTypeface(mTypeFace);
 	}
 
 	@Override

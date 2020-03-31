@@ -329,7 +329,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mBackgroundMusicPlayer.start();
 
 		mGTitleView = new GTitleView("8 bit Quoridor", Color.GREEN, 184f, getWidth());
-		mGTitleView.setTypeFace(DEFAULT_TYPEFACE);
 		mGTitleView.setY(128);
 
 		mQuoridorView = new QuoridorView(mGame, 50, mGTitleView.getBottom() + 128, width);
