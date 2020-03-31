@@ -40,24 +40,41 @@ public class Quoridor {
 	String mLastMoveType = "";
 	String mLastMoveCoordinates = "";
 
-	public Quoridor() {
 
-	}
 
-	/* Copy constructor*/
-	public Quoridor(Quoridor quoridor) {
+	/**
+	 * Copy constructor
+	 * @param quoridor The quoridor game to copy from
+	 */
+	public Quoridor( Quoridor quoridor) {
 		putGameState(quoridor.getGameStateJSON());
 	}
 
+	/**
+	 * Con
+	 * @param gameID The ID of the game
+	 * @param initialGameState The JSONObject corresponding to the game state
+	 */
 	public Quoridor(String gameID, JSONObject initialGameState) {
 		mGameID = gameID;
 		putGameState(initialGameState);
 	}
 
+	/**
+	 * Sets the game ID
+	 * @param gameID String corresponding to the game ID
+	 */
 	public void setGameID(String gameID) {
 		mGameID = gameID;
 	}
 
+	/**
+	 * Changes coordinates of a player, and updates mLastMoveType and mLastMoveCoordinates
+	 * accordingly
+	 * @param playerNumber The number of the player to change position (1 or 2)
+	 * @param x The new x coordinate
+	 * @param y The new y coordinate
+	 */
 	public void movePlayer(int playerNumber, int x, int y) {
 		if (playerNumber == 1)
 			mPlayerOnePosition = new int[]{x, y};
@@ -67,6 +84,14 @@ public class Quoridor {
 		mLastMoveCoordinates = "(" + x + ", " + y + ")";
 	}
 
+	/**
+	 * Adds a wall to the horizontal or vertical wall list and subtract 1 to the number of walls left
+	 * for the player who places the wall
+	 * @param player The player who places the wall (1 or 2)
+	 * @param type The type of wall to place (constant HORIZONTAL or VERTICAL)
+	 * @param x The x coordinate of the wall
+	 * @param y The y coordinate of the wall
+	 */
 	public void placeWall(int player, int type, int x, int y) {
 		if (type == HORIZONTAL) {
 			int[] wallCoordinates = new int[2];
@@ -90,9 +115,11 @@ public class Quoridor {
 			mLastMoveType = "MV";
 		mLastMoveCoordinates = "(" + x + ", " + y + ")";
 
-
 	}
 
+	/**
+	 * @return JSONObject corresponding to the current game state
+	 */
 	public JSONObject getGameStateJSON() {
 
 		try {
@@ -160,6 +187,10 @@ public class Quoridor {
 		}
 	}
 
+	/**
+	 * Parses game state and injects modifies the object to match that game state.
+	 * @param gameState A JSONObject to be injected
+	 */
 	public void putGameState(JSONObject gameState) {
 
 		// Clear containers
@@ -241,18 +272,13 @@ public class Quoridor {
 		}
 	}
 
-	private void assignPlayerPosition(int player, int x, int y) {
-		if (x < 1 || x > 9 || y < 1 || y > 9) throw new AssertionError("Invalid coordinates");
-		if (player < 1 || player > 2) throw new AssertionError("Invalid player number");
-		if (player == 1) {
-			mPlayerOnePosition[0] = x;
-			mPlayerOnePosition[1] = y;
-		} else {
-			mPlayerTwoPosition[0] = x;
-			mPlayerTwoPosition[1] = y;
-		}
-	}
-
+	/**
+	 * Moves player at specified position if the move is valid and legal, else throws a QuoridorException
+	 * @param playerNumber The player to move to the position (1 or 2)
+	 * @param x The x coordinate
+	 * @param y The y coordinate
+	 * @throws QuoridorException if the move is invalid
+	 */
 	public void requestPlayerMovement(int playerNumber, int x, int y) throws QuoridorException {
 		int[] coordinates = new int[]{x, y};
 		List<int[]> possibleNextCoordinates = getPossibleNextCoordinates(playerNumber, false, null);
@@ -264,6 +290,14 @@ public class Quoridor {
 
 	}
 
+	/**
+	 * Places wall at specified position if it is valid, else throws a QuoridorException.
+	 * @param playerNumber The player placing the wall (1 or 2)
+	 * @param wallType The type of wall to place (constant HORIZONTAL or VERTICAL)
+	 * @param x The x coordinate
+	 * @param y The y coordinate
+	 * @throws QuoridorException if the move is invalid
+	 */
 	public void requestWallPlacement(int playerNumber, int wallType, int x, int y) throws QuoridorException {
 		int[] coordinates = new int[]{x, y};
 		List<int[]> invalidWallCoordinates = getInvalidWallCoordinates(wallType);
@@ -275,6 +309,11 @@ public class Quoridor {
 		}
 	}
 
+	/**
+	 * Retrieves a list of invalid wall coordinates depending on the current game state for the specified wall type
+	 * @param wallType The wall type for which to get the list of invalid positions (HORIZONTAL or VERTICAL)
+	 * @return A list containing arrays of size 2 (x, y), the invalid coordinates for the wall placement
+	 */
 	public List<int[]> getInvalidWallCoordinates(int wallType) {
 		List<int[]> invalidWallCoordinates = new ArrayList<>();
 
@@ -301,6 +340,16 @@ public class Quoridor {
 		return invalidWallCoordinates;
 	}
 
+	/**
+	 * Retrieves the possible coordinates a player can move to
+	 * @param playerNumber The player for which to retrieve the next possible coordinates
+	 * @param ignoreOtherPlayerJump Whether to ignore the option to jump over the other player
+	 *                              (used in recursion to analyze the jump over the other player).
+	 *                           	Should be false if called from outside the method
+	 * @param virtualPosition If not null, the player is considered to be at that position (x, y).
+	 *                        Used for analysing different scenarios
+	 * @return
+	 */
 	public List<int[]> getPossibleNextCoordinates(int playerNumber, boolean ignoreOtherPlayerJump, @Nullable int[] virtualPosition) {
 		List<int[]> possibleNextCoordinates = new ArrayList<>();
 
@@ -435,7 +484,12 @@ public class Quoridor {
 		return possibleNextCoordinates;
 	}
 
-
+	/**
+	 * Finds out if there is a horizontal wall at the specified location in the current game state
+	 * @param x The x coordinate
+	 * @param y The y coordinate
+	 * @return True if there is a wall, false if not
+	 */
 	private boolean isHorizontalWall(int x, int y) {
 		boolean isWall = false;
 		for (int[] wall : mHorizontalWalls) {
@@ -444,6 +498,12 @@ public class Quoridor {
 		return isWall;
 	}
 
+	/**
+	 * Finds out if there is a vertical wall at the specified location in the current game state
+	 * @param x The x coordinate
+	 * @param y The y coordinate
+	 * @return True if there is a wall, false if not
+	 */
 	private boolean isVerticalWall(int x, int y) {
 		boolean isWall = false;
 		for (int[] wall : mVerticalWalls) {
@@ -452,6 +512,13 @@ public class Quoridor {
 		return isWall;
 	}
 
+	/**
+	 * Utility method to check if a position is included in a List. The function assumes that the
+	 * positions are arrays of size 2, both in the list and for the first parameter
+	 * @param position An array of size 2 corresponding to a position (x, y)
+	 * @param positionArrayList The list to search in
+	 * @return True if the position is found in the list, else false
+	 */
 	static boolean positionIncluded(int[] position, List<int[]> positionArrayList) {
 		boolean included = false;
 
@@ -462,13 +529,20 @@ public class Quoridor {
 		return included;
 	}
 
+	/**
+	 * Check if a player has won the game
+	 * @return The number corresponding to the winner (1 or 2) if someone has won, else 0
+	 */
 	public int getWinnerPlayerNumberOrZero() {
 		if (mPlayerOnePosition[1] == 9) return 1;
 		if (mPlayerTwoPosition[1] == 1) return 2;
 		return 0;
 	}
 
-	private class Node {
+	/**
+	 * Class used for the A star pathfinder algorithm
+	 */
+	private static class Node {
 		int g = 0;
 		int h = 0;
 
@@ -496,6 +570,14 @@ public class Quoridor {
 		}
 	}
 
+	/**
+	 * Finds the shortest path a player has to get to the victory line
+	 * @param playerNumber The player number (1 or 2) for which to find the path
+	 * @return A list containing coordinates (arrays of size 2) to the victory or null if not path
+	 * is possible. Does not include the starting position, but includes the ending position (since
+	 * there are several possible ending positions). The first element of the list is the first
+	 * position the player has to move to.
+	 */
 	public List<int[]> getShortestPathToVictory(int playerNumber) { // null if none
 		ArrayList<Node> openNodes = new ArrayList<>();
 		ArrayList<Node> closedNodes = new ArrayList<>();
@@ -548,10 +630,16 @@ public class Quoridor {
 		return null;
 	}
 
-	private List<int[]> getPathToNode(Node n) {
+	/**
+	 * Utility function for the A star algorithm. Generates the path to victory by accessing parent
+	 * nodes from the winner node
+	 * @param node The node to retrace the path to
+	 * @return A list containing positions representing the path to that node
+	 */
+	private static List<int[]> getPathToNode(Node node) {
 		List<int[]> path = new ArrayList<>();
-		path.add(0, n.position);
-		Node currentNode = n;
+		path.add(0, node.position);
+		Node currentNode = node;
 		while (currentNode.parent != null) {
 			path.add(0, currentNode.parent.position);
 			currentNode = currentNode.parent;
@@ -559,14 +647,28 @@ public class Quoridor {
 		return path;
 	}
 
-	private boolean aStarListContainsNodePositionWithLessF(Node node, List<Node> list) {
+	/**
+	 * Utility function for the A star algorithm. Checks if a list contains a node with an F lower
+	 * than the node passed in argument
+	 * @param node The node with which to compare f's
+	 * @param list The list in which to search for a node with a lower f
+	 * @return True if such node is found in the list, false otherwise
+	 */
+	private static boolean aStarListContainsNodePositionWithLessF(Node node, List<Node> list) {
 		for (Node n : list) {
 			if (n.position[0] == node.position[0] && n.position[1] == node.position[1] && n.getF() <= node.getF()) return true;
 		}
 		return false;
 	}
 
-	private int aStarEvaluateF(int playerNumber, int[] position) {
+	/**
+	 * Utility function for the A star algorithm. Evaluates the f (game state score) associated
+	 * with the position passed as argument for the player specified
+	 * @param playerNumber The player the position if for
+	 * @param position The (x, y) coordinates of the position
+	 * @return The f-value for that position and player
+	 */
+	private static int aStarEvaluateF(int playerNumber, int[] position) {
 		if (playerNumber == 1) {
 			return 9 - position[1];
 		} else {
@@ -574,6 +676,10 @@ public class Quoridor {
 		}
 	}
 
+	/**
+	 * @param playerNumber The number of the player for which to get the position
+	 * @return A 2-sized array containing the player's position
+	 */
 	public int[] getPlayerPosition(int playerNumber) {
 		if (playerNumber == 1)
 			return mPlayerOnePosition;
