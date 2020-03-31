@@ -72,7 +72,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	private static int DEFAULT_BUTTON_BACKGROUND_COLOR = Color.rgb(40, 40, 40);
 
 	/**
-	 * Default typeface used in drawText calls TODO: Actually implement default in views
+	 * Default typeface used in drawText calls
 	 */
 	public static Typeface DEFAULT_TYPEFACE;
 
@@ -249,6 +249,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	public boolean modal = false;
 
 
+	//==============================================================================================
+	// Constructors
+	//==============================================================================================
+
 	public GameView(Context context) {
 		super(context);
 
@@ -281,6 +285,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		setFocusable(true);
 	}
 
+	//==============================================================================================
+	// Methods
+	//==============================================================================================
+
 	private void playSound(int soundId, float intensity) {
 		mSoundPool.play(soundId, intensity, intensity, 1, 0, 1f);
 	}
@@ -304,9 +312,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	}
 
-	public void update() {
-
-	}
 
 	@Override
 	public void draw(Canvas canvas) {
