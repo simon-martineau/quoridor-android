@@ -3,26 +3,88 @@ package simon.app.quoridor;
 import android.graphics.Canvas;
 import android.graphics.Typeface;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Base class for custom views
  */
-public abstract class GView {
+public abstract class GView implements Comparable<GView> {
 	private int mX;
 	private int mY;
-	private onClickAction mOnClickAction;
-	private boolean mIsVisible = true;
 
+	private GameView mGameView;
+	private ModalView mModalView;
+
+	private onClickAction mOnClickAction;
+	private boolean hasOnClick = false;
+	private boolean mIsVisible = true;
 	protected Typeface mTypeFace = GameView.DEFAULT_TYPEFACE;
 
+	private int mZIndex;
+
+
 	/**
-	 * Constructor for the GView
+	 * Constructor for the GView in a GameView
 	 * @param x The x coordinate (in pixels) for the view
 	 * @param y The y coordinate (in pixels) for the view
 	 */
-	public GView(int x, int y) {
+	public GView(GameView gameView, int x, int y) {
 		mX = x;
 		mY = y;
+		mGameView = gameView;
+		registerView(gameView);
 	}
+
+	/**
+	 * Constructor for the GView in a ModalView
+	 * @param x The x coordinate (in pixels) for the view
+	 * @param y The y coordinate (in pixels) for the view
+	 */
+	public GView(ModalView modalView, int x, int y, boolean register) {
+		mX = x;
+		mY = y;
+		mModalView = modalView;
+		if (register) {
+			registerViewModal(modalView);
+		}
+	}
+
+
+	/**
+	 * @return The view's zIndex
+	 */
+	public int getZIndex() {
+		return mZIndex;
+	}
+
+	/**
+	 * @param index The zIndex to set the member to
+	 */
+	public void setZIndex(int index) {
+		mZIndex = index;
+		if (mGameView != null) {
+			mGameView.sortViews();
+		} else if (mModalView != null) {
+			mModalView.sortViews();
+		}
+	}
+
+	/**
+	 * Register the view in the parent GameView
+	 * @param gameView The parent GameView
+	 */
+	private void registerView(GameView gameView) {
+		gameView.registerGView(this);
+	}
+
+	/**
+	 * Register the view in the parent ModalView
+	 * @param modalView The parent ModalView
+	 */
+	private void registerViewModal(ModalView modalView) {
+		modalView.registerGView(this);
+	}
+
 
 	/**
 	 * Perform the view's method associated with its mOnClickAction interface
@@ -31,7 +93,9 @@ public abstract class GView {
 	 * @param y The y coordinate of the touch event
 	 */
 	public void performClick(GameView gameView, int x, int y) {
-		mOnClickAction.onClick(gameView, x, y);
+		if (hasOnClick) {
+			mOnClickAction.onClick(gameView, x, y);
+		}
 	}
 
 	/**
@@ -40,6 +104,7 @@ public abstract class GView {
 	 */
 	public void setOnClickAction(onClickAction action) {
 		mOnClickAction = action;
+		hasOnClick = true;
 	}
 
 	/**
@@ -153,4 +218,13 @@ public abstract class GView {
 		mIsVisible = visible;
 	}
 
+	/**
+	 * CompareTo implementation. Comparison is based on the zIndex
+	 * @param o The other object
+	 * @return The difference in zIndex
+	 */
+	@Override
+	public int compareTo(@NotNull GView o) {
+		return this.getZIndex() - o.getZIndex();
+	}
 }

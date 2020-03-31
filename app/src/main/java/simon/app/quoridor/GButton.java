@@ -16,9 +16,28 @@ public class GButton extends GView {
 
 	private int mWidth, mHeight;
 
-	public GButton(String text, int width, int height, int x, int y, int backgroundColor, int foreGroundColor)
+	public GButton(GameView gameView, String text, int width, int height, int x, int y, int backgroundColor, int foreGroundColor)
 	{
-		super(x, y);
+		super(gameView, x, y);
+
+		mText = text;
+		mWidth = width;
+		mHeight = height;
+
+
+		mPaint = new Paint();
+		mPaint.setColor(backgroundColor);
+
+		mTextPaint = new Paint();
+		mTextPaint.setTextAlign(Paint.Align.CENTER);
+		mTextPaint.setTextSize(48);
+		mTextPaint.setColor(foreGroundColor);
+
+	}
+
+	public GButton(ModalView modalView, String text, int width, int height, int x, int y, int backgroundColor, int foreGroundColor, boolean register)
+	{
+		super(modalView, x, y, register);
 
 		mText = text;
 		mWidth = width;

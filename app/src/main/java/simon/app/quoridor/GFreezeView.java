@@ -8,8 +8,8 @@ public class GFreezeView extends GView {
 	private int mHeight;
 	private Paint mPaint;
 
-	public GFreezeView(int x, int y, int width, int height, int color, int alpha) {
-		super(x, y);
+	public GFreezeView(GameView gameView, int x, int y, int width, int height, int color, int alpha) {
+		super(gameView, x, y);
 		mWidth = width;
 		mHeight = height;
 
@@ -17,6 +17,17 @@ public class GFreezeView extends GView {
 		mPaint.setColor(color);
 		mPaint.setAlpha(alpha);
 	}
+
+	public GFreezeView(ModalView modalView, int x, int y, int width, int height, int color, int alpha, boolean register) {
+		super(modalView, x, y, register);
+		mWidth = width;
+		mHeight = height;
+
+		mPaint = new Paint();
+		mPaint.setColor(color);
+		mPaint.setAlpha(alpha);
+	}
+
 
 	@Override
 	public int getWidth() {

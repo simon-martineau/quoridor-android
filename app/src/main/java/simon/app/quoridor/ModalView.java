@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ModalView extends GView {
 	private static final int LEFT_MARGIN = 100;
@@ -22,14 +23,18 @@ public class ModalView extends GView {
 	private static final int BORDER_SIZE = 3;
 	private static final int TEXT_COLOR = Color.GREEN;
 
-	private GFreezeView mGFreezeView = null;
+	private GFreezeView mGFreezeView;
 	private ArrayList<GView> mGViews = new ArrayList<>();
 	private String mPromptString;
+	private final GameView mGameView;
 
 	// TODO: Implement offset button coordinates instead of absolute
 
-	public ModalView(String message, int x, int y) {
-		super(x, y);
+	public ModalView(GameView gameView, String message, int x, int y) {
+		super(gameView, x, y);
+
+		setZIndex(100);
+
 		mPromptString = message;
 
 		setOnClickAction(new onClickAction() {
@@ -43,16 +48,38 @@ public class ModalView extends GView {
 				}
 			}
 		});
+
+		// Default FreezeView
+		setFreezeView(new GFreezeView(this, 0, 0, gameView.getWidth(), gameView.getHeight(), Color.WHITE, 50, false));
+
+		mGameView = gameView;
 	}
 
 	public void setFreezeView(GFreezeView gFreezeView) {
 		mGFreezeView = gFreezeView;
+		mGFreezeView.setZIndex(-1);
 	}
 
+	// TODO: Add ModalView's own z-index system ?
 	public void addGButton(int foreGroundColor, int backgroundColor, int width, int height, String text, onClickAction action) {
-		GButton newButton = new GButton(text, width, height, getNextButtonX(), getTop() + TOP_MARGIN + MESSAGE_SECTION_HEIGHT + TEXT_TO_GVIEW_SEPARATION, backgroundColor, foreGroundColor);
+		GButton newButton = new GButton(this, text, width, height, getNextButtonX(),
+				getTop() + TOP_MARGIN + MESSAGE_SECTION_HEIGHT + TEXT_TO_GVIEW_SEPARATION, backgroundColor, foreGroundColor, true);
 		newButton.setOnClickAction(action);
-		mGViews.add(newButton);
+//		mGViews.add(newButton);
+	}
+
+	/**
+	 * Registers a view in mGViews. GViews is sorted by zIndex after each call
+	 * @param gView The view to register
+	 */
+	public void registerGView(GView gView) {
+		mGViews.add(gView);
+		sortViews();
+	}
+
+	public void sortViews() {
+		Collections.sort(mGViews);
+		Collections.reverse(mGViews);
 	}
 
 	private int getHighestButtonBottomValue() {
@@ -67,7 +94,7 @@ public class ModalView extends GView {
 		if (mGViews.isEmpty()) {
 			return (getLeft() + LEFT_MARGIN);
 		} else {
-			return (mGViews.get(mGViews.size() - 1).getRight() + GVIEW_TO_GVIEW_SEPARATION);
+			return (mGViews.get(0).getRight() + GVIEW_TO_GVIEW_SEPARATION);
 		}
 	}
 

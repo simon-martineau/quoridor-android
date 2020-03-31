@@ -71,8 +71,8 @@ public class QuoridorView extends GView {
 
 
 	// TODO: Implement flexibility in constructor
-	public QuoridorView(Quoridor quoridor, int x, int y, int width) {
-		super(x, y);
+	public QuoridorView(GameView gameView, Quoridor quoridor, int x, int y, int width) {
+		super(gameView, x, y);
 		mQuoridor = quoridor;
 		cellSize = (int) ((width - (gridMargin*2 + wrapperWidth*2 + cellBorderWidth*10)) / 9.0);
 	}

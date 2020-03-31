@@ -10,8 +10,8 @@ public class GTitleView extends GView {
 	private Paint mPaint;
 
 	// Constructor for centered text
-	public GTitleView(String text, int color, float textSize, int parentWidth) {
-		super(0, 0);
+	public GTitleView(GameView gameView, String text, int color, float textSize, int parentWidth) {
+		super(gameView, 0, 0);
 		mText = text;
 
 		mPaint = new Paint();
@@ -23,8 +23,8 @@ public class GTitleView extends GView {
 		setX(parentWidth / 2 - getTextWidth() / 2);
 	}
 
-	public GTitleView(int x, int y, String text, int color, float textSize) {
-		super(x, y);
+	public GTitleView(GameView gameView, int x, int y, String text, int color, float textSize) {
+		super(gameView, x, y);
 		mText = text;
 
 		mPaint = new Paint();

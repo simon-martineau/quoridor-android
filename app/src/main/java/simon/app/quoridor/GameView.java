@@ -19,7 +19,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Objects;
 
 import okhttp3.Call;
@@ -312,31 +315,42 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 	}
 
+	/**
+	 * Registers a view in mGViews. GViews is sorted by zIndex after each call
+	 * @param gView The view to register
+	 */
+	public void registerGView(GView gView) {
+		mGViews.add(gView);
+		sortViews();
+	}
+
+	public void sortViews() {
+		Collections.sort(mGViews);
+		Collections.reverse(mGViews);
+	}
 
 	@Override
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
 
-		for (GView gView : mGViews) {
-			gView.draw(canvas);
+		for (int i = mGViews.size() - 1; i >= 0; i--) {
+			mGViews.get(i).draw(canvas);
 		}
 
 		if (gamePaused)
 			mQuoridorView.setBlink(false);
 		else
 			mQuoridorView.setBlink(true);
-
-
 	}
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		mBackgroundMusicPlayer.start();
 
-		mGTitleView = new GTitleView("8 bit Quoridor", Color.GREEN, 184f, getWidth());
+		mGTitleView = new GTitleView(this, "8 bit Quoridor", Color.GREEN, 184f, getWidth());
 		mGTitleView.setY(128);
 
-		mQuoridorView = new QuoridorView(mGame, 50, mGTitleView.getBottom() + 128, width);
+		mQuoridorView = new QuoridorView(this, mGame, 50, mGTitleView.getBottom() + 128, width);
 		mQuoridorView.setOnClickAction(new QuoridorView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
@@ -350,7 +364,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		});
 		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
 
-		mPlaceWallButton = new GButton("Place a wall", 300, 150, 100, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
+		mPlaceWallButton = new GButton(this, "Place a wall", 300, 150, 100, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mPlaceWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
@@ -374,7 +388,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		});
 
-		mToggleWallTypeButton = new GButton("Horizontal", 300, 150, 475, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+		mToggleWallTypeButton = new GButton(this, "Horizontal", 300, 150, 475, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
 		mToggleWallTypeButton.setOnClickAction(new GView.onClickAction() {
 
 			@Override
@@ -394,7 +408,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mToggleWallTypeButton.setVisible(false);
 
 
-		mConfirmWallButton = new GButton("Confirm", 300, 150, 850, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
+		mConfirmWallButton = new GButton(this, "Confirm", 300, 150, 850, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mConfirmWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
@@ -415,7 +429,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		});
 		mConfirmWallButton.setVisible(false);
 
-		mAbandonButton = new GButton("Abandon", 300, 150, getWidth() - 450, getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.RED);
+		mAbandonButton = new GButton(this, "Abandon", 300, 150, getWidth() - 450, getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.RED);
 		mAbandonButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
@@ -425,7 +439,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		});
 
-		mNewGameButton = new GButton("New Game", 300, 150, getWidth() - 450, getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
+		mNewGameButton = new GButton(this, "New Game", 300, 150, getWidth() - 450, getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mNewGameButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(GameView gameView, int x, int y) {
@@ -435,8 +449,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		});
 		mNewGameButton.setVisible(false);
 
-		mRestartConfirmModalView = new ModalView("Confirm match forfeit?", 100, 600);
-		mRestartConfirmModalView.setFreezeView(new GFreezeView(0, 0, getWidth(), getHeight(), Color.WHITE, 50));
+		mRestartConfirmModalView = new ModalView(this, "Confirm match forfeit?", 100, 600);
 		mRestartConfirmModalView.addGButton(Color.RED, DEFAULT_BUTTON_BACKGROUND_COLOR, 400, 150, "Yes",
 				new GView.onClickAction() {
 					@Override
@@ -460,18 +473,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 		mRestartConfirmModalView.setX(getWidth() / 2 - mRestartConfirmModalView.getWidth() / 2);
 		mRestartConfirmModalView.setY(getHeight() / 2 - mRestartConfirmModalView.getHeight() / 2 - 200);
 		mRestartConfirmModalView.setVisible(false);
-
-
-
-		// Register views
-		mGViews.add(mGTitleView);
-		mGViews.add(mPlaceWallButton);
-		mGViews.add(mToggleWallTypeButton);
-		mGViews.add(mConfirmWallButton);
-		mGViews.add(mNewGameButton);
-		mGViews.add(mAbandonButton);
-		mGViews.add(mQuoridorView);
-		mGViews.add(mRestartConfirmModalView);
 
 	}
 
@@ -502,7 +503,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 	private void dispatchTouchToViews(int x, int y) {
 		for (GView gView : mGViews) {
 
-			if ((gView.isInRect(x, y) && !modal) || (gView instanceof ModalView)) {
+			if (gView.isInRect(x, y)) {
 				gView.performClick(this, x, y);
 				return;
 			}
