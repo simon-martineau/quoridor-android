@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +40,7 @@ public class MainMenuView extends WindowView {
 	/**
 	 * Frequency at which numberStreams are generated horizontally. The lower, the more there are.
 	 */
-	private final static int HORIZONTAL_STREAM_RATE = 1000;
+	private final static int HORIZONTAL_STREAM_RATE = 200;
 
 
 	/**
@@ -102,7 +103,6 @@ public class MainMenuView extends WindowView {
 //				getWidth(), getHeight(), false);
 //		mBackground = new GBackgroundView(this, 0, 0, mBackgroundBitmap);
 //		mBackground.setAlphaPulsate(0, 255, 180);
-
 
 		mStartGameButton = new GButton(this, "Start game", 400, 200, 0, getHeight() / 2 + 100,
 				DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);

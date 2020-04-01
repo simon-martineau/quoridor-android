@@ -88,10 +88,7 @@ public class GNumberStream extends GView {
 				doDraw = false;
 				setVisible(false);
 			}
-
 		}
-
-
 	}
 
 	@Override
