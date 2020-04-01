@@ -10,7 +10,7 @@ import java.util.List;
 import simon.app.quoridor.Core.GameView;
 import simon.app.quoridor.Core.Quoridor;
 
-public class QuoridorView extends GView {
+public class GQuoridorView extends GView {
 	// TODO: Change colors into constants
 
 	// Linked quoridorGame
@@ -73,7 +73,7 @@ public class QuoridorView extends GView {
 
 
 	// TODO: Implement flexibility in constructor
-	public QuoridorView(GameView gameView, Quoridor quoridor, int x, int y, int width) {
+	public GQuoridorView(GameView gameView, Quoridor quoridor, int x, int y, int width) {
 		super(gameView, x, y);
 		mQuoridor = quoridor;
 		cellSize = (int) ((width - (gridMargin*2 + wrapperWidth*2 + cellBorderWidth*10)) / 9.0);

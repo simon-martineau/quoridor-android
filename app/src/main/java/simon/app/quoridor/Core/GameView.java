@@ -29,7 +29,7 @@ import simon.app.quoridor.CustomViews.GButton;
 import simon.app.quoridor.CustomViews.GTitleView;
 import simon.app.quoridor.CustomViews.GView;
 import simon.app.quoridor.CustomViews.GModalView;
-import simon.app.quoridor.CustomViews.QuoridorView;
+import simon.app.quoridor.CustomViews.GQuoridorView;
 import simon.app.quoridor.R;
 
 public class GameView extends WindowView{
@@ -116,9 +116,9 @@ public class GameView extends WindowView{
 	/**
 	 * View in charge of drawing the Quoridor game on the canvas. Also handles some logic regarding
 	 * the user placing a wall. Has to be linked to mGame.
-	 * @see QuoridorView#linkQuoridorGame(Quoridor quoridor)
+	 * @see GQuoridorView#linkQuoridorGame(Quoridor quoridor)
 	 */
-	public QuoridorView mQuoridorView;
+	public GQuoridorView mGQuoridorView;
 
 	// Buttons
 	/**
@@ -314,21 +314,21 @@ public class GameView extends WindowView{
 		mGTitleView = new GTitleView(this, "8 bit Quoridor", Color.GREEN, 184f, mAppView.getWidth());
 		mGTitleView.setY(128);
 
-		mQuoridorView = new QuoridorView(this, mGame, 50, mGTitleView.getBottom() + 128, getWidth());
-		mQuoridorView.setOnClickAction(new QuoridorView.onClickAction() {
+		mGQuoridorView = new GQuoridorView(this, mGame, 50, mGTitleView.getBottom() + 128, getWidth());
+		mGQuoridorView.setOnClickAction(new GQuoridorView.onClickAction() {
 			@Override
 			public void onClick(WindowView windowView, int x, int y) {
 				if (!gamePaused && !placingWall) {
 					int[] possibleCellCoordinates;
-					possibleCellCoordinates = mQuoridorView.getCellCorrespondingToTouch(x, y);
+					possibleCellCoordinates = mGQuoridorView.getCellCorrespondingToTouch(x, y);
 					if (possibleCellCoordinates != null)
 						tryToMovePlayer(1, possibleCellCoordinates[0], possibleCellCoordinates[1]);
 				}
 			}
 		});
-		mQuoridorView.linkQuoridorGame(mGame);
+		mGQuoridorView.linkQuoridorGame(mGame);
 
-		mPlaceWallButton = new GButton(this, "Place a wall", 300, 150, 100, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
+		mPlaceWallButton = new GButton(this, "Place a wall", 300, 150, 100, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mPlaceWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(WindowView windowView, int x, int y) {
@@ -352,7 +352,7 @@ public class GameView extends WindowView{
 			}
 		});
 
-		mToggleWallTypeButton = new GButton(this, "Horizontal", 300, 150, 475, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+		mToggleWallTypeButton = new GButton(this, "Horizontal", 300, 150, 475, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
 		mToggleWallTypeButton.setOnClickAction(new GView.onClickAction() {
 
 			@Override
@@ -372,7 +372,7 @@ public class GameView extends WindowView{
 		mToggleWallTypeButton.setVisible(false);
 
 
-		mConfirmWallButton = new GButton(this, "Confirm", 300, 150, 850, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
+		mConfirmWallButton = new GButton(this, "Confirm", 300, 150, 850, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mConfirmWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(WindowView windowView, int x, int y) {
@@ -384,7 +384,7 @@ public class GameView extends WindowView{
 					mPlaceWallButton.setText("Place a wall");
 					mToggleWallTypeButton.setText("Horizontal");
 				} catch (QuoridorException e) {
-					mQuoridorView.setCustomMessageBlink(e.getMessage(), Color.RED, 64, 5, 3);
+					mGQuoridorView.setCustomMessageBlink(e.getMessage(), Color.RED, 64, 5, 3);
 					playSound(mInvalidWallSoundId, 0.5f);
 				}
 
@@ -446,9 +446,9 @@ public class GameView extends WindowView{
 		}
 
 		if (gamePaused)
-			mQuoridorView.setBlink(false);
+			mGQuoridorView.setBlink(false);
 		else
-			mQuoridorView.setBlink(true);
+			mGQuoridorView.setBlink(true);
 	}
 
 	@Override
@@ -487,21 +487,21 @@ public class GameView extends WindowView{
 					float posY = event.getY();
 
 					if (posX - mLastTouchX > WALL_UPDATE_STEP) {
-						mQuoridorView.offsetWallPreview(mWallPreviewType, 1, 0);
+						mGQuoridorView.offsetWallPreview(mWallPreviewType, 1, 0);
 						mLastTouchX = posX - 10;
 						playSound(mWallMoveSoundId, 0.3f);
 
 					} else if (posX - mLastTouchX < WALL_UPDATE_STEP * -1) {
-						mQuoridorView.offsetWallPreview(mWallPreviewType, -1, 0);
+						mGQuoridorView.offsetWallPreview(mWallPreviewType, -1, 0);
 						mLastTouchX = posX + 10;
 						playSound(mWallMoveSoundId, 0.3f);
 					}
 					if (posY - mLastTouchY > WALL_UPDATE_STEP) {
-						mQuoridorView.offsetWallPreview(mWallPreviewType, 0, -1);
+						mGQuoridorView.offsetWallPreview(mWallPreviewType, 0, -1);
 						mLastTouchY = posY - 10;
 						playSound(mWallMoveSoundId, 0.3f);
 					} else if (posY - mLastTouchY < WALL_UPDATE_STEP * -1) {
-						mQuoridorView.offsetWallPreview(mWallPreviewType, 0, 1);
+						mGQuoridorView.offsetWallPreview(mWallPreviewType, 0, 1);
 						mLastTouchY = posY + 10;
 						playSound(mWallMoveSoundId, 0.3f);
 					}
@@ -527,24 +527,24 @@ public class GameView extends WindowView{
 	}
 
 	public void refreshHover() {
-		mQuoridorView.resetHoverPositions();
-		// mQuoridorView.hoverCells(mGame.getShortestPathToVictory(1));
-		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
+		mGQuoridorView.resetHoverPositions();
+		// mGQuoridorView.hoverCells(mGame.getShortestPathToVictory(1));
+		mGQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
 	}
 
 	public void initiateWallPlacement(int wallType) {
 		placingWall = true;
 		mWallPreviewType = wallType;
-		mQuoridorView.setWallPreview(wallType, 5, 5);
+		mGQuoridorView.setWallPreview(wallType, 5, 5);
 
 	}
 
 	public void finalizeWallPlacement() throws QuoridorException {
-		if (mQuoridorView.isWallPreviewInvalid()) {
+		if (mGQuoridorView.isWallPreviewInvalid()) {
 			throw new QuoridorException("Illegal wall placement!");
 		}
 
-		int[] coordinates = mQuoridorView.getWallPreviewCoordinates();
+		int[] coordinates = mGQuoridorView.getWallPreviewCoordinates();
 
 		// TODO: Make this concise and avoid state check redundancy
 		try {
@@ -563,15 +563,15 @@ public class GameView extends WindowView{
 
 		mGame.requestWallPlacement(playerNumber, wallType, x, y);
 
-		mQuoridorView.resetHoverPositions();
-		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
+		mGQuoridorView.resetHoverPositions();
+		mGQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
 
 	}
 
 	public void cancelWallPlacement() {
 		placingWall = false;
 		mWallPreviewType = 0;
-		mQuoridorView.clearWallPreview();
+		mGQuoridorView.clearWallPreview();
 	}
 
 	private void setNewGame(String serverResponse) {
@@ -588,7 +588,7 @@ public class GameView extends WindowView{
 		}
 
 		mGame = new Quoridor(gameID, state);
-		mQuoridorView.linkQuoridorGame(mGame);
+		mGQuoridorView.linkQuoridorGame(mGame);
 	}
 
 	private void setGameState(String serverResponse) {
@@ -678,9 +678,9 @@ public class GameView extends WindowView{
 	public void initGameLoss() {
 		gamePaused = true;
 		playSound(mLoseSoundId, 0.6f);
-		mQuoridorView.setConsoleMessageColor(Color.RED);
-		mQuoridorView.setConsoleMessage("YOU LOST!");
-		mQuoridorView.setBorderBlink(Color.RED, 8, 5);
+		mGQuoridorView.setConsoleMessageColor(Color.RED);
+		mGQuoridorView.setConsoleMessage("YOU LOST!");
+		mGQuoridorView.setBorderBlink(Color.RED, 8, 5);
 		mAbandonButton.setVisible(false);
 		mNewGameButton.setVisible(true);
 
@@ -689,9 +689,9 @@ public class GameView extends WindowView{
 	public void initGameWin() {
 		gamePaused = true;
 		playSound(mWinSoundId, 0.6f);
-		mQuoridorView.setConsoleMessageColor(Color.GREEN);
-		mQuoridorView.setConsoleMessage("YOU WON!");
-		mQuoridorView.setBorderBlink(Color.GREEN, 8, 3);
+		mGQuoridorView.setConsoleMessageColor(Color.GREEN);
+		mGQuoridorView.setConsoleMessage("YOU WON!");
+		mGQuoridorView.setBorderBlink(Color.GREEN, 8, 3);
 		mAbandonButton.setVisible(false);
 		mNewGameButton.setVisible(true);
 	}
@@ -700,7 +700,7 @@ public class GameView extends WindowView{
 
 		fetchNewGameFromServer(API_BASE_URL + API_BEGIN_GAME_SUFFIX, IDUL);
 		mAbandonButton.setVisible(true);
-		mQuoridorView.setConsoleMessage("");
+		mGQuoridorView.setConsoleMessage("");
 	}
 
 }
