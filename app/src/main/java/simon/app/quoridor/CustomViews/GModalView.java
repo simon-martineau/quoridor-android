@@ -10,7 +10,7 @@ import java.util.Collections;
 
 import simon.app.quoridor.Core.WindowView;
 
-public class ModalView extends GView {
+public class GModalView extends GView {
 	private static final int LEFT_MARGIN = 100;
 	private static final int RIGHT_MARGIN = 100;
 	private static final int TOP_MARGIN = 100;
@@ -32,7 +32,7 @@ public class ModalView extends GView {
 
 	// TODO: Implement offset button coordinates instead of absolute
 
-	public ModalView(WindowView windowView, String message, int x, int y) {
+	public GModalView(WindowView windowView, String message, int x, int y) {
 		super(windowView, x, y);
 
 		setZIndex(100);

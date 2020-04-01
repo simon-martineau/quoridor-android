@@ -28,7 +28,7 @@ import okhttp3.Response;
 import simon.app.quoridor.CustomViews.GButton;
 import simon.app.quoridor.CustomViews.GTitleView;
 import simon.app.quoridor.CustomViews.GView;
-import simon.app.quoridor.CustomViews.ModalView;
+import simon.app.quoridor.CustomViews.GModalView;
 import simon.app.quoridor.CustomViews.QuoridorView;
 import simon.app.quoridor.R;
 
@@ -150,7 +150,7 @@ public class GameView extends WindowView{
 	/**
 	 * Prompt to confirm match forfeiting
 	 */
-	ModalView mRestartConfirmModalView;
+	GModalView mRestartConfirmModalView;
 
 	// Title view
 	/**
@@ -412,7 +412,7 @@ public class GameView extends WindowView{
 		});
 		mNewGameButton.setVisible(false);
 
-		mRestartConfirmModalView = new ModalView(this, "Confirm match forfeit?", 100, 600);
+		mRestartConfirmModalView = new GModalView(this, "Confirm match forfeit?", 100, 600);
 		mRestartConfirmModalView.addGButton(Color.RED, DEFAULT_BUTTON_BACKGROUND_COLOR, 400, 150, "Yes",
 				new GView.onClickAction() {
 					@Override

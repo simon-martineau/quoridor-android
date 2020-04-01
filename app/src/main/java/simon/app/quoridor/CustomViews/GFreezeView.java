@@ -20,8 +20,8 @@ public class GFreezeView extends GView {
 		mPaint.setAlpha(alpha);
 	}
 
-	public GFreezeView(ModalView modalView, int x, int y, int width, int height, int color, int alpha, boolean register) {
-		super(modalView, x, y, register);
+	public GFreezeView(GModalView gModalView, int x, int y, int width, int height, int color, int alpha, boolean register) {
+		super(gModalView, x, y, register);
 		mWidth = width;
 		mHeight = height;
 

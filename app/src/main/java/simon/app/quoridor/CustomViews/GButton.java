@@ -33,9 +33,9 @@ public class GButton extends GView {
 
 	}
 
-	public GButton(ModalView modalView, String text, int width, int height, int x, int y, int backgroundColor, int foreGroundColor, boolean register)
+	public GButton(GModalView gModalView, String text, int width, int height, int x, int y, int backgroundColor, int foreGroundColor, boolean register)
 	{
-		super(modalView, x, y, register);
+		super(gModalView, x, y, register);
 
 		mText = text;
 		mWidth = width;

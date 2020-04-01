@@ -16,7 +16,7 @@ public abstract class GView implements Comparable<GView> {
 	private int mY;
 
 	private WindowView mWindowView;
-	private ModalView mModalView;
+	private GModalView mGModalView;
 
 	private onClickAction mOnClickAction;
 	private boolean hasOnClick = false;
@@ -43,12 +43,12 @@ public abstract class GView implements Comparable<GView> {
 	 * @param x The x coordinate (in pixels) for the view
 	 * @param y The y coordinate (in pixels) for the view
 	 */
-	public GView(ModalView modalView, int x, int y, boolean register) {
+	public GView(GModalView gModalView, int x, int y, boolean register) {
 		mX = x;
 		mY = y;
-		mModalView = modalView;
+		mGModalView = gModalView;
 		if (register) {
-			registerViewModal(modalView);
+			registerViewModal(gModalView);
 		}
 	}
 
@@ -67,8 +67,8 @@ public abstract class GView implements Comparable<GView> {
 		mZIndex = index;
 		if (mWindowView != null) {
 			mWindowView.sortViews();
-		} else if (mModalView != null) {
-			mModalView.sortViews();
+		} else if (mGModalView != null) {
+			mGModalView.sortViews();
 		}
 	}
 
@@ -82,10 +82,10 @@ public abstract class GView implements Comparable<GView> {
 
 	/**
 	 * Register the view in the parent ModalView
-	 * @param modalView The parent ModalView
+	 * @param gModalView The parent GModalView
 	 */
-	private void registerViewModal(ModalView modalView) {
-		modalView.registerGView(this);
+	private void registerViewModal(GModalView gModalView) {
+		gModalView.registerGView(this);
 	}
 
 
