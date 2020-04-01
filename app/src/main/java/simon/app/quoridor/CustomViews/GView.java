@@ -61,11 +61,11 @@ public abstract class GView implements Comparable<GView> {
 	 * @param x The x coordinate (in pixels) for the view
 	 * @param y The y coordinate (in pixels) for the view
 	 */
-	public GView(WindowView windowView, int x, int y, boolean register) {
+	public GView(WindowView windowView, int x, int y) {
 		mX = x;
 		mY = y;
 		mWindowView = windowView;
-		if (register) registerView(windowView);
+		registerView(windowView);
 	}
 
 	/**
@@ -77,11 +77,13 @@ public abstract class GView implements Comparable<GView> {
 	 * @param x The x coordinate (in pixels) for the view
 	 * @param y The y coordinate (in pixels) for the view
 	 */
-	public GView(GView gView, int x, int y) {
+	public GView(GView gView, int x, int y, boolean register) {
 		mX = x;
 		mY = y;
 		mParentGView = gView;
-		registerView(gView);
+		if (register) {
+			registerView(gView);
+		}
 	}
 
 	/**
