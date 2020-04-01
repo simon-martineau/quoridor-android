@@ -417,7 +417,6 @@ public class GameView extends WindowView {
 	 */
 	@Override
 	public void draw(Canvas canvas) {
-		super.draw(canvas);
 
 		for (int i = mGViews.size() - 1; i >= 0; i--) {
 			mGViews.get(i).draw(canvas);

@@ -6,14 +6,15 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 
 import simon.app.quoridor.Core.GameView;
+import simon.app.quoridor.Core.WindowView;
 
 public class GTitleView extends GView {
 	private String mText;
 	private Paint mPaint;
 
 	// Constructor for centered text
-	public GTitleView(GameView gameView, String text, int color, float textSize, int parentWidth) {
-		super(gameView, 0, 0);
+	public GTitleView(WindowView windowView, String text, int color, float textSize, int parentWidth) {
+		super(windowView, 0, 0);
 		mText = text;
 
 		mPaint = new Paint();
@@ -25,14 +26,21 @@ public class GTitleView extends GView {
 		setX(parentWidth / 2 - getTextWidth() / 2);
 	}
 
-	public GTitleView(GameView gameView, int x, int y, String text, int color, float textSize) {
-		super(gameView, x, y);
+	public GTitleView(WindowView windowView, int x, int y, String text, int color, float textSize) {
+		super(windowView, x, y);
 		mText = text;
 
 		mPaint = new Paint();
 		mPaint.setColor(color);
 		mPaint.setTextSize(textSize);
+		mPaint.setTextAlign(Paint.Align.CENTER);
+
 	}
+
+//	@Override
+//	public void setCenterHorizontal() {
+//		setX(mWindowView.getWidth());
+//	}
 
 	public void setTypeFace(Typeface typeFace) {
 		mTypeFace = typeFace;

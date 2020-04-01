@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 
 import simon.app.quoridor.Core.GameView;
+import simon.app.quoridor.Core.WindowView;
 
 
 public class GButton extends GView {
@@ -14,9 +15,9 @@ public class GButton extends GView {
 
 	private int mWidth, mHeight;
 
-	public GButton(GameView gameView, String text, int width, int height, int x, int y, int backgroundColor, int foreGroundColor)
+	public GButton(WindowView windowView, String text, int width, int height, int x, int y, int backgroundColor, int foreGroundColor)
 	{
-		super(gameView, x, y);
+		super(windowView, x, y);
 
 		mText = text;
 		mWidth = width;
@@ -52,9 +53,13 @@ public class GButton extends GView {
 
 	}
 
+
+
 	public void setText(String text) {
 		mText = text;
 	}
+
+	public void setTextSize(int textSize) {mTextPaint.setTextSize(textSize);}
 
 	public void setTextColor(int color) {
 		mTextPaint.setColor(color);

@@ -67,9 +67,7 @@ public abstract class WindowView {
 	 * Draws the views contained in the window. Can be overrode to customize the drawing process.
 	 * @param canvas The canvas to draw on
 	 */
-	public void draw(Canvas canvas) {
-
-	}
+	public abstract void draw(Canvas canvas);
 
 	/**
 	 * Children can override this to handle touch events

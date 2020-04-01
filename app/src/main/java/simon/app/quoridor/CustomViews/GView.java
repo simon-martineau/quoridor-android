@@ -15,8 +15,8 @@ public abstract class GView implements Comparable<GView> {
 	private int mX;
 	private int mY;
 
-	private WindowView mWindowView;
-	private GModalView mGModalView;
+	protected WindowView mWindowView;
+	protected GModalView mGModalView;
 
 	private onClickAction mOnClickAction;
 	private boolean hasOnClick = false;
@@ -52,6 +52,19 @@ public abstract class GView implements Comparable<GView> {
 		}
 	}
 
+	/**
+	 * Centers the view horizontally in its parent WindowView
+	 */
+	public void setCenterHorizontal() {
+		setX(mWindowView.getWidth() / 2 - getWidth() / 2);
+	}
+
+	/**
+	 * Centers the view vertically in its parent WindowView
+	 */
+	public void setCenterVertical() {
+		setX(mWindowView.getHeight() / 2 - getHeight() / 2);
+	}
 
 	/**
 	 * @return The view's zIndex
