@@ -86,7 +86,7 @@ public abstract class WindowView {
 		for (GView gView : mGViews) {
 
 			if (gView.isInRect(x, y)) {
-				gView.performClick(this, x, y); // TODO: make GViews accept WindowView as argument
+				gView.performClick(x, y);
 				return;
 			}
 		}

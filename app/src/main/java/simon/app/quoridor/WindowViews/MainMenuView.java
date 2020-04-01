@@ -95,7 +95,7 @@ public class MainMenuView extends WindowView {
 		mStartGameButton.setCenterHorizontal();
 		mStartGameButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(WindowView windowView, int x, int y) {
+			public void onClick(int x, int y) {
 				getAppView().swapToGameView();
 			}
 		});
@@ -106,7 +106,7 @@ public class MainMenuView extends WindowView {
 		mSettingsButton.setCenterHorizontal();
 		mSettingsButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(WindowView windowView, int x, int y) {
+			public void onClick(int x, int y) {
 				getAppView().swapToSettingsView();
 			}
 		});

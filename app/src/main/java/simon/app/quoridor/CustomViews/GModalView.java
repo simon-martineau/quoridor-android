@@ -41,10 +41,10 @@ public class GModalView extends GView {
 
 		setOnClickAction(new onClickAction() {
 			@Override
-			public void onClick(WindowView windowView, int x, int y) {
+			public void onClick(int x, int y) {
 				for (GView gView: mGViews) {
 					if (gView.isInRect(x, y)) {
-						gView.performClick(windowView, x, y);
+						gView.performClick(x, y);
 						break;
 					}
 				}

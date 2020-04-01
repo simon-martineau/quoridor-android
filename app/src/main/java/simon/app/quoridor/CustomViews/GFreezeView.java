@@ -3,7 +3,7 @@ package simon.app.quoridor.CustomViews;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import simon.app.quoridor.Core.GameView;
+import simon.app.quoridor.WindowViews.GameView;
 
 public class GFreezeView extends GView {
 	private int mWidth;

@@ -1,4 +1,4 @@
-package simon.app.quoridor.Core;
+package simon.app.quoridor.WindowViews;
 
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
@@ -25,6 +25,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import simon.app.quoridor.Core.AppView;
+import simon.app.quoridor.Core.Quoridor;
+import simon.app.quoridor.Core.QuoridorException;
 import simon.app.quoridor.Utils.Annotations.Asynchronous;
 import simon.app.quoridor.CustomViews.GButton;
 import simon.app.quoridor.CustomViews.GTitleView;
@@ -301,7 +304,7 @@ public class GameView extends WindowView {
 		mGQuoridorView.setPlayerColor(1, mPawnColorPref);
 		mGQuoridorView.setOnClickAction(new GQuoridorView.onClickAction() {
 			@Override
-			public void onClick(WindowView windowView, int x, int y) {
+			public void onClick(int x, int y) {
 				if (!gamePaused && !placingWall) {
 					int[] possibleCellCoordinates;
 					possibleCellCoordinates = mGQuoridorView.getCellCorrespondingToTouch(x, y);
@@ -315,7 +318,7 @@ public class GameView extends WindowView {
 		mPlaceWallButton = new GButton(this, "Place a wall", 300, 150, 150, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mPlaceWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(WindowView windowView, int x, int y) {
+			public void onClick(int x, int y) {
 				if (!gamePaused) {
 					if (!placingWall) {
 						playSound(mBeginPlaceWallSoundId, 0.5f);
@@ -340,7 +343,7 @@ public class GameView extends WindowView {
 		mToggleWallTypeButton.setOnClickAction(new GView.onClickAction() {
 
 			@Override
-			public void onClick(WindowView windowView, int x, int y) {
+			public void onClick(int x, int y) {
 				cancelWallPlacement();
 				playSound(mSwitchWallTypeSoundId, 0.3f);
 				if (mToggleWallTypeButton.getText().equals("Horizontal"))
@@ -359,7 +362,7 @@ public class GameView extends WindowView {
 		mConfirmWallButton = new GButton(this, "Confirm", 300, 150, 900, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mConfirmWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(WindowView windowView, int x, int y) {
+			public void onClick(int x, int y) {
 				try {
 					finalizeWallPlacement();
 					mToggleWallTypeButton.setVisible(false);
@@ -380,7 +383,7 @@ public class GameView extends WindowView {
 		mAbandonButton = new GButton(this, "Abandon", 300, 150, mAppView.getWidth() - 450, mAppView.getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.RED);
 		mAbandonButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(WindowView windowView, int x, int y) {
+			public void onClick(int x, int y) {
 				playSound(mAbandonButtonSoundId, 0.5f);
 				mRestartConfirmModalView.setVisible(true);
 			}
@@ -389,7 +392,7 @@ public class GameView extends WindowView {
 		mNewGameButton = new GButton(this, "New Game", 300, 150, mAppView.getWidth() - 450, mAppView.getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mNewGameButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(WindowView windowView, int x, int y) {
+			public void onClick(int x, int y) {
 				startNewGame();
 				mNewGameButton.setVisible(false);
 			}
@@ -400,9 +403,9 @@ public class GameView extends WindowView {
 		mRestartConfirmModalView.addGButton(Color.RED, DEFAULT_BUTTON_BACKGROUND_COLOR, 400, 150, "Yes",
 				new GView.onClickAction() {
 					@Override
-					public void onClick(WindowView windowView, int x, int y) {
+					public void onClick(int x, int y) {
 						playSound(mLoseSoundId, 0.5f);
-						if (placingWall) mPlaceWallButton.performClick(windowView, x, y);
+						if (placingWall) mPlaceWallButton.performClick(x, y);
 						startNewGame();
 						mRestartConfirmModalView.setVisible(false);
 					}
@@ -411,7 +414,7 @@ public class GameView extends WindowView {
 		mRestartConfirmModalView.addGButton(Color.GREEN, DEFAULT_BUTTON_BACKGROUND_COLOR, 400, 150, "No",
 				new GView.onClickAction() {
 					@Override
-					public void onClick(WindowView windowView, int x, int y) {
+					public void onClick(int x, int y) {
 						playSound(mWallMoveSoundId, 0.5f);
 						mRestartConfirmModalView.setVisible(false);
 					}
@@ -423,10 +426,12 @@ public class GameView extends WindowView {
 		mSettingsButton = new GButton(this, "Main menu", 300, 150, 150, getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
 		mSettingsButton.setOnClickAction(new GView.onClickAction() {
 			@Override
-			public void onClick(WindowView windowView, int x, int y) {
+			public void onClick(int x, int y) {
 				getAppView().swapToMainMenuView();
 			}
 		});
+
+		refreshHover();
 
 	}
 

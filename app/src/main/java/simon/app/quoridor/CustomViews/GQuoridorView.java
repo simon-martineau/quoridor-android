@@ -7,7 +7,7 @@ import android.graphics.Paint;
 import java.util.ArrayList;
 import java.util.List;
 
-import simon.app.quoridor.Core.GameView;
+import simon.app.quoridor.WindowViews.GameView;
 import simon.app.quoridor.Core.Quoridor;
 
 public class GQuoridorView extends GView {

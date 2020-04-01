@@ -5,24 +5,53 @@ import android.graphics.Typeface;
 
 import org.jetbrains.annotations.NotNull;
 
-import simon.app.quoridor.Core.GameView;
+import java.util.List;
+
+import simon.app.quoridor.WindowViews.GameView;
 import simon.app.quoridor.WindowViews.WindowView;
 
 /**
  * Base class for custom views
  */
 public abstract class GView implements Comparable<GView> {
+
+	protected List<GView> mGViews = null;
+	protected boolean isParent = false;
+
+	/**
+	 * X coordinate of the GView in relation to its parent
+	 */
 	private int mX;
+
+	/**
+	 * Y coordinate of the GView in relation to its parent
+	 */
 	private int mY;
 
 	protected WindowView mWindowView;
 	protected GModalView mGModalView;
 
+	/**
+	 * Callback for click event
+	 */
 	private onClickAction mOnClickAction;
 	private boolean hasOnClick = false;
-	private boolean mIsVisible = true;
-	protected Typeface mTypeFace = GameView.DEFAULT_TYPEFACE;
 
+
+	/**
+	 * If the GView is visible. If not, it does not get drawn, and it does not consume click events
+	 */
+	private boolean mIsVisible = true;
+
+	/**
+	 * Default typeface
+	 */
+	protected static Typeface mTypeFace = GameView.DEFAULT_TYPEFACE;
+
+	/**
+	 * The index used for drawing GViews and handling events. Higher zIndex views are drawn on top
+	 * and have priority on click events
+	 */
 	private int mZIndex;
 
 
@@ -37,6 +66,10 @@ public abstract class GView implements Comparable<GView> {
 		mWindowView = windowView;
 		registerView(windowView);
 	}
+
+	/**
+	 * Constructor for the GView in another GView
+	 */
 
 	/**
 	 * Constructor for the GView in a ModalView
@@ -102,15 +135,19 @@ public abstract class GView implements Comparable<GView> {
 	}
 
 
+	private void registerViewModal(GView gView) {
+		// TODO: Merge this with ModalView
+	}
+
+
 	/**
 	 * Perform the view's method associated with its mOnClickAction interface
-	 * @param windowView A reference to the WindowView in which the view resides
 	 * @param x The x coordinate of the touch event
 	 * @param y The y coordinate of the touch event
 	 */
-	public void performClick(WindowView windowView, int x, int y) {
+	public void performClick(int x, int y) {
 		if (hasOnClick) {
-			mOnClickAction.onClick(windowView, x, y);
+			mOnClickAction.onClick(x, y);
 		}
 	}
 
@@ -128,7 +165,7 @@ public abstract class GView implements Comparable<GView> {
 	 * routed to the view
 	 */
 	public interface onClickAction {
-		void onClick(WindowView windowView, int x, int y);
+		void onClick(int x, int y);
 	}
 
 	// Abstract methods

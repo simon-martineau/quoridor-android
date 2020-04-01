@@ -36,9 +36,20 @@ public class MainActivity extends Activity {
 	}
 }
 
+// TODO: "Allow" GViews to contain other GViews and simplify ModalView
+// TODO: Make GViews draw relative to parent coordinates
+// TODO: Make a color picker view for picking colors in settings
 
-// TODO: Add home screen
-// TODO: Cancel wall placement on abandon match
+// TODO: Add loading bar sound effect
+
+/* TODO: Implement stats tracking:
+	- Walls placed
+	- Distance moved
+	- Wins/Losses, Win %
+	- Play time
+
+	Reset Stats
+	*/
 
 
 
