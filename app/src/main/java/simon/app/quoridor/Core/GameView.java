@@ -1,5 +1,6 @@
 package simon.app.quoridor.Core;
 
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -72,7 +73,7 @@ public class GameView extends WindowView {
 	/**
 	 * The default color to use for button background
 	 */
-	private static int DEFAULT_BUTTON_BACKGROUND_COLOR = Color.rgb(40, 40, 40);
+	public static int DEFAULT_BUTTON_BACKGROUND_COLOR = Color.rgb(40, 40, 40);
 
 	/**
 	 * Default typeface used in drawText calls
@@ -88,6 +89,12 @@ public class GameView extends WindowView {
 	 * Logical implementation of Quoridor. The game that is drawn to the canvas
 	 */
 	public Quoridor mGame;
+
+	//==============================================================================================
+	// Preferences
+	//==============================================================================================
+	private int mPawnColorPref;
+
 
 
 	//==============================================================================================
@@ -147,6 +154,11 @@ public class GameView extends WindowView {
 	 */
 	GButton mAbandonButton;
 
+	/**
+	 * Button to open settings menu
+	 */
+	GButton mSettingsButton;
+
 	// Modal views
 	/**
 	 * Prompt to confirm match forfeiting
@@ -158,6 +170,7 @@ public class GameView extends WindowView {
 	 * Name of the app at the top of the screen
 	 */
 	GTitleView mGTitleView;
+
 
 	//==============================================================================================
 	// Audio
@@ -279,11 +292,13 @@ public class GameView extends WindowView {
 	private void setUpViews() {
 		Log.i(TAG, "setUpViews: mAppView.getWidth() = " + mAppView.getWidth());
 		Log.i(TAG, "setUpViews: getWidth() = " + getWidth());
+		retrievePreferences();
 
 		mGTitleView = new GTitleView(this, "8 bit Quoridor", Color.GREEN, 184f, mAppView.getWidth());
 		mGTitleView.setY(128);
 
 		mGQuoridorView = new GQuoridorView(this, mGame, 50, mGTitleView.getBottom() + 128, getWidth());
+		mGQuoridorView.setPlayerColor(1, mPawnColorPref);
 		mGQuoridorView.setOnClickAction(new GQuoridorView.onClickAction() {
 			@Override
 			public void onClick(WindowView windowView, int x, int y) {
@@ -297,7 +312,7 @@ public class GameView extends WindowView {
 		});
 		mGQuoridorView.linkQuoridorGame(mGame);
 
-		mPlaceWallButton = new GButton(this, "Place a wall", 300, 150, 100, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
+		mPlaceWallButton = new GButton(this, "Place a wall", 300, 150, 150, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mPlaceWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(WindowView windowView, int x, int y) {
@@ -321,7 +336,7 @@ public class GameView extends WindowView {
 			}
 		});
 
-		mToggleWallTypeButton = new GButton(this, "Horizontal", 300, 150, 475, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+		mToggleWallTypeButton = new GButton(this, "Horizontal", 300, 150, 525, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
 		mToggleWallTypeButton.setOnClickAction(new GView.onClickAction() {
 
 			@Override
@@ -341,7 +356,7 @@ public class GameView extends WindowView {
 		mToggleWallTypeButton.setVisible(false);
 
 
-		mConfirmWallButton = new GButton(this, "Confirm", 300, 150, 850, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
+		mConfirmWallButton = new GButton(this, "Confirm", 300, 150, 900, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mConfirmWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(WindowView windowView, int x, int y) {
@@ -405,6 +420,22 @@ public class GameView extends WindowView {
 		mRestartConfirmModalView.setY(mAppView.getHeight() / 2 - mRestartConfirmModalView.getHeight() / 2 - 200);
 		mRestartConfirmModalView.setVisible(false);
 
+		mSettingsButton = new GButton(this, "Main menu", 300, 150, 150, getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+		mSettingsButton.setOnClickAction(new GView.onClickAction() {
+			@Override
+			public void onClick(WindowView windowView, int x, int y) {
+				getAppView().swapToMainMenuView();
+			}
+		});
+
+	}
+
+	/**
+	 * Retrieves the user preferences and updates members accordingly
+	 */
+	private void retrievePreferences() {
+		SharedPreferences prefs = getAppView().getSharedPreferences();
+		mPawnColorPref = prefs.getInt("pawn_color", Color.WHITE);
 	}
 
 	//==============================================================================================
@@ -434,6 +465,7 @@ public class GameView extends WindowView {
 	@Override
 	public void onActivate() {
 		super.onActivate();
+		setUpViews();
 		mBackgroundMusicPlayer.start();
 	}
 

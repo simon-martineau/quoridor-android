@@ -61,6 +61,12 @@ public class MainMenuView extends WindowView {
 	 */
 	GButton mStartGameButton;
 
+
+	/**
+	 * Button to go to settings window
+	 */
+	GButton mSettingsButton;
+
 	//==============================================================================================
 	// Bitmaps
 	//==============================================================================================
@@ -94,14 +100,27 @@ public class MainMenuView extends WindowView {
 		mStartGameButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(WindowView windowView, int x, int y) {
-				mAppView.swapToGameView();
+				getAppView().swapToGameView();
+			}
+		});
+
+		mSettingsButton = new GButton(this, "Settings", 400, 200, 0, getHeight() / 2 + 400,
+				DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+		mSettingsButton.setTextSize(64);
+		mSettingsButton.setCenterHorizontal();
+		mSettingsButton.setOnClickAction(new GView.onClickAction() {
+			@Override
+			public void onClick(WindowView windowView, int x, int y) {
+				getAppView().swapToSettingsView();
 			}
 		});
 
 		mAppTitleView = new GTitleView(this, 0, getHeight() / 3 - 100, "8 BIT QUORIDOR",
-				Color.GREEN, 192);
+		Color.GREEN, 192);
 		mAppTitleView.setTypeFace(DEFAULT_TYPEFACE);
 		mAppTitleView.setCenterHorizontal();
+
+
 
 	}
 

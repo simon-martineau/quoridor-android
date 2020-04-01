@@ -2,6 +2,7 @@ package simon.app.quoridor.Core;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -31,6 +32,18 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	 * Thread from which to run the game
 	 */
 	public GameThread mGameThread;
+
+	/**
+	 * For accessing SharedPreferences
+	 */
+	public static final String APP_NAME = "";
+
+	//==============================================================================================
+	// Preferences
+	//==============================================================================================
+	public SharedPreferences mPreferences = getContext().getApplicationContext()
+			.getSharedPreferences("Quoridor settings", Context.MODE_PRIVATE);
+
 
 	//==============================================================================================
 	// WindowViews
@@ -80,6 +93,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 		mWindowViews.put("game", new GameView(this));
 		mWindowViews.put("main menu", new MainMenuView(this));
 		mWindowViews.put("loading screen", new LoadingView(this));
+		mWindowViews.put("settings view", new SettingsView(this));
 	}
 
 	private void deactivateCurrentWindow() {
@@ -189,5 +203,10 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	public void swapToMainMenuView() {
 		setActiveWindowView("main menu");
+	}
+	public void swapToSettingsView() { setActiveWindowView("settings view"); }
+
+	public SharedPreferences getSharedPreferences() {
+		return mPreferences;
 	}
 }

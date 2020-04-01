@@ -483,7 +483,13 @@ public class GQuoridorView extends GView {
 		consoleMessageColor = color;
 	}
 
-
+	public void setPlayerColor(int playerNumber, int color) {
+		if (playerNumber == 1) {
+			playerOneColor = color;
+		} else if (playerNumber == 2) {
+			playerTwoColor = color;
+		}
+	}
 
 	public void linkQuoridorGame(Quoridor quoridor) {
 		mQuoridor = quoridor;
