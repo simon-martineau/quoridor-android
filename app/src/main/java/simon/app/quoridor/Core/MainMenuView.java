@@ -1,14 +1,18 @@
 package simon.app.quoridor.Core;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import simon.app.quoridor.CustomViews.GBackgroundView;
 import simon.app.quoridor.CustomViews.GButton;
 import simon.app.quoridor.CustomViews.GTitleView;
 import simon.app.quoridor.CustomViews.GView;
+import simon.app.quoridor.R;
 
 public class MainMenuView extends WindowView {
 	private static Typeface DEFAULT_TYPEFACE;
@@ -34,6 +38,20 @@ public class MainMenuView extends WindowView {
 	 */
 	GButton mStartGameButton;
 
+	/**
+	 * Background
+	 */
+	GBackgroundView mBackground;
+	//==============================================================================================
+	// Bitmaps
+	//==============================================================================================
+
+	/**
+	 * Background Bitmap
+	 */
+	Bitmap mBackgroundBitmap;
+
+
 	//==============================================================================================
 	// Constructors
 	//==============================================================================================
@@ -52,6 +70,11 @@ public class MainMenuView extends WindowView {
 	// Setup methods
 	//==============================================================================================
 	private void setUpViews() {
+
+		mBackgroundBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(mAppView.getResources(), R.drawable.main_menu_background),
+				getWidth(), getHeight(), false);
+		mBackground = new GBackgroundView(this, 0, 0, mBackgroundBitmap);
+		mBackground.setAlphaPulsate(0, 255, 180);
 
 		mStartGameButton = new GButton(this, "Start game", 400, 200, 0, getHeight() / 2 + 100,
 				DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
