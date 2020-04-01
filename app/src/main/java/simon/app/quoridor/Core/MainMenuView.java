@@ -8,8 +8,14 @@ import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
 import simon.app.quoridor.CustomViews.GBackgroundView;
 import simon.app.quoridor.CustomViews.GButton;
+import simon.app.quoridor.CustomViews.GNumberStream;
 import simon.app.quoridor.CustomViews.GTitleView;
 import simon.app.quoridor.CustomViews.GView;
 import simon.app.quoridor.R;
@@ -18,13 +24,29 @@ public class MainMenuView extends WindowView {
 	private static Typeface DEFAULT_TYPEFACE;
 
 	//==============================================================================================
-	// GViews
+	// Constants
 	//==============================================================================================
 	/**
 	 * The default color to use for button background
 	 */
-	private static int DEFAULT_BUTTON_BACKGROUND_COLOR = Color.rgb(40, 40, 40);
+	private final static int DEFAULT_BUTTON_BACKGROUND_COLOR = Color.rgb(40, 40, 40);
 
+	/**
+	 * Rate at which the GNumberStream are generated on average. Lower means more are generated.
+	 */
+	private final static int NUMBER_STREAM_GENERATING_RATE = 20;
+
+	/**
+	 * Frequency at which numberStreams are generated horizontally. The lower, the more there are.
+	 */
+	private final static int HORIZONTAL_STREAM_RATE = 1000;
+
+
+	/**
+	 * Color pool for the numberStream randomizer
+	 */
+	private final static List<Integer> NUMBER_STREAM_COLOR_POOL = new ArrayList<>(Arrays.asList(
+			Color.GREEN, Color.BLUE, Color.RED));
 	//==============================================================================================
 	// GViews
 	//==============================================================================================
@@ -42,6 +64,11 @@ public class MainMenuView extends WindowView {
 	 * Background
 	 */
 	GBackgroundView mBackground;
+
+	/**
+	 *
+	 */
+	GNumberStream mMyNumberStream;
 	//==============================================================================================
 	// Bitmaps
 	//==============================================================================================
@@ -71,10 +98,11 @@ public class MainMenuView extends WindowView {
 	//==============================================================================================
 	private void setUpViews() {
 
-		mBackgroundBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(mAppView.getResources(), R.drawable.main_menu_background),
-				getWidth(), getHeight(), false);
-		mBackground = new GBackgroundView(this, 0, 0, mBackgroundBitmap);
-		mBackground.setAlphaPulsate(0, 255, 180);
+//		mBackgroundBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(mAppView.getResources(), R.drawable.main_menu_background),
+//				getWidth(), getHeight(), false);
+//		mBackground = new GBackgroundView(this, 0, 0, mBackgroundBitmap);
+//		mBackground.setAlphaPulsate(0, 255, 180);
+
 
 		mStartGameButton = new GButton(this, "Start game", 400, 200, 0, getHeight() / 2 + 100,
 				DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
@@ -119,6 +147,7 @@ public class MainMenuView extends WindowView {
 	 */
 	@Override
 	public void draw(Canvas canvas) {
+		generateRandomNumberStream();
 		for (int i = mGViews.size() - 1; i >= 0; i--) {
 			mGViews.get(i).draw(canvas);
 		}
@@ -141,5 +170,31 @@ public class MainMenuView extends WindowView {
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		setUpViews();
+	}
+
+	/**
+	 * Chance to generate a random GNumberStream for the main menu WindowView
+	 */
+	public void generateRandomNumberStream() {
+		int matchAttempt = (int) (Math.random()*NUMBER_STREAM_GENERATING_RATE);
+
+		if (matchAttempt == NUMBER_STREAM_GENERATING_RATE - 1) {
+			Random rand = new Random();
+
+			int x = rand.nextInt(getWidth());
+			int y = rand.nextInt(getHeight() + 600) - 600;
+			int size = 48;
+			int color = NUMBER_STREAM_COLOR_POOL.get(rand.nextInt(NUMBER_STREAM_COLOR_POOL.size()));
+			int eraserIndex = - rand.nextInt(50);
+
+			GNumberStream gNumberStream = new GNumberStream(this, x, y, size, color);
+			gNumberStream.setEraserIndex(eraserIndex);
+			if (rand.nextInt(HORIZONTAL_STREAM_RATE) == HORIZONTAL_STREAM_RATE - 1) {
+				gNumberStream.setXStep(gNumberStream.getYStep() - 8);
+				gNumberStream.setYStep(0);
+			}
+		}
+
+
 	}
 }
