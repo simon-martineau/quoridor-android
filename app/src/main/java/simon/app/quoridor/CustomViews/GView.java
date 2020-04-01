@@ -73,15 +73,15 @@ public abstract class GView implements Comparable<GView> {
 	}
 
 	/**
-	 * Register the view in the parent GameView
-	 * @param windowView The parent GameView
+	 * Register the view in the parent WindowView
+	 * @param windowView The parent WindowView
 	 */
 	private void registerView(WindowView windowView) {
 		windowView.registerGView(this);
 	}
 
 	/**
-	 * Register the view in the parent ModalView
+	 * Register the view in the parent GModalView
 	 * @param gModalView The parent GModalView
 	 */
 	private void registerViewModal(GModalView gModalView) {

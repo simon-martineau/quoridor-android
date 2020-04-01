@@ -25,6 +25,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import simon.app.quoridor.Annotations.Asynchronous;
 import simon.app.quoridor.CustomViews.GButton;
 import simon.app.quoridor.CustomViews.GTitleView;
 import simon.app.quoridor.CustomViews.GView;
@@ -32,7 +33,7 @@ import simon.app.quoridor.CustomViews.GModalView;
 import simon.app.quoridor.CustomViews.GQuoridorView;
 import simon.app.quoridor.R;
 
-public class GameView extends WindowView{
+public class GameView extends WindowView {
 	//==============================================================================================
 	// Constants
 	//==============================================================================================
@@ -247,47 +248,13 @@ public class GameView extends WindowView{
 		setUpAudio();
 	}
 
-	public GameView(AppView appView, String id, String state) {
-		super(appView);
-
-		DEFAULT_TYPEFACE = Typeface.createFromAsset(appView.getContext().getAssets(), "fonts/8_bit_style.ttf");
-
-		JSONObject stateJSON;
-		try {
-			stateJSON = new JSONObject(state);
-			mGame = new Quoridor(id, stateJSON);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-
-		setUpAudio();
-	}
-
-
 	//==============================================================================================
-	// Methods
+	// Setup Methods
 	//==============================================================================================
-
-	private void playSound(int soundId, float intensity) {
-		mSoundPool.play(soundId, intensity, intensity, 1, 0, 1f);
-	}
-
-
 
 	/**
-	 * Registers a view in mGViews. GViews is sorted by zIndex after each call
-	 * @param gView The view to register
+	 * Sets up audio required to run the window
 	 */
-	public void registerGView(GView gView) {
-		mGViews.add(gView);
-		sortViews();
-	}
-
-	public void sortViews() {
-		Collections.sort(mGViews);
-		Collections.reverse(mGViews);
-	}
-
 	private void setUpAudio() {
 		mBackgroundMusicPlayer = MediaPlayer.create(mAppView.getContext(), R.raw.game_track);
 		mBackgroundMusicPlayer.setLooping(true);
@@ -304,9 +271,11 @@ public class GameView extends WindowView{
 		mBeginPlaceWallSoundId = mSoundPool.load(mAppView.getContext(), R.raw.begin_place_wall, 1);
 		mAbandonButtonSoundId = mSoundPool.load(mAppView.getContext(), R.raw.abandon_button_sound, 1);
 		mInvalidWallSoundId = mSoundPool.load(mAppView.getContext(), R.raw.invalid_wall, 1);
-
 	}
 
+	/**
+	 * Sets up the all the window's views
+	 */
 	private void setUpViews() {
 		Log.i(TAG, "setUpViews: mAppView.getWidth() = " + mAppView.getWidth());
 		Log.i(TAG, "setUpViews: getWidth() = " + getWidth());
@@ -418,6 +387,7 @@ public class GameView extends WindowView{
 					@Override
 					public void onClick(WindowView windowView, int x, int y) {
 						playSound(mLoseSoundId, 0.5f);
+						if (placingWall) mPlaceWallButton.performClick(windowView, x, y);
 						startNewGame();
 						mRestartConfirmModalView.setVisible(false);
 					}
@@ -437,6 +407,14 @@ public class GameView extends WindowView{
 
 	}
 
+	//==============================================================================================
+	// Override Methods
+	//==============================================================================================
+
+	/**
+	 * Draws the window to the canvas
+	 * @param canvas The canvas to draw on
+	 */
 	@Override
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
@@ -451,23 +429,38 @@ public class GameView extends WindowView{
 			mGQuoridorView.setBlink(true);
 	}
 
+	/**
+	 * Called when the window is activated by the AppView.
+	 */
 	@Override
 	public void onActivate() {
 		super.onActivate();
 		mBackgroundMusicPlayer.start();
 	}
 
+	/**
+	 * Called when the window is deactivated by the AppView.
+	 */
 	@Override
 	public void onDeactivate() {
 		super.onDeactivate();
 		mBackgroundMusicPlayer.pause();
 	}
 
+	/**
+	 * Routed here by the AppView on a surfaceChanged
+	 * @see AppView#surfaceChanged(SurfaceHolder, int, int, int)
+	 */
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		setUpViews();
 	}
 
+	/**
+	 * Routed here by the AppView on a touch event if this window is activated
+	 * @param event The touch event routed from the AppView
+	 * @return true
+	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		int x = (int) event.getX();
@@ -514,8 +507,17 @@ public class GameView extends WindowView{
 		return true;
 	}
 
+	//==============================================================================================
+	// Game flow methods
+	//==============================================================================================
+
+	/**
+	 * Moves player in mGame if coordinates are a valid move. Does nothing otherwise.
+	 * @param playerNumber The player to move (1 or 2)
+	 * @param x The x coordinate
+	 * @param y The y coordinate
+	 */
 	public void tryToMovePlayer(int playerNumber, int x, int y) {
-		// Logic
 		try {
 			mGame.requestPlayerMovement(playerNumber, x, y);
 			playSound(mPawnMoveSoundId, 0.5f);
@@ -526,19 +528,38 @@ public class GameView extends WindowView{
 		}
 	}
 
-	public void refreshHover() {
+	/**
+	 * Places wall at specified position in mGame if the wall placement is invalid.
+	 * @param playerNumber The player that places the wall (1 or 2)
+	 * @param wallType The type of wall to place (HORIZONTAL or VERTICAL)
+	 * @param x The x coordinate
+	 * @param y The y coordinate
+	 * @throws QuoridorException If the wall placement is invalid. mGame will therefore not be modified.
+	 */
+	public void tryToPlaceWall(int playerNumber, int wallType, int x, int y) throws QuoridorException {
+
+		mGame.requestWallPlacement(playerNumber, wallType, x, y);
+
 		mGQuoridorView.resetHoverPositions();
-		// mGQuoridorView.hoverCells(mGame.getShortestPathToVictory(1));
 		mGQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
 	}
 
+	/**
+	 * Begins a wall placement state for the GameView.
+	 * @param wallType The type of wall to place (HORIZONTAL or VERTICAL)
+	 */
 	public void initiateWallPlacement(int wallType) {
 		placingWall = true;
 		mWallPreviewType = wallType;
 		mGQuoridorView.setWallPreview(wallType, 5, 5);
-
 	}
 
+	/**
+	 * Attempts to place a wall accordingly to the wall placement state. If the wall placement is valid,
+	 * mGame will be modified and the wall placement state will end.
+	 * @throws QuoridorException if the wall placement is invalid. mGame will not be modified and the
+	 * wall placement state will remain active.
+	 */
 	public void finalizeWallPlacement() throws QuoridorException {
 		if (mGQuoridorView.isWallPreviewInvalid()) {
 			throw new QuoridorException("Illegal wall placement!");
@@ -559,21 +580,19 @@ public class GameView extends WindowView{
 		cancelWallPlacement();
 	}
 
-	public void tryToPlaceWall(int playerNumber, int wallType, int x, int y) throws QuoridorException {
-
-		mGame.requestWallPlacement(playerNumber, wallType, x, y);
-
-		mGQuoridorView.resetHoverPositions();
-		mGQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
-
-	}
-
+	/**
+	 * Ends the wall placement state.
+	 */
 	public void cancelWallPlacement() {
 		placingWall = false;
 		mWallPreviewType = 0;
 		mGQuoridorView.clearWallPreview();
 	}
 
+	/**
+	 * Creates new game according to the server response passed as argument
+	 * @param serverResponse The string containing JSON of the game state and gameID
+	 */
 	private void setNewGame(String serverResponse) {
 		JSONObject serverResponseJSON;
 		JSONObject state;
@@ -591,6 +610,10 @@ public class GameView extends WindowView{
 		mGQuoridorView.linkQuoridorGame(mGame);
 	}
 
+	/**
+	 * Changes mGame according to the game sate passed as argument
+	 * @param serverResponse The string containing JSON of the game state
+	 */
 	private void setGameState(String serverResponse) {
 		JSONObject serverResponseJSON;
 		JSONObject state;
@@ -605,6 +628,63 @@ public class GameView extends WindowView{
 		mGame.putGameState(state);
 	}
 
+	/**
+	 * Initiates game winning sequence if a player has won, else does nothing
+	 */
+	public void checkForWin() {
+		int possibleWinner = mGame.getWinnerPlayerNumberOrZero();
+		if (possibleWinner == 1) initGameWin();
+		else if (possibleWinner == 2) initGameLoss();
+	}
+
+	/**
+	 * Modifies the GUI for a game loss
+	 */
+	public void initGameLoss() {
+		gamePaused = true;
+		playSound(mLoseSoundId, 0.6f);
+		mGQuoridorView.setConsoleMessageColor(Color.RED);
+		mGQuoridorView.setConsoleMessage("YOU LOST!");
+		mGQuoridorView.setBorderBlink(Color.RED, 8, 5);
+		mAbandonButton.setVisible(false);
+		mNewGameButton.setVisible(true);
+
+	}
+
+	/**
+	 * Modifies the GUI for a game win
+	 */
+	public void initGameWin() {
+		gamePaused = true;
+		playSound(mWinSoundId, 0.6f);
+		mGQuoridorView.setConsoleMessageColor(Color.GREEN);
+		mGQuoridorView.setConsoleMessage("YOU WON!");
+		mGQuoridorView.setBorderBlink(Color.GREEN, 8, 3);
+		mAbandonButton.setVisible(false);
+		mNewGameButton.setVisible(true);
+	}
+
+	/**
+	 * Fetches a new game from the server and modifies the UI accordingly
+	 */
+	public void startNewGame() {
+
+		fetchNewGameFromServer(API_BASE_URL + API_BEGIN_GAME_SUFFIX, IDUL);
+		mAbandonButton.setVisible(true);
+		mGQuoridorView.setConsoleMessage("");
+	}
+
+	//==============================================================================================
+	// Server request methods
+	//==============================================================================================
+
+	/**
+	 * Queues a post request to the server to start a new game.
+	 * @param targetURL The URL to make the request to
+	 * @param idul The identifier used for the server
+	 * @callback Starts a new game
+	 */
+	@Asynchronous
 	public void fetchNewGameFromServer(String targetURL, String idul) {
 
 		RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
@@ -629,13 +709,33 @@ public class GameView extends WindowView{
 							throw new IOException("Error : " + response);
 						}
 						String data =  Objects.requireNonNull(response.body()).string();
-						setNewGame(data);
+						// Wait for mGQuoridorView to be initialised
+						try {
+							while (true) {
+								if (mGQuoridorView != null) {
+									setNewGame(data);
+									break;
+								}
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 						gamePaused = false;
 						refreshHover();
 					}
 				});
 	}
 
+
+	/**
+	 * Queues a post request to the server to make a move and get a new state
+	 * @param targetURL The URL to make the request to
+	 * @param gameID The gameID associated with the current game
+	 * @param moveType The type of move ('D' for move, 'MH' for horizontal wall, 'MV' for vertical wall)
+	 * @param position The position (x, y) of the move.
+	 * @callback Updates mGame with the new game state
+	 */
+	@Asynchronous
 	public void postMoveAndGetNewState(String targetURL, String gameID, String moveType, String position) {
 
 		RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
@@ -669,38 +769,25 @@ public class GameView extends WindowView{
 				});
 	}
 
-	public void checkForWin() {
-		int possibleWinner = mGame.getWinnerPlayerNumberOrZero();
-		if (possibleWinner == 1) initGameWin();
-		else if (possibleWinner == 2) initGameLoss();
+	//==============================================================================================
+	// Graphic/Audio methods
+	//==============================================================================================
+
+	/**
+	 * Plays a sound using mSoundPool
+	 * @param soundId The SoundPool ID of the sound to play
+	 * @param intensity The intensity of the sound
+	 */
+	private void playSound(int soundId, float intensity) {
+		mSoundPool.play(soundId, intensity, intensity, 1, 0, 1f);
 	}
 
-	public void initGameLoss() {
-		gamePaused = true;
-		playSound(mLoseSoundId, 0.6f);
-		mGQuoridorView.setConsoleMessageColor(Color.RED);
-		mGQuoridorView.setConsoleMessage("YOU LOST!");
-		mGQuoridorView.setBorderBlink(Color.RED, 8, 5);
-		mAbandonButton.setVisible(false);
-		mNewGameButton.setVisible(true);
-
-	}
-
-	public void initGameWin() {
-		gamePaused = true;
-		playSound(mWinSoundId, 0.6f);
-		mGQuoridorView.setConsoleMessageColor(Color.GREEN);
-		mGQuoridorView.setConsoleMessage("YOU WON!");
-		mGQuoridorView.setBorderBlink(Color.GREEN, 8, 3);
-		mAbandonButton.setVisible(false);
-		mNewGameButton.setVisible(true);
-	}
-
-	public void startNewGame() {
-
-		fetchNewGameFromServer(API_BASE_URL + API_BEGIN_GAME_SUFFIX, IDUL);
-		mAbandonButton.setVisible(true);
-		mGQuoridorView.setConsoleMessage("");
+	/**
+	 * Refreshes the blinking cells representing possible moves according to the current game state
+	 */
+	public void refreshHover() {
+		mGQuoridorView.resetHoverPositions();
+		mGQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
 	}
 
 }
