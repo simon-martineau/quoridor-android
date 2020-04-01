@@ -1,4 +1,4 @@
-package simon.app.quoridor;
+package simon.app.quoridor.Core;
 
 public class QuoridorException extends Exception {
 

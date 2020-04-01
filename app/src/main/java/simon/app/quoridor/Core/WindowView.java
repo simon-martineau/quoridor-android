@@ -1,15 +1,14 @@
-package simon.app.quoridor;
+package simon.app.quoridor.Core;
 
-import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import simon.app.quoridor.CustomViews.GView;
 
 /**
  * Abstract class representing a Window, child of AppView

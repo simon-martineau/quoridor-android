@@ -1,4 +1,4 @@
-package simon.app.quoridor;
+package simon.app.quoridor.Core;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

@@ -1,11 +1,9 @@
-package simon.app.quoridor;
+package simon.app.quoridor.CustomViews;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
-import android.view.View;
+
+import simon.app.quoridor.Core.GameView;
 
 
 public class GButton extends GView {

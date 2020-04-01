@@ -1,9 +1,12 @@
-package simon.app.quoridor;
+package simon.app.quoridor.CustomViews;
 
 import android.graphics.Canvas;
 import android.graphics.Typeface;
 
 import org.jetbrains.annotations.NotNull;
+
+import simon.app.quoridor.Core.GameView;
+import simon.app.quoridor.Core.WindowView;
 
 /**
  * Base class for custom views

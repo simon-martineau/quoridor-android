@@ -1,7 +1,5 @@
-package simon.app.quoridor;
+package simon.app.quoridor.Core;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -9,9 +7,7 @@ import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.SurfaceHolder;
-import android.view.Window;
 
 
 import org.jetbrains.annotations.NotNull;
@@ -19,11 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Objects;
 
 import okhttp3.Call;
@@ -33,6 +25,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import simon.app.quoridor.CustomViews.GButton;
+import simon.app.quoridor.CustomViews.GTitleView;
+import simon.app.quoridor.CustomViews.GView;
+import simon.app.quoridor.CustomViews.ModalView;
+import simon.app.quoridor.CustomViews.QuoridorView;
+import simon.app.quoridor.R;
 
 public class GameView extends WindowView{
 	//==============================================================================================

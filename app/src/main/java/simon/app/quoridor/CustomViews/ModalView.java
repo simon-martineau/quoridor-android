@@ -1,4 +1,4 @@
-package simon.app.quoridor;
+package simon.app.quoridor.CustomViews;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -7,6 +7,8 @@ import android.graphics.Rect;
 
 import java.util.ArrayList;
 import java.util.Collections;
+
+import simon.app.quoridor.Core.WindowView;
 
 public class ModalView extends GView {
 	private static final int LEFT_MARGIN = 100;

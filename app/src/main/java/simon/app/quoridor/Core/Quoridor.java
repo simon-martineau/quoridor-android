@@ -1,11 +1,6 @@
-package simon.app.quoridor;
+package simon.app.quoridor.Core;
 
-import android.annotation.SuppressLint;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.util.JsonReader;
 import android.util.Log;
-import android.view.WindowManager;
 
 import androidx.annotation.Nullable;
 
@@ -14,7 +9,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,17 +26,17 @@ public class Quoridor {
 	public static final int VERTICAL = 2;
 
 	// Logic & api
-	String mGameID = "";
-	int[] mPlayerOnePosition = new int[2];
-	int mPlayerOneWallsLeft = 10;
+	public String mGameID = "";
+	public int[] mPlayerOnePosition = new int[2];
+	public int mPlayerOneWallsLeft = 10;
 	public String mPlayerOneName = "";
-	int[] mPlayerTwoPosition = new int[2];
-	int mPlayerTwoWallsLeft = 10;
+	public int[] mPlayerTwoPosition = new int[2];
+	public int mPlayerTwoWallsLeft = 10;
 	public String mPlayerTwoName = "";
-	List<int[]> mHorizontalWalls = new ArrayList<>();
-	List<int[]> mVerticalWalls = new ArrayList<>();
-	String mLastMoveType = "";
-	String mLastMoveCoordinates = "";
+	public List<int[]> mHorizontalWalls = new ArrayList<>();
+	public List<int[]> mVerticalWalls = new ArrayList<>();
+	public String mLastMoveType = "";
+	public String mLastMoveCoordinates = "";
 
 	/**
 	 * Default constructor. Initialises an empty game
@@ -534,7 +528,7 @@ public class Quoridor {
 	 * @param positionArrayList The list to search in
 	 * @return True if the position is found in the list, else false
 	 */
-	static boolean positionIncluded(int[] position, List<int[]> positionArrayList) {
+	public static boolean positionIncluded(int[] position, List<int[]> positionArrayList) {
 		boolean included = false;
 
 		for (int[] positionInArray : positionArrayList) {

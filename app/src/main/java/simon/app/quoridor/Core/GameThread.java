@@ -1,6 +1,5 @@
-package simon.app.quoridor;
+package simon.app.quoridor.Core;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 

@@ -1,12 +1,14 @@
-package simon.app.quoridor;
+package simon.app.quoridor.CustomViews;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+
+import simon.app.quoridor.Core.GameView;
+import simon.app.quoridor.Core.Quoridor;
 
 public class QuoridorView extends GView {
 	// TODO: Change colors into constants
