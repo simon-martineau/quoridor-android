@@ -66,7 +66,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 		getHolder().addCallback(this);
 
 		setUpWindowViews();
-		setActiveWindowView("main menu");
+		setActiveWindowView("loading screen");
 
 		setFocusable(true);
 	}
@@ -79,6 +79,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 
 		mWindowViews.put("game", new GameView(this));
 		mWindowViews.put("main menu", new MainMenuView(this));
+		mWindowViews.put("loading screen", new LoadingView(this));
 	}
 
 	private void deactivateCurrentWindow() {
@@ -185,5 +186,8 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	//==============================================================================================
 	public void swapToGameView() {
 		setActiveWindowView("game");
+	}
+	public void swapToMainMenuView() {
+		setActiveWindowView("main menu");
 	}
 }

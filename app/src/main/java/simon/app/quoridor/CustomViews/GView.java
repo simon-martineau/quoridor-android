@@ -63,7 +63,7 @@ public abstract class GView implements Comparable<GView> {
 	 * Centers the view vertically in its parent WindowView
 	 */
 	public void setCenterVertical() {
-		setX(mWindowView.getHeight() / 2 - getHeight() / 2);
+		setY(mWindowView.getHeight() / 2 - getHeight() / 2);
 	}
 
 	/**

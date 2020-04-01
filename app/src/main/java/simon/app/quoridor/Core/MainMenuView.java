@@ -40,7 +40,7 @@ public class MainMenuView extends WindowView {
 	/**
 	 * Frequency at which numberStreams are generated horizontally. The lower, the more there are.
 	 */
-	private final static int HORIZONTAL_STREAM_RATE = 200;
+	private final static int REVERSE_STREAM_RATE = 2;
 
 
 	/**
@@ -61,23 +61,10 @@ public class MainMenuView extends WindowView {
 	 */
 	GButton mStartGameButton;
 
-	/**
-	 * Background
-	 */
-	GBackgroundView mBackground;
-
-	/**
-	 *
-	 */
-	GNumberStream mMyNumberStream;
 	//==============================================================================================
 	// Bitmaps
 	//==============================================================================================
 
-	/**
-	 * Background Bitmap
-	 */
-	Bitmap mBackgroundBitmap;
 
 
 	//==============================================================================================
@@ -98,11 +85,7 @@ public class MainMenuView extends WindowView {
 	// Setup methods
 	//==============================================================================================
 	private void setUpViews() {
-
-//		mBackgroundBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(mAppView.getResources(), R.drawable.main_menu_background),
-//				getWidth(), getHeight(), false);
-//		mBackground = new GBackgroundView(this, 0, 0, mBackgroundBitmap);
-//		mBackground.setAlphaPulsate(0, 255, 180);
+		mGViews.clear();
 
 		mStartGameButton = new GButton(this, "Start game", 400, 200, 0, getHeight() / 2 + 100,
 				DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
@@ -182,16 +165,15 @@ public class MainMenuView extends WindowView {
 			Random rand = new Random();
 
 			int x = rand.nextInt(getWidth());
-			int y = rand.nextInt(getHeight() + 600) - 600;
+			int y = - 400 + rand.nextInt(getHeight() + 800);
 			int size = 48;
 			int color = NUMBER_STREAM_COLOR_POOL.get(rand.nextInt(NUMBER_STREAM_COLOR_POOL.size()));
 			int eraserIndex = - rand.nextInt(50);
 
 			GNumberStream gNumberStream = new GNumberStream(this, x, y, size, color);
 			gNumberStream.setEraserIndex(eraserIndex);
-			if (rand.nextInt(HORIZONTAL_STREAM_RATE) == HORIZONTAL_STREAM_RATE - 1) {
-				gNumberStream.setXStep(gNumberStream.getYStep() - 8);
-				gNumberStream.setYStep(0);
+			if (rand.nextInt(REVERSE_STREAM_RATE) == REVERSE_STREAM_RATE - 1) {
+				gNumberStream.setYStep(gNumberStream.getYStep()* -1);
 			}
 		}
 
