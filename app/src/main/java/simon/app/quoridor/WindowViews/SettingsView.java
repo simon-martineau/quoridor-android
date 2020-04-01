@@ -1,4 +1,4 @@
-package simon.app.quoridor.Core;
+package simon.app.quoridor.WindowViews;
 
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
@@ -6,6 +6,8 @@ import android.graphics.Color;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import simon.app.quoridor.Core.AppView;
+import simon.app.quoridor.Core.GameView;
 import simon.app.quoridor.CustomViews.GButton;
 import simon.app.quoridor.CustomViews.GTitleView;
 import simon.app.quoridor.CustomViews.GView;
@@ -41,9 +43,9 @@ public class SettingsView extends WindowView {
 		mTitleView = new GTitleView(this, 0, 100, "Settings", Color.GREEN, 128);
 		mTitleView.setCenterHorizontal();
 
-		mPawnColorSettingLabel = new GTitleView(this, 50, 400, "Pawn color", Color.GREEN, 64);
+		mPawnColorSettingLabel = new GTitleView(this, 50, 400, "Pawn color", Color.GREEN, 48);
 
-		mPawnColorSettingButtonBlue = new GButton(this, "Blue", 200, 100, 300, 400, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.BLUE);
+		mPawnColorSettingButtonBlue = new GButton(this, "Blue", 200, 100, 400, 400, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.BLUE);
 		mPawnColorSettingButtonBlue.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(WindowView windowView, int x, int y) {
@@ -51,7 +53,7 @@ public class SettingsView extends WindowView {
 			}
 		});
 
-		mPawnColorSettingButtonGreen = new GButton(this, "Orange", 200, 100, 550, 400, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, MoreColors.ORANGE);
+		mPawnColorSettingButtonGreen = new GButton(this, "Orange", 200, 100, 650, 400, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, MoreColors.ORANGE);
 		mPawnColorSettingButtonGreen.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(WindowView windowView, int x, int y) {
@@ -59,7 +61,7 @@ public class SettingsView extends WindowView {
 			}
 		});
 
-		mPawnColorSettingButtonYellow = new GButton(this, "Yellow", 200, 100, 800, 400, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.YELLOW);
+		mPawnColorSettingButtonYellow = new GButton(this, "Yellow", 200, 100, 900, 400, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.YELLOW);
 		mPawnColorSettingButtonYellow.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(WindowView windowView, int x, int y) {
@@ -67,7 +69,7 @@ public class SettingsView extends WindowView {
 			}
 		});
 
-		mPawnColorSettingButtonWhite = new GButton(this, "White", 200, 100, 1050, 400, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+		mPawnColorSettingButtonWhite = new GButton(this, "White", 200, 100, 1150, 400, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
 		mPawnColorSettingButtonWhite.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(WindowView windowView, int x, int y) {

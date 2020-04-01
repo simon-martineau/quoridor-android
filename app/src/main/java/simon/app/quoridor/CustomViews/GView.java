@@ -6,7 +6,7 @@ import android.graphics.Typeface;
 import org.jetbrains.annotations.NotNull;
 
 import simon.app.quoridor.Core.GameView;
-import simon.app.quoridor.Core.WindowView;
+import simon.app.quoridor.WindowViews.WindowView;
 
 /**
  * Base class for custom views

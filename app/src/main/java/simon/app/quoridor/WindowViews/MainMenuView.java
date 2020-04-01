@@ -1,25 +1,21 @@
-package simon.app.quoridor.Core;
+package simon.app.quoridor.WindowViews;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import simon.app.quoridor.CustomViews.GBackgroundView;
+import simon.app.quoridor.Core.AppView;
 import simon.app.quoridor.CustomViews.GButton;
 import simon.app.quoridor.CustomViews.GNumberStream;
 import simon.app.quoridor.CustomViews.GTitleView;
 import simon.app.quoridor.CustomViews.GView;
-import simon.app.quoridor.R;
 
 public class MainMenuView extends WindowView {
 	private static Typeface DEFAULT_TYPEFACE;

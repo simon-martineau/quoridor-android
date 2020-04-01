@@ -12,6 +12,10 @@ import android.view.SurfaceView;
 import java.util.HashMap;
 import java.util.Map;
 
+import simon.app.quoridor.WindowViews.LoadingView;
+import simon.app.quoridor.WindowViews.MainMenuView;
+import simon.app.quoridor.WindowViews.SettingsView;
+import simon.app.quoridor.WindowViews.WindowView;
 
 
 /**

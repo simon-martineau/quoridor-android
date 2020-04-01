@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import simon.app.quoridor.Core.WindowView;
+import simon.app.quoridor.WindowViews.WindowView;
 
 public class GBackgroundView extends GView {
 	private Bitmap mBitmap;

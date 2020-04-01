@@ -1,4 +1,4 @@
-package simon.app.quoridor.Core;
+package simon.app.quoridor.WindowViews;
 
 import android.graphics.Canvas;
 import android.view.MotionEvent;
@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import simon.app.quoridor.Core.AppView;
 import simon.app.quoridor.CustomViews.GView;
 
 /**

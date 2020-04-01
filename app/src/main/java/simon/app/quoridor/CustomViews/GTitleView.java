@@ -5,8 +5,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 
-import simon.app.quoridor.Core.GameView;
-import simon.app.quoridor.Core.WindowView;
+import simon.app.quoridor.WindowViews.WindowView;
 
 public class GTitleView extends GView {
 	private String mText;

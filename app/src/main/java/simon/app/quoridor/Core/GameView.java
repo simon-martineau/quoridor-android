@@ -16,7 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Objects;
 
 import okhttp3.Call;
@@ -26,13 +25,14 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import simon.app.quoridor.Annotations.Asynchronous;
+import simon.app.quoridor.Utils.Annotations.Asynchronous;
 import simon.app.quoridor.CustomViews.GButton;
 import simon.app.quoridor.CustomViews.GTitleView;
 import simon.app.quoridor.CustomViews.GView;
 import simon.app.quoridor.CustomViews.GModalView;
 import simon.app.quoridor.CustomViews.GQuoridorView;
 import simon.app.quoridor.R;
+import simon.app.quoridor.WindowViews.WindowView;
 
 public class GameView extends WindowView {
 	//==============================================================================================

@@ -8,7 +8,7 @@ import android.graphics.Rect;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import simon.app.quoridor.Core.WindowView;
+import simon.app.quoridor.WindowViews.WindowView;
 
 public class GModalView extends GView {
 	private static final int LEFT_MARGIN = 100;
