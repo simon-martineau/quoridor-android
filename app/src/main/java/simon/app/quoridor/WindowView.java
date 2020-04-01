@@ -104,18 +104,18 @@ public abstract class WindowView {
 	 */
 	public abstract void surfaceChanged(SurfaceHolder holder, int format, int width, int height);
 
-	/**
-	 * Actions to perform when surfaceCreated gets called in the AppView.
-	 * @see android.view.SurfaceHolder.Callback#surfaceCreated(SurfaceHolder)
-	 */
-	public abstract void surfaceCreated(SurfaceHolder holder);
-
-	/**
-	 * Actions to perform when surfaceDestroyed gets called in the AppView. The implementation
-	 * should free non-necessary resources
-	 * @see android.view.SurfaceHolder.Callback#surfaceDestroyed(SurfaceHolder)
-	 */
-	public abstract void surfaceDestroyed(SurfaceHolder holder);
+//	/**
+//	 * Actions to perform when surfaceCreated gets called in the AppView.
+//	 * @see android.view.SurfaceHolder.Callback#surfaceCreated(SurfaceHolder)
+//	 */
+//	public abstract void surfaceCreated(SurfaceHolder holder);
+//
+//	/**
+//	 * Actions to perform when surfaceDestroyed gets called in the AppView. The implementation
+//	 * should free non-necessary resources
+//	 * @see android.view.SurfaceHolder.Callback#surfaceDestroyed(SurfaceHolder)
+//	 */
+//	public abstract void surfaceDestroyed(SurfaceHolder holder);
 
 	/**
 	 * Actions to perform when the WindowView gets activated by the AppView

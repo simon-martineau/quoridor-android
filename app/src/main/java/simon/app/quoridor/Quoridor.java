@@ -35,10 +35,10 @@ public class Quoridor {
 	String mGameID = "";
 	int[] mPlayerOnePosition = new int[2];
 	int mPlayerOneWallsLeft = 10;
-	String mPlayerOneName = "";
+	public String mPlayerOneName = "";
 	int[] mPlayerTwoPosition = new int[2];
 	int mPlayerTwoWallsLeft = 10;
-	String mPlayerTwoName = "";
+	public String mPlayerTwoName = "";
 	List<int[]> mHorizontalWalls = new ArrayList<>();
 	List<int[]> mVerticalWalls = new ArrayList<>();
 	String mLastMoveType = "";

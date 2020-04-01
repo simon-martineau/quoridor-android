@@ -47,27 +47,14 @@ public class MainActivity extends Activity {
 		super.onStart();
 
 		Log.i(TAG, "onStart: called");
-		if (mAppView == null) Log.i(TAG, "onStart: mGameView is null");
-
-//		if (mGameKey != null) {
-//			mGameView = new GameView(this, mGameKey, mGameState);
-//		}
+		if (mAppView == null) Log.i(TAG, "onStart: mAppView is null");
 
 	}
 
 	@Override
 	protected void onStop() {
-//		Log.i(TAG, "onStop: called");
 		super.onStop();
-//		mGameKey = mGameView.mGame.mGameID;
-//		mGameState = mGameView.getGameStateJSONString();
 	}
-
-	@Override
-	protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-	}
-
 
 	@Override
 	protected void onPause() {

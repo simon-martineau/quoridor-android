@@ -243,10 +243,10 @@ public class GameView extends WindowView{
 
 		DEFAULT_TYPEFACE = Typeface.createFromAsset(appView.getContext().getAssets(), "fonts/8_bit_style.ttf");
 
-		fetchNewGameFromServer(API_BASE_URL + API_BEGIN_GAME_SUFFIX, IDUL);
-		setUpAudio();
-
 		mGame = new Quoridor();
+		fetchNewGameFromServer(API_BASE_URL + API_BEGIN_GAME_SUFFIX, IDUL);
+
+		setUpAudio();
 	}
 
 	public GameView(AppView appView, String id, String state) {
@@ -274,6 +274,22 @@ public class GameView extends WindowView{
 		mSoundPool.play(soundId, intensity, intensity, 1, 0, 1f);
 	}
 
+
+
+	/**
+	 * Registers a view in mGViews. GViews is sorted by zIndex after each call
+	 * @param gView The view to register
+	 */
+	public void registerGView(GView gView) {
+		mGViews.add(gView);
+		sortViews();
+	}
+
+	public void sortViews() {
+		Collections.sort(mGViews);
+		Collections.reverse(mGViews);
+	}
+
 	private void setUpAudio() {
 		mBackgroundMusicPlayer = MediaPlayer.create(mAppView.getContext(), R.raw.game_track);
 		mBackgroundMusicPlayer.setLooping(true);
@@ -293,52 +309,14 @@ public class GameView extends WindowView{
 
 	}
 
-	/**
-	 * Registers a view in mGViews. GViews is sorted by zIndex after each call
-	 * @param gView The view to register
-	 */
-	public void registerGView(GView gView) {
-		mGViews.add(gView);
-		sortViews();
-	}
+	private void setUpViews() {
+		Log.i(TAG, "setUpViews: mAppView.getWidth() = " + mAppView.getWidth());
+		Log.i(TAG, "setUpViews: getWidth() = " + getWidth());
 
-	public void sortViews() {
-		Collections.sort(mGViews);
-		Collections.reverse(mGViews);
-	}
-
-	@Override
-	public void draw(Canvas canvas) {
-		super.draw(canvas);
-
-		for (int i = mGViews.size() - 1; i >= 0; i--) {
-			mGViews.get(i).draw(canvas);
-		}
-
-		if (gamePaused)
-			mQuoridorView.setBlink(false);
-		else
-			mQuoridorView.setBlink(true);
-	}
-
-	@Override
-	public void onActivate() {
-		super.onActivate();
-		mBackgroundMusicPlayer.start();
-	}
-
-	@Override
-	public void onDeactivate() {
-		super.onDeactivate();
-		mBackgroundMusicPlayer.pause();
-	}
-
-	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		mGTitleView = new GTitleView(this, "8 bit Quoridor", Color.GREEN, 184f, mAppView.getWidth());
 		mGTitleView.setY(128);
 
-		mQuoridorView = new QuoridorView(this, mGame, 50, mGTitleView.getBottom() + 128, width);
+		mQuoridorView = new QuoridorView(this, mGame, 50, mGTitleView.getBottom() + 128, getWidth());
 		mQuoridorView.setOnClickAction(new QuoridorView.onClickAction() {
 			@Override
 			public void onClick(WindowView windowView, int x, int y) {
@@ -350,7 +328,7 @@ public class GameView extends WindowView{
 				}
 			}
 		});
-		mQuoridorView.hoverCells(mGame.getPossibleNextCoordinates(1, false, null));
+		mQuoridorView.linkQuoridorGame(mGame);
 
 		mPlaceWallButton = new GButton(this, "Place a wall", 300, 150, 100, mQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
 		mPlaceWallButton.setOnClickAction(new GView.onClickAction() {
@@ -462,11 +440,35 @@ public class GameView extends WindowView{
 	}
 
 	@Override
-	public void surfaceCreated(SurfaceHolder holder) { }
+	public void draw(Canvas canvas) {
+		super.draw(canvas);
+
+		for (int i = mGViews.size() - 1; i >= 0; i--) {
+			mGViews.get(i).draw(canvas);
+		}
+
+		if (gamePaused)
+			mQuoridorView.setBlink(false);
+		else
+			mQuoridorView.setBlink(true);
+	}
 
 	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) { }
+	public void onActivate() {
+		super.onActivate();
+		mBackgroundMusicPlayer.start();
+	}
 
+	@Override
+	public void onDeactivate() {
+		super.onDeactivate();
+		mBackgroundMusicPlayer.pause();
+	}
+
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+		setUpViews();
+	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {

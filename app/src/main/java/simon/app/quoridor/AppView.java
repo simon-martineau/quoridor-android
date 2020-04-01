@@ -36,6 +36,20 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	// WindowViews
 	//==============================================================================================
 
+	/**
+	 * Width of the SurfaceView
+	 */
+	private int mWidth;
+
+	/**
+	 * Height of the SurfaceView
+	 */
+	private int mHeight;
+
+	//==============================================================================================
+	// WindowViews
+	//==============================================================================================
+
 	private HashMap<String, WindowView> mWindowViews = new HashMap<>();
 	private String mActiveWindowView = null;
 
@@ -60,6 +74,15 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	//==============================================================================================
 	// WindowView methods
 	//==============================================================================================
+	private void deactivateCurrentWindow() {
+		WindowView currentWindow = mWindowViews.get(mActiveWindowView);
+		if (currentWindow != null) currentWindow.onDeactivate();
+	}
+
+	private void activateCurrentWindow() {
+		WindowView currentWindow = mWindowViews.get(mActiveWindowView);
+		if (currentWindow != null) currentWindow.onActivate();
+	}
 
 	private void setActiveWindowView(String key) {
 		if (mActiveWindowView != null) {
@@ -71,10 +94,10 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	//==============================================================================================
-	// Overrode methods
+	// Overridden methods
 	//==============================================================================================
 	/**
-	 * Draws the app to the canvas
+	 * Draws the app on the canvas
 	 * @param canvas The canvas to draw on
 	 */
 	@Override
@@ -111,6 +134,8 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	 */
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+		mWidth = width;
+		mHeight = height;
 		for (Map.Entry<String, WindowView> pair: mWindowViews.entrySet()) {
 			pair.getValue().surfaceChanged(holder, format, width, height);
 		}
@@ -125,10 +150,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 		mGameThread.setRunning(true);
 		mGameThread.start();
 
-		for (Map.Entry<String, WindowView> pair: mWindowViews.entrySet()) {
-			pair.getValue().surfaceCreated(holder);
-		}
-
+		activateCurrentWindow();
 	}
 
 	/**
@@ -136,9 +158,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	 */
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		for (Map.Entry<String, WindowView> pair: mWindowViews.entrySet()) {
-			pair.getValue().surfaceDestroyed(holder);
-		}
+		deactivateCurrentWindow();
 
 		boolean retry = true;
 		while (retry) {
