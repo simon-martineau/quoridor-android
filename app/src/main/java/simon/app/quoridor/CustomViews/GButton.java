@@ -1,6 +1,7 @@
 package simon.app.quoridor.CustomViews;
 
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 
 import simon.app.quoridor.WindowViews.WindowView;
@@ -33,9 +34,9 @@ public class GButton extends GView {
 
 	}
 
-	public GButton(GModalView gModalView, String text, int width, int height, int x, int y, int backgroundColor, int foreGroundColor, boolean register)
+	public GButton(GView gView, String text, int width, int height, int x, int y, int backgroundColor, int foreGroundColor, boolean register)
 	{
-		super(gModalView, x, y, register);
+		super(gView, x, y, register);
 
 		mText = text;
 		mWidth = width;
@@ -51,8 +52,6 @@ public class GButton extends GView {
 		mTextPaint.setColor(foreGroundColor);
 
 	}
-
-
 
 	public void setText(String text) {
 		mText = text;

@@ -1,10 +1,13 @@
 package simon.app.quoridor.CustomViews;
 
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Typeface;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import simon.app.quoridor.WindowViews.GameView;
@@ -14,9 +17,6 @@ import simon.app.quoridor.WindowViews.WindowView;
  * Base class for custom views
  */
 public abstract class GView implements Comparable<GView> {
-
-	protected List<GView> mGViews = null;
-	protected boolean isParent = false;
 
 	/**
 	 * X coordinate of the GView in relation to its parent
@@ -29,6 +29,7 @@ public abstract class GView implements Comparable<GView> {
 	private int mY;
 
 	protected WindowView mWindowView;
+	protected GView mParentGView; // TODO: Merge modalView into this
 	protected GModalView mGModalView;
 
 	/**
@@ -46,7 +47,7 @@ public abstract class GView implements Comparable<GView> {
 	/**
 	 * Default typeface
 	 */
-	protected static Typeface mTypeFace = GameView.DEFAULT_TYPEFACE;
+	protected Typeface mTypeFace = GameView.DEFAULT_TYPEFACE;
 
 	/**
 	 * The index used for drawing GViews and handling events. Higher zIndex views are drawn on top
@@ -76,12 +77,12 @@ public abstract class GView implements Comparable<GView> {
 	 * @param x The x coordinate (in pixels) for the view
 	 * @param y The y coordinate (in pixels) for the view
 	 */
-	public GView(GModalView gModalView, int x, int y, boolean register) {
+	public GView(GView gView, int x, int y, boolean register) {
 		mX = x;
 		mY = y;
-		mGModalView = gModalView;
+		mParentGView = gView;
 		if (register) {
-			registerViewModal(gModalView);
+			registerView(gView);
 		}
 	}
 
@@ -89,14 +90,14 @@ public abstract class GView implements Comparable<GView> {
 	 * Centers the view horizontally in its parent WindowView
 	 */
 	public void setCenterHorizontal() {
-		setX(mWindowView.getWidth() / 2 - getWidth() / 2);
+		setX(getParentWidth() / 2 - getWidth() / 2);
 	}
 
 	/**
 	 * Centers the view vertically in its parent WindowView
 	 */
 	public void setCenterVertical() {
-		setY(mWindowView.getHeight() / 2 - getHeight() / 2);
+		setY(getParentHeight() / 2 - getHeight() / 2);
 	}
 
 	/**
@@ -126,17 +127,8 @@ public abstract class GView implements Comparable<GView> {
 		windowView.registerGView(this);
 	}
 
-	/**
-	 * Register the view in the parent GModalView
-	 * @param gModalView The parent GModalView
-	 */
-	private void registerViewModal(GModalView gModalView) {
-		gModalView.registerGView(this);
-	}
-
-
-	private void registerViewModal(GView gView) {
-		// TODO: Merge this with ModalView
+	private void registerView(GView gView) {
+		gView.registerGView(this);
 	}
 
 
@@ -146,6 +138,16 @@ public abstract class GView implements Comparable<GView> {
 	 * @param y The y coordinate of the touch event
 	 */
 	public void performClick(int x, int y) {
+		if (isParent) {
+			int relX = x - getLeft();
+			int relY = y - getTop();
+			for (GView gView : mGViews) {
+				if (gView.isInRect(relX, relY)) {
+					gView.performClick(relX, relY);
+					return;
+				}
+			}
+		}
 		if (hasOnClick) {
 			mOnClickAction.onClick(x, y);
 		}
@@ -186,10 +188,23 @@ public abstract class GView implements Comparable<GView> {
 
 	/**
 	 * Draw the view on the canvas. Each children has its own implementation.
+	 * IMPORTANT: Children need to draw relative to the parent.
 	 * @param canvas The canvas on which to draw the view on
 	 */
 	public abstract void draw(Canvas canvas);
 
+
+	protected void drawChildren(Canvas canvas) {
+		Matrix translateMatrix = new Matrix();
+		translateMatrix.setTranslate(getLeft(), getTop());
+
+		canvas.save();
+		canvas.concat(translateMatrix);
+		for (GView gView : mGViews) {
+			gView.draw(canvas);
+		}
+		canvas.restore();
+	}
 
 	// Dimensions
 
@@ -247,13 +262,21 @@ public abstract class GView implements Comparable<GView> {
 
 	/**
 	 * Checks if the position is included in the view's rectangle. If mIsVisible is set to false,
-	 * will always return false
+	 * will always return false.
 	 * @param x The x coordinate (pixels)
 	 * @param y The y coordinate (pixels)
 	 * @return True if the coordinates are included in the rectangle AND the view is visible, false
 	 * otherwise
 	 */
 	public boolean isInRect(int x, int y) {
+		if (isParent) {
+			// First, translate in coordinates relative to this
+			int relX = x - getLeft();
+			int relY = y - getTop();
+			for (GView gView : mGViews) {
+				if (gView.isInRect(relX, relY)) return true;
+			}
+		}
 		return (getLeft() < x && x < getRight() && getTop() < y && y < getBottom() && mIsVisible);
 	}
 
@@ -280,4 +303,87 @@ public abstract class GView implements Comparable<GView> {
 	public int compareTo(@NotNull GView o) {
 		return this.getZIndex() - o.getZIndex();
 	}
+
+	/**
+	 * Returns the width of the parent (WindowView or GView)
+	 * @return The width in pixels
+	 */
+	protected int getParentWidth() {
+		if (mGModalView != null) return mGModalView.getWidth();
+		if (mParentGView != null) return mParentGView.getWidth();
+		if (mWindowView != null) return mWindowView.getWidth();
+
+		return -1;
+	}
+
+	/**
+	 * Returns the height of the parent (WindowView or GView)
+	 * @return The height in pixels
+	 */
+	protected int getParentHeight() {
+		if (mGModalView != null) return mGModalView.getHeight();
+		if (mParentGView != null) return mParentGView.getHeight();
+		if (mWindowView != null) return mWindowView.getHeight();
+
+		return -1;
+	}
+
+
+	protected int getParentLeft() {
+		if (mGModalView != null) return mGModalView.getLeft();
+		if (mParentGView != null) return mParentGView.getLeft();
+		if (mWindowView != null) return mWindowView.getLeft();
+
+		return -1;
+	}
+
+	protected int getParentTop() {
+		if (mGModalView != null) return mGModalView.getTop();
+		if (mParentGView != null) return mParentGView.getTop();
+		if (mWindowView != null) return mWindowView.getTop();
+
+		return -1;
+	}
+
+	protected int getParentRight() {
+		if (mGModalView != null) return mGModalView.getRight();
+		if (mParentGView != null) return mParentGView.getRight();
+		if (mWindowView != null) return mWindowView.getRight();
+
+		return -1;
+	}
+
+	protected int getParentBottom() {
+		if (mGModalView != null) return mGModalView.getBottom();
+		if (mParentGView != null) return mParentGView.getBottom();
+		if (mWindowView != null) return mWindowView.getBottom();
+
+		return -1;
+	}
+
+
+	// =============================================================================================
+	// Parenting
+	// =============================================================================================
+
+	protected List<GView> mGViews = new ArrayList<>();
+	protected boolean isParent = false;
+
+	public void registerGView(GView gView) {
+		mGViews.add(gView);
+		sortViews();
+	}
+
+	public void sortViews() {
+		Collections.sort(mGViews);
+		Collections.reverse(mGViews);
+	}
 }
+
+
+// TODO: Draw relative to parent in the following views:
+// TODO: GFreezeView**
+// TODO: GModalView**
+// TODO: GQuoridorView***
+
+

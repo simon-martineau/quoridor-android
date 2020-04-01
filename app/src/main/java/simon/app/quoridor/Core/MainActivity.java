@@ -51,6 +51,9 @@ public class MainActivity extends Activity {
 	Reset Stats
 	*/
 
+// TODO: Setting to turn on/off music, sfx
+// TODO: Settings to select difficulty
+
 
 
 

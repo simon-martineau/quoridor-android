@@ -26,30 +26,19 @@ public class GModalView extends GView {
 	private static final int TEXT_COLOR = Color.GREEN;
 
 	private GFreezeView mGFreezeView;
-	private ArrayList<GView> mGViews = new ArrayList<>();
 	private String mPromptString;
 	private final WindowView mWindowView;
+
 
 	// TODO: Implement offset button coordinates instead of absolute
 
 	public GModalView(WindowView windowView, String message, int x, int y) {
 		super(windowView, x, y);
 
+		isParent = true; // Since this is true, touch events will be routed to children
 		setZIndex(100);
 
 		mPromptString = message;
-
-		setOnClickAction(new onClickAction() {
-			@Override
-			public void onClick(int x, int y) {
-				for (GView gView: mGViews) {
-					if (gView.isInRect(x, y)) {
-						gView.performClick(x, y);
-						break;
-					}
-				}
-			}
-		});
 
 		// Default FreezeView
 		setFreezeView(new GFreezeView(this, 0, 0, windowView.getWidth(), windowView.getHeight(), Color.WHITE, 50, false));
@@ -64,22 +53,8 @@ public class GModalView extends GView {
 
 	public void addGButton(int foreGroundColor, int backgroundColor, int width, int height, String text, onClickAction action) {
 		GButton newButton = new GButton(this, text, width, height, getNextButtonX(),
-				getTop() + TOP_MARGIN + MESSAGE_SECTION_HEIGHT + TEXT_TO_GVIEW_SEPARATION, backgroundColor, foreGroundColor, true);
+				TOP_MARGIN + MESSAGE_SECTION_HEIGHT + TEXT_TO_GVIEW_SEPARATION, backgroundColor, foreGroundColor, true);
 		newButton.setOnClickAction(action);
-	}
-
-	/**
-	 * Registers a view in mGViews. GViews is sorted by zIndex after each call
-	 * @param gView The view to register
-	 */
-	public void registerGView(GView gView) {
-		mGViews.add(gView);
-		sortViews();
-	}
-
-	public void sortViews() {
-		Collections.sort(mGViews);
-		Collections.reverse(mGViews);
 	}
 
 	private int getHighestButtonBottomValue() {
@@ -92,7 +67,7 @@ public class GModalView extends GView {
 
 	private int getNextButtonX() {
 		if (mGViews.isEmpty()) {
-			return (getLeft() + LEFT_MARGIN);
+			return (LEFT_MARGIN);
 		} else {
 			return (mGViews.get(0).getRight() + GVIEW_TO_GVIEW_SEPARATION);
 		}
@@ -114,7 +89,7 @@ public class GModalView extends GView {
 	public int getWidth() {
 
 		if (getTextWidth() < getNextButtonX() - GVIEW_TO_GVIEW_SEPARATION - LEFT_MARGIN - getLeft()) {
-			return getNextButtonX() - GVIEW_TO_GVIEW_SEPARATION - getLeft() + RIGHT_MARGIN;
+			return getNextButtonX() - GVIEW_TO_GVIEW_SEPARATION + RIGHT_MARGIN;
 		} else {
 			return LEFT_MARGIN + getTextWidth() + RIGHT_MARGIN;
 		}
@@ -122,7 +97,7 @@ public class GModalView extends GView {
 
 	@Override
 	public int getHeight() {
-		return getHighestButtonBottomValue() + BOTTOM_MARGIN - getTop();
+		return getHighestButtonBottomValue() + BOTTOM_MARGIN;
 
 	}
 
@@ -155,10 +130,7 @@ public class GModalView extends GView {
 			canvas.drawText(mPromptString, getLeft() + getWidth() / 2f,
 					getTop() + TOP_MARGIN + MESSAGE_SECTION_HEIGHT / 2f -  ((textPaint.descent() + textPaint.ascent()) / 2), textPaint);
 
-			// Draw the buttons
-			for (GView gView : mGViews) {
-				gView.draw(canvas);
-			}
+			drawChildren(canvas);
 		}
 	}
 
@@ -174,21 +146,4 @@ public class GModalView extends GView {
 		return isVisible();
 	}
 
-	@Override
-	public void setX(int x) {
-		int offset = x - getLeft();
-		for (GView gView : mGViews) {
-			gView.setX(gView.getLeft() + offset);
-		}
-		super.setX(x);
-	}
-
-	@Override
-	public void setY(int y) {
-		int offset = y - getTop();
-		for (GView gView : mGViews) {
-			gView.setY(gView.getTop() + offset);
-		}
-		super.setY(y);
-	}
 }

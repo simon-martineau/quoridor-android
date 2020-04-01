@@ -143,6 +143,22 @@ public abstract class WindowView {
 		return mAppView.getHeight();
 	}
 
+	public int getLeft() {
+		return 0;
+	}
+
+	public int getTop() {
+		return 0;
+	}
+
+	public int getRight() {
+		return mAppView.getRight();
+	}
+
+	public int getBottom() {
+		return mAppView.getBottom();
+	}
+
 	public AppView getAppView() {
 		return mAppView;
 	}

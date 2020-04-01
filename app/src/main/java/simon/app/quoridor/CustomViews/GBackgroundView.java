@@ -50,6 +50,6 @@ public class GBackgroundView extends GView {
 			mPulsateCounter++;
 		}
 
-		canvas.drawBitmap(mBitmap, 0, 0, paint);
+		canvas.drawBitmap(mBitmap, getParentLeft() + getLeft(), getParentTop() + getTop(), paint);
 	}
 }

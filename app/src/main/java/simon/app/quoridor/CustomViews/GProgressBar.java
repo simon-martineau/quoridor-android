@@ -69,13 +69,22 @@ public class GProgressBar extends GView {
 	@Override
 	public void draw(Canvas canvas) {
 		// Draw background
-		canvas.drawRect(getLeft(), getTop(), getRight(), getBottom(), mBackgroundPaint);
+		canvas.drawRect(getLeft(), getTop(),
+				getRight(), getBottom(), mBackgroundPaint);
 
 		// Draw border
-		canvas.drawRect(getLeft(), getTop(), getRight(), getBottom(), mBorderPaint);
+		canvas.drawRect(
+				getLeft(), getTop(),
+				getRight(), getBottom(),
+				mBorderPaint
+		);
 
 		// Draw bar
-		canvas.drawRect(getLeft() + getPadding(), getTop() + getPadding(),
-				getLeft() + getPadding() + mProgress*(getWidth() - 2*getPadding()), getBottom() - getPadding(), mForegroundPaint);
+		canvas.drawRect(
+				getLeft() + getPadding(),
+				getTop() + getPadding(),
+				getLeft() + getPadding() + mProgress*(getWidth() - 2*getPadding()),
+				getBottom() - getPadding(), mForegroundPaint
+		);
 	}
 }
