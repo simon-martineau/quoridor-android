@@ -14,6 +14,8 @@ import simon.app.quoridor.Core.Quoridor;
 public class GQuoridorView extends GView {
 	// TODO: Change colors into constants
 
+	private boolean drawPath = false;
+
 	// Linked quoridorGame
 	private Quoridor mQuoridor;
 
@@ -178,13 +180,23 @@ public class GQuoridorView extends GView {
 		if (blink) {
 			if (drawHover) {
 				for (int[] coordinates : hoverPositions) {
-					drawHover(canvas, coordinates[0], coordinates[1]);
+					drawHover(canvas, coordinates[0], coordinates[1], hoverColor, 80);
 				}
 			}
 			blinkTimer--;
 			if (blinkTimer <= 0) {
 				blinkTimer = blinkDelay;
 				drawHover = !drawHover;
+			}
+		}
+
+		if (drawPath) {
+			List<int[]> pathCoordinates = mQuoridor.getShortestPathToVictory(1);
+			pathCoordinates.remove(0);
+			for (int[] coordinates : pathCoordinates) {
+
+				drawHover(canvas, coordinates[0], coordinates[1], Color.WHITE, 30);
+
 			}
 		}
 
@@ -254,16 +266,15 @@ public class GQuoridorView extends GView {
 		hoverPositions.clear();
 	}
 
-	private void drawHover(Canvas canvas, int x, int y) {
+	private void drawHover(Canvas canvas, int x, int y, int color, int alpha) {
 		Paint hoverPaint = new Paint();
-		hoverPaint.setColor(hoverColor);
-		hoverPaint.setAlpha(80);
+		hoverPaint.setColor(color);
+		hoverPaint.setAlpha(alpha);
 		float left = getLeft() + gridMargin + (x - 1)*cellSize;
 		float top = getTop() + headerHeight + (9 - y)*cellSize;
 
 		canvas.drawRect(left, top, left + cellSize, top + cellSize, hoverPaint);
 	}
-
 
 	private void drawWalls(Canvas canvas, List<int[]> walls, int wallType) {
 		float beginX = getLeft() + gridMargin;
@@ -343,6 +354,10 @@ public class GQuoridorView extends GView {
 		canvas.drawLine(beginX + 9*cellSize, beginY, beginX + 9*cellSize, beginY + 9*cellSize, borderGridPaint);
 		canvas.drawLine(beginX, beginY, beginX + 9*cellSize, beginY, borderGridPaint);
 		canvas.drawLine(beginX, beginY + 9*cellSize, beginX + 9*cellSize, beginY + 9*cellSize, borderGridPaint);
+	}
+
+	public void setDrawPath(boolean value) {
+		drawPath = value;
 	}
 
 	public void setBlink(boolean blink) {

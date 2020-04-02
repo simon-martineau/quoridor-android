@@ -33,7 +33,7 @@ public class ColorPickerView extends GView {
 
 
 	// =============================================================================================
-	// Color Views
+	// Views
 	// =============================================================================================
 	private ColorView mColorView0;
 	private ColorView mColorView1;

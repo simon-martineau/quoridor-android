@@ -99,6 +99,7 @@ public class GameView extends WindowView {
 	private int mPawnColorPref;
 	private int mEnemyPawnColorPref;
 	private int mWallColorPref;
+	private boolean mDrawPathPref;
 
 
 
@@ -251,6 +252,9 @@ public class GameView extends WindowView {
 	 */
 	public boolean gamePaused = false;
 
+	private long timePaused;
+	private long MINIMUM_PAUSE_DELAY = 750;
+
 
 	//==============================================================================================
 	// Constructors
@@ -307,6 +311,7 @@ public class GameView extends WindowView {
 		mGQuoridorView = new GQuoridorView(this, mGame, 50, mGTitleView.getBottom() + 128, getWidth());
 		mGQuoridorView.setPlayerColor(1, mPawnColorPref);
 		mGQuoridorView.setPlayerColor(2, mEnemyPawnColorPref);
+		mGQuoridorView.setDrawPath(mDrawPathPref);
 		mGQuoridorView.setWallColor(mWallColorPref);
 		mGQuoridorView.setOnClickAction(new GQuoridorView.onClickAction() {
 			@Override
@@ -450,6 +455,7 @@ public class GameView extends WindowView {
 		mPawnColorPref = prefs.getInt("pawn_color", SettingsView.DEFAULT_PAWN_COLOR);
 		mEnemyPawnColorPref = prefs.getInt("enemy_pawn_color", SettingsView.DEFAULT_ENEMY_PAWN_COLOR);
 		mWallColorPref = prefs.getInt("wall_color", SettingsView.DEFAULT_WALL_COLOR);
+		mDrawPathPref = prefs.getBoolean("draw_path", SettingsView.DEFAULT_DRAW_PATH);
 	}
 
 	//==============================================================================================
@@ -741,6 +747,7 @@ public class GameView extends WindowView {
 				.method("POST", body)
 				.build();
 
+
 		httpClient.newCall(request)
 				.enqueue(new Callback() {
 					@Override
@@ -782,6 +789,8 @@ public class GameView extends WindowView {
 	 */
 	@Asynchronous
 	public void postMoveAndGetNewState(String targetURL, String gameID, String moveType, String position) {
+		// Temp
+		mGQuoridorView.setDrawPath(false);
 
 		RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
 				.addFormDataPart("id", gameID)
@@ -805,9 +814,11 @@ public class GameView extends WindowView {
 						if (!response.isSuccessful()) {
 							throw new IOException("Error : " + response);
 						}
+
 						String data =  Objects.requireNonNull(response.body()).string();
 						setGameState(data);
 						gamePaused = false;
+						mGQuoridorView.setDrawPath(mDrawPathPref);
 						refreshHover();
 						checkForWin();
 					}

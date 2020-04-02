@@ -35,6 +35,8 @@ public class GLine extends GView{
 
 	@Override
 	public void draw(Canvas canvas) {
-		canvas.drawLine(getLeft(), getTop(), mX2, mY2, mPaint);
+		if (isVisible()) {
+			canvas.drawLine(getLeft(), getTop(), mX2, mY2, mPaint);
+		}
 	}
 }

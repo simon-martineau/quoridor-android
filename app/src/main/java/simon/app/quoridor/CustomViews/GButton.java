@@ -1,6 +1,7 @@
 package simon.app.quoridor.CustomViews;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 
@@ -12,6 +13,8 @@ public class GButton extends GView {
 
 	private Paint mPaint;
 	private Paint mTextPaint;
+	private Paint mBorderPaint;
+	private boolean mHasBorder;
 	private String mText;
 
 	private int mWidth, mHeight;
@@ -29,11 +32,28 @@ public class GButton extends GView {
 		mPaint = new Paint();
 		mPaint.setColor(backgroundColor);
 
+		mBorderPaint = new Paint();
+		mBorderPaint.setStyle(Paint.Style.STROKE);
+		mBorderPaint.setStrokeWidth(2);
+		mBorderPaint.setColor(Color.WHITE);
+
 		mTextPaint = new Paint();
 		mTextPaint.setTextAlign(Paint.Align.CENTER);
 		mTextPaint.setTextSize(48);
 		mTextPaint.setColor(foreGroundColor);
 
+	}
+
+	public void setBorderColor(int color) {
+		mBorderPaint.setColor(color);
+	}
+
+	public void setBorderWidth(int width) {
+		mBorderPaint.setStrokeWidth(width);
+	}
+
+	public void setBorder(boolean border) {
+		mHasBorder = border;
 	}
 
 	public void setText(String text) {
@@ -71,6 +91,10 @@ public class GButton extends GView {
 		if (isVisible()) {
 			canvas.drawRect(getLeft(), getTop(), getRight(), getBottom(), mPaint);
 			canvas.drawText(mText, getLeft() + mWidth / 2.0f, getTop() + mHeight / 2.0f - ((mTextPaint.descent() + mTextPaint.ascent()) / 2), mTextPaint);
+
+			if (mHasBorder) {
+				canvas.drawRect(getLeft(), getTop(), getRight(), getBottom(), mBorderPaint);
+			}
 		}
 	}
 

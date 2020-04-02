@@ -25,6 +25,7 @@ public class SettingsView extends WindowView {
 	public static final int DEFAULT_PAWN_COLOR = Color.BLUE;
 	public static final int DEFAULT_ENEMY_PAWN_COLOR = Color.RED;
 	public static final int DEFAULT_WALL_COLOR = Color.GREEN;
+	public static final boolean DEFAULT_DRAW_PATH = false;
 
 
 	//==============================================================================================
@@ -40,7 +41,8 @@ public class SettingsView extends WindowView {
 	private static final int OPTION_1_BOTTOM_Y = 500;
 	private static final int OPTION_2_BOTTOM_Y = 650;
 	private static final int OPTION_3_BOTTOM_Y = 800;
-	private static final int OPTION_SECTION_1_FRAME_BOTTOM = 850;
+	private static final int OPTION_4_BOTTOM_Y = 950;
+	private static final int OPTION_SECTION_1_FRAME_BOTTOM = 1000;
 
 
 
@@ -70,6 +72,11 @@ public class SettingsView extends WindowView {
 	ColorView mWallColorSettingColorPreview;
 	ColorPickerView mWallColorSettingColorPicker;
 	GLine mWallColorSettingLine;
+
+	// Option 4
+	GTitleView mDrawPathSettingLabel;
+	GButton mDrawPathSettingButton;
+	GLine mDrawPathSettingLine;
 
 	GButton mBackButton;
 
@@ -212,6 +219,37 @@ public class SettingsView extends WindowView {
 		mWallColorSettingColorPicker.setCenterHorizontal();
 		mWallColorSettingColorPicker.setVisible(false);
 
+		// Option 4 ================================================================================
+		mDrawPathSettingLabel = new GTitleView(this, OPTION_FRAMES_LEFT + OPTION_FRAMES_MARGIN, 0, "Draw path to victory:", Color.WHITE, 48);
+		mDrawPathSettingLabel.setBottom(OPTION_4_BOTTOM_Y);
+
+		boolean drawPath = getAppView().getSharedPreferences().getBoolean("draw_path", DEFAULT_DRAW_PATH);
+		int textColor = drawPath ? Color.GREEN : Color.RED;
+		String text = drawPath ? "Yes" : "No";
+		mDrawPathSettingButton = new GButton(this, text, 200, 110, 0, 0, Color.BLACK, textColor, true);
+		mDrawPathSettingButton.setBorder(true);
+		mDrawPathSettingButton.setRight(getWidth() - OPTION_FRAMES_LEFT - OPTION_FRAMES_MARGIN);
+		mDrawPathSettingButton.setBottom(OPTION_4_BOTTOM_Y);
+		mDrawPathSettingButton.setOnClickAction(new GView.onClickAction() {
+			@Override
+			public void onClick(int x, int y) {
+				if (mDrawPathSettingButton.getText().equals("Yes")) {
+					mDrawPathSettingButton.setText("No");
+					mDrawPathSettingButton.setTextColor(Color.RED);
+					setPrefBoolean("draw_path", false);
+
+				} else {
+					mDrawPathSettingButton.setText("Yes");
+					mDrawPathSettingButton.setTextColor(Color.GREEN);
+					setPrefBoolean("draw_path", true);
+				}
+			}
+		});
+
+		mWallColorSettingLine = new GLine(this,
+				mDrawPathSettingLabel.getRight() + 20, OPTION_4_BOTTOM_Y,
+				mDrawPathSettingButton.getLeft() - 20, OPTION_4_BOTTOM_Y, 3, true);
+
 
 		// =========================================================================================
 		// Others
@@ -225,6 +263,12 @@ public class SettingsView extends WindowView {
 			}
 		});
 
+	}
+
+	private void setPrefBoolean(String key, boolean pref) {
+		SharedPreferences.Editor editor = mAppView.getSharedPreferences().edit();
+		editor.putBoolean(key, pref);
+		editor.apply();
 	}
 
 	private void setPrefInt(String key, int pref) {
