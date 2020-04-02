@@ -30,6 +30,10 @@ public class GNumberStream extends GView {
 		setZIndex(-99);
 	}
 
+	public void setAlpha(int alpha) {
+		mPaint.setAlpha(alpha);
+	}
+
 	public void setStreamSize(int size) {
 		mStreamSize = size;
 	}

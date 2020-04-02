@@ -116,8 +116,6 @@ public class MainMenuView extends WindowView {
 		mAppTitleView.setTypeFace(DEFAULT_TYPEFACE);
 		mAppTitleView.setCenterHorizontal();
 
-
-
 	}
 
 	//==============================================================================================
@@ -181,11 +179,15 @@ public class MainMenuView extends WindowView {
 
 			int x = rand.nextInt(getWidth());
 			int y = - 400 + rand.nextInt(getHeight() + 800);
-			int size = 48;
 			int color = NUMBER_STREAM_COLOR_POOL.get(rand.nextInt(NUMBER_STREAM_COLOR_POOL.size()));
 			int eraserIndex = - rand.nextInt(50);
 
+			double factor = Math.random();
+			int size = (int) (32 + factor*32);
+			int alpha = (int) (20 + factor * 150);
+
 			GNumberStream gNumberStream = new GNumberStream(this, x, y, size, color);
+			gNumberStream.setAlpha(alpha);
 			gNumberStream.setEraserIndex(eraserIndex);
 			if (rand.nextInt(REVERSE_STREAM_RATE) == REVERSE_STREAM_RATE - 1) {
 				gNumberStream.setYStep(gNumberStream.getYStep()* -1);
