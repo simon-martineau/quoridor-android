@@ -46,8 +46,14 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	//==============================================================================================
 	// Preferences
 	//==============================================================================================
-	public SharedPreferences mPreferences = getContext().getApplicationContext()
-			.getSharedPreferences("Quoridor settings", Context.MODE_PRIVATE);
+	public static final String SETTINGS_KEY = "Quoridor settings";
+	public static final String STATISTICS_KEY = "Quoridor statistics";
+
+	private SharedPreferences mSettings = getContext().getApplicationContext()
+			.getSharedPreferences(SETTINGS_KEY, Context.MODE_PRIVATE);
+
+	private SharedPreferences mStatistics = getContext().getApplicationContext()
+			.getSharedPreferences(STATISTICS_KEY, Context.MODE_PRIVATE);
 
 
 	//==============================================================================================
@@ -211,7 +217,19 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 	public void swapToSettingsView() { setActiveWindowView("settings view"); }
 
-	public SharedPreferences getSharedPreferences() {
-		return mPreferences;
+
+	public static final int DATA_SETTINGS = 1;
+	public static final int DATA_STATISTICS = 2;
+
+	public SharedPreferences getSharedPreferences(int group) {
+		switch (group) {
+			case DATA_SETTINGS:
+				return mSettings;
+			case DATA_STATISTICS:
+				return mStatistics;
+			default:
+				return null;
+		}
+
 	}
 }

@@ -453,7 +453,7 @@ public class GameView extends WindowView {
 	 * Retrieves the user preferences and updates members accordingly
 	 */
 	private void retrievePreferences() {
-		SharedPreferences prefs = getAppView().getSharedPreferences();
+		SharedPreferences prefs = getAppView().getSharedPreferences(AppView.DATA_SETTINGS);
 		mPawnColorPref = prefs.getInt("pawn_color", SettingsView.DEFAULT_PAWN_COLOR);
 		mEnemyPawnColorPref = prefs.getInt("enemy_pawn_color", SettingsView.DEFAULT_ENEMY_PAWN_COLOR);
 		mWallColorPref = prefs.getInt("wall_color", SettingsView.DEFAULT_WALL_COLOR);

@@ -18,6 +18,8 @@ import simon.app.quoridor.CustomViews.GView;
 import simon.app.quoridor.Utils.MoreColors;
 
 public class SettingsView extends WindowView {
+	SharedPreferences mSettings;
+
 	//==============================================================================================
 	// Default preferences
 	//==============================================================================================
@@ -103,6 +105,7 @@ public class SettingsView extends WindowView {
 	 */
 	public SettingsView(AppView appView) {
 		super(appView);
+		mSettings = getAppView().getSharedPreferences(AppView.DATA_SETTINGS);
 	}
 
 
@@ -126,7 +129,7 @@ public class SettingsView extends WindowView {
 		mPawnColorSettingLabel.setBottom(OPTION_1_BOTTOM_Y);
 
 		mPawnColorSettingColorPreview = new ColorView(this, 0, 0, 100, 100,
-				getAppView().getSharedPreferences().getInt("pawn_color", DEFAULT_PAWN_COLOR), true);
+				mSettings.getInt("pawn_color", DEFAULT_PAWN_COLOR), true);
 		mPawnColorSettingColorPreview.setBottom(OPTION_1_BOTTOM_Y);
 		mPawnColorSettingColorPreview.setRight(getWidth() - OPTION_FRAMES_LEFT - OPTION_FRAMES_MARGIN);
 		mPawnColorSettingColorPreview.setOnClickAction(new GView.onClickAction() {
@@ -165,7 +168,7 @@ public class SettingsView extends WindowView {
 		mEnemyPawnColorSettingLabel.setBottom(OPTION_2_BOTTOM_Y);
 
 		mEnemyPawnColorSettingColorPreview = new ColorView(this, 0, 0, 100, 100,
-				getAppView().getSharedPreferences().getInt("enemy_pawn_color", DEFAULT_ENEMY_PAWN_COLOR), true);
+				mSettings.getInt("enemy_pawn_color", DEFAULT_ENEMY_PAWN_COLOR), true);
 		mEnemyPawnColorSettingColorPreview.setRight(getWidth() - OPTION_FRAMES_LEFT - OPTION_FRAMES_MARGIN);
 		mEnemyPawnColorSettingColorPreview.setBottom(OPTION_2_BOTTOM_Y);
 		mEnemyPawnColorSettingColorPreview.setOnClickAction(new GView.onClickAction() {
@@ -203,7 +206,7 @@ public class SettingsView extends WindowView {
 		mWallColorSettingLabel.setBottom(OPTION_3_BOTTOM_Y);
 
 		mWallColorSettingColorPreview = new ColorView(this, 0, 0, 100, 100,
-				getAppView().getSharedPreferences().getInt("wall_color", DEFAULT_WALL_COLOR), true);
+				mSettings.getInt("wall_color", DEFAULT_WALL_COLOR), true);
 		mWallColorSettingColorPreview.setRight(getWidth() - OPTION_FRAMES_LEFT - OPTION_FRAMES_MARGIN);
 		mWallColorSettingColorPreview.setBottom(OPTION_3_BOTTOM_Y);
 		mWallColorSettingColorPreview.setOnClickAction(new GView.onClickAction() {
@@ -239,7 +242,7 @@ public class SettingsView extends WindowView {
 		mDrawPathSettingLabel = new GTitleView(this, OPTION_FRAMES_LEFT + OPTION_FRAMES_MARGIN, 0, "Draw path to victory:", Color.WHITE, 48);
 		mDrawPathSettingLabel.setBottom(OPTION_4_BOTTOM_Y);
 
-		boolean drawPath = getAppView().getSharedPreferences().getBoolean("draw_path", DEFAULT_DRAW_PATH);
+		boolean drawPath = mSettings.getBoolean("draw_path", DEFAULT_DRAW_PATH);
 		int textColor = drawPath ? Color.GREEN : Color.RED;
 		String text = drawPath ? "Yes" : "No";
 		mDrawPathSettingButton = new GButton(this, text, 200, 110, 0, 0, Color.BLACK, textColor, true);
@@ -279,7 +282,7 @@ public class SettingsView extends WindowView {
 		mMusicSettingLabel = new GTitleView(this, OPTION_FRAMES_LEFT + OPTION_FRAMES_MARGIN, 0, "Music:", Color.WHITE, 48);
 		mMusicSettingLabel.setBottom(OPTION_5_BOTTOM_Y);
 
-		boolean musicOn = getAppView().getSharedPreferences().getBoolean("music", DEFAULT_MUSIC);
+		boolean musicOn = mSettings.getBoolean("music", DEFAULT_MUSIC);
 		int musicTextColor = musicOn ? Color.GREEN : Color.RED;
 		String musicText = musicOn ? "On" : "Off";
 		mMusicSettingButton = new GButton(this, musicText, 200, 110, 0, 0, Color.BLACK, musicTextColor, true);
@@ -311,7 +314,7 @@ public class SettingsView extends WindowView {
 		mSoundEffectsSettingLabel = new GTitleView(this, OPTION_FRAMES_LEFT + OPTION_FRAMES_MARGIN, 0, "Sound effects:", Color.WHITE, 48);
 		mSoundEffectsSettingLabel.setBottom(OPTION_6_BOTTOM_Y);
 
-		boolean soundEffectsOn = getAppView().getSharedPreferences().getBoolean("sound_effects", DEFAULT_MUSIC);
+		boolean soundEffectsOn = mSettings.getBoolean("sound_effects", DEFAULT_MUSIC);
 		int soundEffectsTextColor = soundEffectsOn ? Color.GREEN : Color.RED;
 		String soundEffectsText = soundEffectsOn ? "On" : "Off";
 		mSoundEffectsSettingButton = new GButton(this, soundEffectsText, 200, 110, 0, 0, Color.BLACK, soundEffectsTextColor, true);
@@ -355,13 +358,13 @@ public class SettingsView extends WindowView {
 	}
 
 	private void setPrefBoolean(String key, boolean pref) {
-		SharedPreferences.Editor editor = mAppView.getSharedPreferences().edit();
+		SharedPreferences.Editor editor = mSettings.edit();
 		editor.putBoolean(key, pref);
 		editor.apply();
 	}
 
 	private void setPrefInt(String key, int pref) {
-		SharedPreferences.Editor editor = mAppView.getSharedPreferences().edit();
+		SharedPreferences.Editor editor = mSettings.edit();
 		editor.putInt(key, pref);
 		editor.apply();
 	}

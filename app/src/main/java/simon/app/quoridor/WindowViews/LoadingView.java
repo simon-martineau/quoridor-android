@@ -35,7 +35,7 @@ public class LoadingView extends WindowView {
 	 * Retrieves the user preferences and updates members accordingly
 	 */
 	private void retrievePreferences() {
-		SharedPreferences prefs = getAppView().getSharedPreferences();
+		SharedPreferences prefs = getAppView().getSharedPreferences(AppView.DATA_SETTINGS);
 		mSoundEffectsPref = prefs.getBoolean("sound_effects", SettingsView.DEFAULT_SOUND_EFFECTS);
 	}
 
