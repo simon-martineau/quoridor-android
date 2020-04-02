@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+import simon.app.quoridor.Core.GParent;
 import simon.app.quoridor.CustomViews.GView;
 import simon.app.quoridor.WindowViews.WindowView;
 
@@ -17,8 +18,8 @@ public class ColorView extends GView {
 	private Paint mPaint = new Paint();
 	private Paint mBorderPaint = new Paint();
 
-	public ColorView(GView gView, int x, int y, int width, int height, int color, boolean register) {
-		super(gView, x, y, register);
+	public ColorView(GParent gParent, int x, int y, int width, int height, int color, boolean register) {
+		super(gParent, x, y, register);
 
 		mWidth = width;
 		mHeight = height;
@@ -26,16 +27,6 @@ public class ColorView extends GView {
 		mPaint.setColor(color);
 		setUpPaints();
 
-	}
-
-	public ColorView(WindowView windowView, int x, int y, int width, int height, int color) {
-		super(windowView, x, y);
-
-		mWidth = width;
-		mHeight = height;
-		mColor = color;
-		mPaint.setColor(color);
-		setUpPaints();
 	}
 
 	public int getColor() {

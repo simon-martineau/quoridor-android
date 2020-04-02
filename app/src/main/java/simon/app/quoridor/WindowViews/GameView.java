@@ -321,7 +321,7 @@ public class GameView extends WindowView {
 		});
 		mGQuoridorView.linkQuoridorGame(mGame);
 
-		mPlaceWallButton = new GButton(this, "Place a wall", 300, 150, 150, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
+		mPlaceWallButton = new GButton(this, "Place a wall", 300, 150, 150, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN, true);
 		mPlaceWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
@@ -346,7 +346,7 @@ public class GameView extends WindowView {
 			}
 		});
 
-		mToggleWallTypeButton = new GButton(this, "Horizontal", 300, 150, 525, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+		mToggleWallTypeButton = new GButton(this, "Horizontal", 300, 150, 525, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE, true);
 		mToggleWallTypeButton.setOnClickAction(new GView.onClickAction() {
 
 			@Override
@@ -366,7 +366,7 @@ public class GameView extends WindowView {
 		mToggleWallTypeButton.setVisible(false);
 
 
-		mConfirmWallButton = new GButton(this, "Confirm", 300, 150, 900, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
+		mConfirmWallButton = new GButton(this, "Confirm", 300, 150, 900, mGQuoridorView.getBottom() + 64, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN, true);
 		mConfirmWallButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
@@ -387,7 +387,7 @@ public class GameView extends WindowView {
 		});
 		mConfirmWallButton.setVisible(false);
 
-		mAbandonButton = new GButton(this, "Abandon", 300, 150, mAppView.getWidth() - 450, mAppView.getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.RED);
+		mAbandonButton = new GButton(this, "Abandon", 300, 150, mAppView.getWidth() - 450, mAppView.getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.RED, true);
 		mAbandonButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
@@ -396,7 +396,7 @@ public class GameView extends WindowView {
 			}
 		});
 
-		mNewGameButton = new GButton(this, "New Game", 300, 150, mAppView.getWidth() - 450, mAppView.getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
+		mNewGameButton = new GButton(this, "New Game", 300, 150, mAppView.getWidth() - 450, mAppView.getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN, true);
 		mNewGameButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
@@ -430,7 +430,7 @@ public class GameView extends WindowView {
 		mRestartConfirmModalView.setY(mAppView.getHeight() / 2 - mRestartConfirmModalView.getHeight() / 2 - 200);
 		mRestartConfirmModalView.setVisible(false);
 
-		mSettingsButton = new GButton(this, "Main menu", 300, 150, 150, getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+		mSettingsButton = new GButton(this, "Main menu", 300, 150, 150, getHeight() - 300, DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE, true);
 		mSettingsButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {

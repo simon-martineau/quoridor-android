@@ -3,6 +3,7 @@ package simon.app.quoridor.CustomViews;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import simon.app.quoridor.Core.GParent;
 import simon.app.quoridor.WindowViews.GameView;
 
 public class GFreezeView extends GView {
@@ -10,18 +11,8 @@ public class GFreezeView extends GView {
 	private int mHeight;
 	private Paint mPaint;
 
-	public GFreezeView(GameView gameView, int x, int y, int width, int height, int color, int alpha) {
-		super(gameView, x, y);
-		mWidth = width;
-		mHeight = height;
-
-		mPaint = new Paint();
-		mPaint.setColor(color);
-		mPaint.setAlpha(alpha);
-	}
-
-	public GFreezeView(GModalView gModalView, int x, int y, int width, int height, int color, int alpha, boolean register) {
-		super(gModalView, x, y, register);
+	public GFreezeView(GParent gParent, int x, int y, int width, int height, int color, int alpha, boolean register) {
+		super(gParent, x, y, register);
 		mWidth = width;
 		mHeight = height;
 

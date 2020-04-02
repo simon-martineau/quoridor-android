@@ -16,7 +16,7 @@ public class GBackgroundView extends GView {
 	private boolean mIsAlphaPulsate = false;
 
 	public GBackgroundView(WindowView windowView, int x, int y, Bitmap bitmap) {
-		super(windowView, x, y);
+		super(windowView, x, y, true);
 
 		mBitmap = bitmap;
 		setZIndex(-100);
@@ -50,6 +50,6 @@ public class GBackgroundView extends GView {
 			mPulsateCounter++;
 		}
 
-		canvas.drawBitmap(mBitmap, getParentLeft() + getLeft(), getParentTop() + getTop(), paint);
+		canvas.drawBitmap(mBitmap, getLeft(), getTop(), paint);
 	}
 }

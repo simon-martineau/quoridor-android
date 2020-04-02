@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import java.util.ArrayList;
 import java.util.List;
 
+import simon.app.quoridor.Core.GParent;
 import simon.app.quoridor.WindowViews.GameView;
 import simon.app.quoridor.Core.Quoridor;
 
@@ -73,8 +74,8 @@ public class GQuoridorView extends GView {
 
 
 	// TODO: Implement flexibility in constructor
-	public GQuoridorView(GameView gameView, Quoridor quoridor, int x, int y, int width) {
-		super(gameView, x, y);
+	public GQuoridorView(GParent parent, Quoridor quoridor, int x, int y, int width) {
+		super(parent, x, y, true);
 		mQuoridor = quoridor;
 		cellSize = (int) ((width - (gridMargin*2 + wrapperWidth*2 + cellBorderWidth*10)) / 9.0);
 	}

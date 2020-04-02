@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 
+import simon.app.quoridor.Core.GParent;
 import simon.app.quoridor.WindowViews.WindowView;
 
 public class GTitleView extends GView {
@@ -12,8 +13,8 @@ public class GTitleView extends GView {
 	private Paint mPaint;
 
 	// Constructor for centered text
-	public GTitleView(WindowView windowView, String text, int color, float textSize, int parentWidth) {
-		super(windowView, 0, 0);
+	public GTitleView(GParent gParent, String text, int color, float textSize, int parentWidth) {
+		super(gParent, 0, 0, true);
 		mText = text;
 
 		mPaint = new Paint();
@@ -25,8 +26,8 @@ public class GTitleView extends GView {
 		setX(parentWidth / 2 - getTextWidth() / 2);
 	}
 
-	public GTitleView(WindowView windowView, int x, int y, String text, int color, float textSize) {
-		super(windowView, x, y);
+	public GTitleView(GParent gParent, int x, int y, String text, int color, float textSize) {
+		super(gParent, x, y, true);
 		mText = text;
 
 		mPaint = new Paint();

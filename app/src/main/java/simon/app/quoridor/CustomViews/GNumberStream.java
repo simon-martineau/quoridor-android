@@ -3,6 +3,7 @@ package simon.app.quoridor.CustomViews;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import simon.app.quoridor.Core.GParent;
 import simon.app.quoridor.WindowViews.WindowView;
 
 public class GNumberStream extends GView {
@@ -18,8 +19,8 @@ public class GNumberStream extends GView {
 	Paint mPaint = new Paint();
 
 
-	public GNumberStream(WindowView windowView, int x, int y, int textSize, int color) {
-		super(windowView, x, y);
+	public GNumberStream(GParent gParent, int x, int y, int textSize, int color) {
+		super(gParent, x, y, true);
 		mPaint.setTextSize(textSize);
 		mPaint.setColor(color);
 		mPaint.setTextAlign(Paint.Align.CENTER);

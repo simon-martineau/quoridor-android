@@ -3,6 +3,7 @@ package simon.app.quoridor.CustomViews;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import simon.app.quoridor.Core.GParent;
 import simon.app.quoridor.WindowViews.WindowView;
 
 public class GProgressBar extends GView {
@@ -16,8 +17,8 @@ public class GProgressBar extends GView {
 	Paint mBackgroundPaint = new Paint();
 	Paint mForegroundPaint = new Paint();
 
-	public GProgressBar(WindowView windowView, int x, int y, int width, int height) {
-		super(windowView, x, y);
+	public GProgressBar(GParent gParent, int x, int y, int width, int height) {
+		super(gParent, x, y, true);
 
 		mWidth = width;
 		mHeight = height;

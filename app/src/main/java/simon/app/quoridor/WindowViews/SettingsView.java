@@ -89,11 +89,11 @@ public class SettingsView extends WindowView {
 		mPawnColorSettingLabel.setYFromViewCenter(OPTION_1_MIDDLE_Y);
 
 		mPawnColorSettingColorPreview = new ColorView(this, mPawnColorSettingLabel.getRight() + OPTION_DESCRIPTOR_LEFT_FROM_LABEL_RIGHT, 0, 100, 100,
-				getAppView().getSharedPreferences().getInt("pawn_color", DEFAULT_PAWN_COLOR));
+				getAppView().getSharedPreferences().getInt("pawn_color", DEFAULT_PAWN_COLOR), true);
 		mPawnColorSettingColorPreview.setYFromViewCenter(OPTION_1_MIDDLE_Y);
 
 		mPawnColorSettingChangeButton = new GButton(this, "Change", 300, 150, getWidth() - 300 - OPTION_BUTTON_RIGHT_FROM_RIGHT, 0,
-				GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+				GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE, true);
 		mPawnColorSettingChangeButton.setYFromViewCenter(OPTION_1_MIDDLE_Y);
 		mPawnColorSettingChangeButton.setOnClickAction(new GView.onClickAction() {
 			@Override
@@ -128,11 +128,11 @@ public class SettingsView extends WindowView {
 		mEnemyPawnColorSettingLabel.setYFromViewCenter(OPTION_2_MIDDLE_Y);
 
 		mEnemyPawnColorSettingColorPreview = new ColorView(this, mEnemyPawnColorSettingLabel.getRight() + OPTION_DESCRIPTOR_LEFT_FROM_LABEL_RIGHT, 0, 100, 100,
-				getAppView().getSharedPreferences().getInt("enemy_pawn_color", DEFAULT_ENEMY_PAWN_COLOR));
+				getAppView().getSharedPreferences().getInt("enemy_pawn_color", DEFAULT_ENEMY_PAWN_COLOR), true);
 		mEnemyPawnColorSettingColorPreview.setYFromViewCenter(OPTION_2_MIDDLE_Y);
 
 		mEnemyPawnColorSettingChangeButton = new GButton(this, "Change", 300, 150, getWidth() - 300 - OPTION_BUTTON_RIGHT_FROM_RIGHT, 0,
-				GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+				GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE, true);
 		mEnemyPawnColorSettingChangeButton.setYFromViewCenter(OPTION_2_MIDDLE_Y);
 		mEnemyPawnColorSettingChangeButton.setOnClickAction(new GView.onClickAction() {
 			@Override
@@ -167,11 +167,11 @@ public class SettingsView extends WindowView {
 		mWallColorSettingLabel.setYFromViewCenter(OPTION_3_MIDDLE_Y);
 
 		mWallColorSettingColorPreview = new ColorView(this, mWallColorSettingLabel.getRight() + OPTION_DESCRIPTOR_LEFT_FROM_LABEL_RIGHT, 0, 100, 100,
-				getAppView().getSharedPreferences().getInt("wall_color", DEFAULT_WALL_COLOR));
+				getAppView().getSharedPreferences().getInt("wall_color", DEFAULT_WALL_COLOR), true);
 		mWallColorSettingColorPreview.setYFromViewCenter(OPTION_3_MIDDLE_Y);
 
 		mWallColorSettingChangeButton = new GButton(this, "Change", 300, 150, getWidth() - 300 - OPTION_BUTTON_RIGHT_FROM_RIGHT, 0,
-				GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+				GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE, true);
 		mWallColorSettingChangeButton.setYFromViewCenter(OPTION_3_MIDDLE_Y);
 		mWallColorSettingChangeButton.setOnClickAction(new GView.onClickAction() {
 			@Override
@@ -202,7 +202,7 @@ public class SettingsView extends WindowView {
 		// Others
 		// =========================================================================================
 
-		mBackButton = new GButton(this, "Back", 300, 150, 150 ,getHeight() - 450, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+		mBackButton = new GButton(this, "Back", 300, 150, 150 ,getHeight() - 450, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE, true);
 		mBackButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {

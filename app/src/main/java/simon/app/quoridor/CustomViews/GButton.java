@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 
+import simon.app.quoridor.Core.GParent;
 import simon.app.quoridor.WindowViews.WindowView;
 
 
@@ -15,28 +16,10 @@ public class GButton extends GView {
 
 	private int mWidth, mHeight;
 
-	public GButton(WindowView windowView, String text, int width, int height, int x, int y, int backgroundColor, int foreGroundColor)
+
+	public GButton(GParent gParent, String text, int width, int height, int x, int y, int backgroundColor, int foreGroundColor, boolean register)
 	{
-		super(windowView, x, y);
-
-		mText = text;
-		mWidth = width;
-		mHeight = height;
-
-
-		mPaint = new Paint();
-		mPaint.setColor(backgroundColor);
-
-		mTextPaint = new Paint();
-		mTextPaint.setTextAlign(Paint.Align.CENTER);
-		mTextPaint.setTextSize(48);
-		mTextPaint.setColor(foreGroundColor);
-
-	}
-
-	public GButton(GView gView, String text, int width, int height, int x, int y, int backgroundColor, int foreGroundColor, boolean register)
-	{
-		super(gView, x, y, register);
+		super(gParent, x, y, register);
 
 		mText = text;
 		mWidth = width;

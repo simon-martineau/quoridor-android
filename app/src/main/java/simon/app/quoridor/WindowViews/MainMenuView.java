@@ -90,7 +90,7 @@ public class MainMenuView extends WindowView {
 		mGViews.clear();
 
 		mStartGameButton = new GButton(this, "Start game", 400, 200, 0, getHeight() / 2 + 100,
-				DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN);
+				DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN, true);
 		mStartGameButton.setTextSize(64);
 		mStartGameButton.setCenterHorizontal();
 		mStartGameButton.setOnClickAction(new GView.onClickAction() {
@@ -101,7 +101,7 @@ public class MainMenuView extends WindowView {
 		});
 
 		mSettingsButton = new GButton(this, "Settings", 400, 200, 0, getHeight() / 2 + 400,
-				DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+				DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE, true);
 		mSettingsButton.setTextSize(64);
 		mSettingsButton.setCenterHorizontal();
 		mSettingsButton.setOnClickAction(new GView.onClickAction() {

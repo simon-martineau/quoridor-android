@@ -9,12 +9,13 @@ import java.util.Collections;
 import java.util.List;
 
 import simon.app.quoridor.Core.AppView;
+import simon.app.quoridor.Core.GParent;
 import simon.app.quoridor.CustomViews.GView;
 
 /**
  * Abstract class representing a Window, child of AppView
  */
-public abstract class WindowView {
+public abstract class WindowView extends GParent {
 
 	/**
 	 * Reference to the AppView containing the WindowView

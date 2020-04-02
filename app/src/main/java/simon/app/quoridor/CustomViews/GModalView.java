@@ -33,7 +33,7 @@ public class GModalView extends GView {
 	// TODO: Implement offset button coordinates instead of absolute
 
 	public GModalView(WindowView windowView, String message, int x, int y) {
-		super(windowView, x, y);
+		super(windowView, x, y, true);
 
 		isParent = true; // Since this is true, touch events will be routed to children
 		setZIndex(100);

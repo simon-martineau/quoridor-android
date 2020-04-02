@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import simon.app.quoridor.Core.GParent;
 import simon.app.quoridor.CustomViews.GView;
 import simon.app.quoridor.Utils.MoreColors;
 import simon.app.quoridor.WindowViews.WindowView;
@@ -53,8 +54,8 @@ public class ColorPickerView extends GView {
 	private ColorPickCallBack mColorPickCallBack;
 
 
-	public ColorPickerView(WindowView windowView, int x, int y) {
-		super(windowView, x, y);
+	public ColorPickerView(GParent gParent, int x, int y) {
+		super(gParent, x, y, true);
 		setZIndex(10);
 
 		isParent = true;
