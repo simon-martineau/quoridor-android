@@ -36,9 +36,6 @@ public class MainActivity extends Activity {
 	}
 }
 
-// TODO: "Allow" GViews to contain other GViews and simplify ModalView
-// TODO: Make GViews draw relative to parent coordinates
-// TODO: Make a color picker view for picking colors in settings
 
 // TODO: Add loading bar sound effect
 
@@ -51,7 +48,6 @@ public class MainActivity extends Activity {
 	Reset Stats
 	*/
 
-// TODO: Setting to turn on/off music, sfx
 // TODO: Settings to select difficulty
 
 

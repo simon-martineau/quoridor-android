@@ -177,7 +177,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 		mGameThread.setRunning(true);
 		mGameThread.start();
 
-		activateCurrentWindow();
+		// activateCurrentWindow();
 	}
 
 	/**

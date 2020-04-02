@@ -54,7 +54,9 @@ public class GTitleView extends GView {
 
 	@Override
 	public void draw(Canvas canvas) {
-		canvas.drawText(mText, getLeft() + getWidth() / 2f, getBottom(), mPaint);
+		if (isVisible()) {
+			canvas.drawText(mText, getLeft() + getWidth() / 2f, getBottom(), mPaint);
+		}
 	}
 
 	private int getTextWidth() {

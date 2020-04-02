@@ -1,21 +1,43 @@
 package simon.app.quoridor.WindowViews;
 
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.icu.text.CaseMap;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 import simon.app.quoridor.Core.AppView;
 import simon.app.quoridor.CustomViews.GProgressBar;
+import simon.app.quoridor.CustomViews.GTitleView;
+import simon.app.quoridor.R;
 
 public class LoadingView extends WindowView {
-	public static final int LOAD_TIME = 30;
 
-	int mCountdown = LOAD_TIME;
+	private static final long LOADING_TIME = 1800;
+	private static final long DING_TIME_STAMP = 1000;
 
+	private long mStartTime;
+	private boolean mPlayedSound;
+
+	private MediaPlayer mLoadingSoundPlayer;
+
+	private boolean mSoundEffectsPref;
+
+
+	GTitleView mCompleteTitleView;
 	GProgressBar mProgressBar;
 
 
+	/**
+	 * Retrieves the user preferences and updates members accordingly
+	 */
+	private void retrievePreferences() {
+		SharedPreferences prefs = getAppView().getSharedPreferences();
+		mSoundEffectsPref = prefs.getBoolean("sound_effects", SettingsView.DEFAULT_SOUND_EFFECTS);
+	}
 
 
 	/**
@@ -26,6 +48,11 @@ public class LoadingView extends WindowView {
 	public LoadingView(AppView appView) {
 		super(appView);
 	}
+
+	private void setUpAudio() {
+		mLoadingSoundPlayer = MediaPlayer.create(mAppView.getContext(), R.raw.loading_sound);
+	}
+
 
 	private void setUpViews() {
 		mGViews.clear();
@@ -38,6 +65,13 @@ public class LoadingView extends WindowView {
 		mProgressBar.setPadding(10);
 		mProgressBar.setCenterHorizontal();
 		mProgressBar.setCenterVertical();
+
+		mCompleteTitleView = new GTitleView(this, 0, 0, "COMPLETE", Color.GREEN, 172);
+		mCompleteTitleView.setTypeFace(GameView.DEFAULT_TYPEFACE);
+		mCompleteTitleView.setCenterHorizontal();
+		mCompleteTitleView.setBottom(mProgressBar.getTop() - 70);
+		mCompleteTitleView.setVisible(false);
+
 	}
 
 	@Override
@@ -46,20 +80,45 @@ public class LoadingView extends WindowView {
 			mGViews.get(i).draw(canvas);
 		}
 
+		if (!mPlayedSound) {
+			mStartTime = System.currentTimeMillis();
+			if (mSoundEffectsPref) {
+				if (!mLoadingSoundPlayer.isPlaying())
+					mLoadingSoundPlayer.start();
+			}
+			mPlayedSound = true;
+		}
+
 		updateProgressBar();
 	}
 
 	private void updateProgressBar() {
-		if (mCountdown <= 0) {
+		if (System.currentTimeMillis() - mStartTime > LOADING_TIME) {
 			mAppView.swapToMainMenuView();
 		}
-		mProgressBar.setProgress((LOAD_TIME - mCountdown) / (float) LOAD_TIME);
-		mCountdown--;
+		mProgressBar.setProgress((System.currentTimeMillis() - mStartTime) / (float) DING_TIME_STAMP);
+		if (System.currentTimeMillis() - mStartTime >= DING_TIME_STAMP) {
+			mProgressBar.setBorderColor(Color.GREEN);
+			mCompleteTitleView.setVisible(true);
+		}
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		return true;
+	}
+
+	@Override
+	public void onActivate() {
+		super.onActivate();
+		setUpAudio();
+		retrievePreferences();
+	}
+
+	@Override
+	public void onDeactivate() {
+		super.onDeactivate();
+		mLoadingSoundPlayer.stop();
 	}
 
 	@Override

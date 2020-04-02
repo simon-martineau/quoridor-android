@@ -183,8 +183,8 @@ public class MainMenuView extends WindowView {
 			int eraserIndex = - rand.nextInt(50);
 
 			double factor = Math.random();
-			int size = (int) (32 + factor*32);
-			int alpha = (int) (20 + factor * 150);
+			int size = (int) (32 + factor*64);
+			int alpha = (int) (20 + factor * 100);
 
 			GNumberStream gNumberStream = new GNumberStream(this, x, y, size, color);
 			gNumberStream.setAlpha(alpha);

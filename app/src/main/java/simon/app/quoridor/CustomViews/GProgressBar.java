@@ -17,6 +17,7 @@ public class GProgressBar extends GView {
 	Paint mBackgroundPaint = new Paint();
 	Paint mForegroundPaint = new Paint();
 
+
 	public GProgressBar(GParent gParent, int x, int y, int width, int height) {
 		super(gParent, x, y, true);
 
