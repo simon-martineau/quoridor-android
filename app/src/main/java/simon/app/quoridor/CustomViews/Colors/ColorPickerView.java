@@ -56,7 +56,7 @@ public class ColorPickerView extends GView {
 
 	public ColorPickerView(GParent gParent, int x, int y) {
 		super(gParent, x, y, true);
-		setZIndex(10);
+		setZIndex(50);
 
 		isParent = true;
 		setOnClickAction(new onClickAction() {

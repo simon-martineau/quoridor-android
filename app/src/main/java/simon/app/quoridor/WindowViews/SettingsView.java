@@ -11,6 +11,8 @@ import simon.app.quoridor.Core.AppView;
 import simon.app.quoridor.CustomViews.Colors.ColorPickerView;
 import simon.app.quoridor.CustomViews.Colors.ColorView;
 import simon.app.quoridor.CustomViews.GButton;
+import simon.app.quoridor.CustomViews.GLine;
+import simon.app.quoridor.CustomViews.GSectionFrame;
 import simon.app.quoridor.CustomViews.GTitleView;
 import simon.app.quoridor.CustomViews.GView;
 import simon.app.quoridor.Utils.MoreColors;
@@ -29,13 +31,18 @@ public class SettingsView extends WindowView {
 	// Constants
 	//==============================================================================================
 
-	private static final int OPTION_LABELS_LEFT_FROM_LEFT = 100;
-	private static final int OPTION_BUTTON_RIGHT_FROM_RIGHT = 100;
-	private static final int OPTION_DESCRIPTOR_LEFT_FROM_LABEL_RIGHT = 50;
+	private static final int OPTION_FRAMES_LEFT = 100;
+	private static final int OPTION_FRAMES_RIGHT = 100;
+	private static final int OPTION_FRAMES_MARGIN = 50;
 
-	private static final int OPTION_1_MIDDLE_Y = 500;
-	private static final int OPTION_2_MIDDLE_Y = 700;
-	private static final int OPTION_3_MIDDLE_Y = 900;
+	// Group 1
+	private static final int OPTION_SECTION_1_FRAME_TOP = 350;
+	private static final int OPTION_1_BOTTOM_Y = 500;
+	private static final int OPTION_2_BOTTOM_Y = 650;
+	private static final int OPTION_3_BOTTOM_Y = 800;
+	private static final int OPTION_SECTION_1_FRAME_BOTTOM = 850;
+
+
 
 
 	//==============================================================================================
@@ -44,24 +51,25 @@ public class SettingsView extends WindowView {
 
 	GTitleView mTitleView;
 
+	GSectionFrame mSectionFrame1;
+
 	// Option 1
 	GTitleView mPawnColorSettingLabel;
 	ColorView mPawnColorSettingColorPreview;
-	GButton mPawnColorSettingChangeButton;
 	ColorPickerView mPawnColorSettingColorPicker;
+	GLine mPawnColorSettingLine;
 
 	// Option 2
 	GTitleView mEnemyPawnColorSettingLabel;
 	ColorView mEnemyPawnColorSettingColorPreview;
-	GButton mEnemyPawnColorSettingChangeButton;
 	ColorPickerView mEnemyPawnColorSettingColorPicker;
+	GLine mEnemyPawnColorSettingLine;
 
 	// Option 2
 	GTitleView mWallColorSettingLabel;
 	ColorView mWallColorSettingColorPreview;
-	GButton mWallColorSettingChangeButton;
 	ColorPickerView mWallColorSettingColorPicker;
-
+	GLine mWallColorSettingLine;
 
 	GButton mBackButton;
 
@@ -82,25 +90,33 @@ public class SettingsView extends WindowView {
 		mTitleView.setCenterHorizontal();
 
 		// =========================================================================================
-		// Option 1
+		// Section frame 1
 		// =========================================================================================
 
-		mPawnColorSettingLabel = new GTitleView(this, OPTION_LABELS_LEFT_FROM_LEFT, 0, "Pawn color:", Color.WHITE, 64);
-		mPawnColorSettingLabel.setYFromViewCenter(OPTION_1_MIDDLE_Y);
+		mSectionFrame1 = new GSectionFrame(this, OPTION_FRAMES_LEFT, OPTION_SECTION_1_FRAME_TOP,
+				getRight() - OPTION_FRAMES_RIGHT, OPTION_SECTION_1_FRAME_BOTTOM, 5, true);
+		mSectionFrame1.setCaption("Appearance", 64, Color.WHITE);
 
-		mPawnColorSettingColorPreview = new ColorView(this, mPawnColorSettingLabel.getRight() + OPTION_DESCRIPTOR_LEFT_FROM_LABEL_RIGHT, 0, 100, 100,
+		// Option 1 ================================================================================
+
+		mPawnColorSettingLabel = new GTitleView(this, OPTION_FRAMES_LEFT + OPTION_FRAMES_MARGIN, 0, "Pawn color:", Color.WHITE, 48);
+		mPawnColorSettingLabel.setBottom(OPTION_1_BOTTOM_Y);
+
+		mPawnColorSettingColorPreview = new ColorView(this, 0, 0, 100, 100,
 				getAppView().getSharedPreferences().getInt("pawn_color", DEFAULT_PAWN_COLOR), true);
-		mPawnColorSettingColorPreview.setYFromViewCenter(OPTION_1_MIDDLE_Y);
-
-		mPawnColorSettingChangeButton = new GButton(this, "Change", 300, 150, getWidth() - 300 - OPTION_BUTTON_RIGHT_FROM_RIGHT, 0,
-				GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE, true);
-		mPawnColorSettingChangeButton.setYFromViewCenter(OPTION_1_MIDDLE_Y);
-		mPawnColorSettingChangeButton.setOnClickAction(new GView.onClickAction() {
+		mPawnColorSettingColorPreview.setBottom(OPTION_1_BOTTOM_Y);
+		mPawnColorSettingColorPreview.setRight(getWidth() - OPTION_FRAMES_LEFT - OPTION_FRAMES_MARGIN);
+		mPawnColorSettingColorPreview.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
 				mPawnColorSettingColorPicker.setVisible(true);
 			}
 		});
+
+		mPawnColorSettingLine = new GLine(this,
+				mPawnColorSettingLabel.getRight() + 20, OPTION_1_BOTTOM_Y,
+				mPawnColorSettingColorPreview.getLeft() - 20, OPTION_1_BOTTOM_Y, 3, true);
+
 
 		mPawnColorSettingColorPicker = new ColorPickerView(this, 400, 200);
 		mPawnColorSettingColorPicker.setColorPickCallBack(new ColorPickerView.ColorPickCallBack() {
@@ -116,30 +132,29 @@ public class SettingsView extends WindowView {
 				mPawnColorSettingColorPicker.setVisible(false);
 			}
 		});
-		mPawnColorSettingColorPicker.setY(mPawnColorSettingColorPreview.getBottom() + 25);
-		mPawnColorSettingColorPicker.setX(OPTION_LABELS_LEFT_FROM_LEFT);
+		mPawnColorSettingColorPicker.setYFromViewCenter(mPawnColorSettingColorPreview.getCenterY());
+		mPawnColorSettingColorPicker.setCenterHorizontal();
 		mPawnColorSettingColorPicker.setVisible(false);
 
-		// =========================================================================================
-		// Option 2
-		// =========================================================================================
+		// Option 2 ================================================================================
 
-		mEnemyPawnColorSettingLabel = new GTitleView(this, OPTION_LABELS_LEFT_FROM_LEFT, 0, "Enemy pawn color:", Color.WHITE, 64);
-		mEnemyPawnColorSettingLabel.setYFromViewCenter(OPTION_2_MIDDLE_Y);
+		mEnemyPawnColorSettingLabel = new GTitleView(this, OPTION_FRAMES_LEFT + OPTION_FRAMES_MARGIN, 0, "Enemy pawn color:", Color.WHITE, 48);
+		mEnemyPawnColorSettingLabel.setBottom(OPTION_2_BOTTOM_Y);
 
-		mEnemyPawnColorSettingColorPreview = new ColorView(this, mEnemyPawnColorSettingLabel.getRight() + OPTION_DESCRIPTOR_LEFT_FROM_LABEL_RIGHT, 0, 100, 100,
+		mEnemyPawnColorSettingColorPreview = new ColorView(this, 0, 0, 100, 100,
 				getAppView().getSharedPreferences().getInt("enemy_pawn_color", DEFAULT_ENEMY_PAWN_COLOR), true);
-		mEnemyPawnColorSettingColorPreview.setYFromViewCenter(OPTION_2_MIDDLE_Y);
-
-		mEnemyPawnColorSettingChangeButton = new GButton(this, "Change", 300, 150, getWidth() - 300 - OPTION_BUTTON_RIGHT_FROM_RIGHT, 0,
-				GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE, true);
-		mEnemyPawnColorSettingChangeButton.setYFromViewCenter(OPTION_2_MIDDLE_Y);
-		mEnemyPawnColorSettingChangeButton.setOnClickAction(new GView.onClickAction() {
+		mEnemyPawnColorSettingColorPreview.setRight(getWidth() - OPTION_FRAMES_LEFT - OPTION_FRAMES_MARGIN);
+		mEnemyPawnColorSettingColorPreview.setBottom(OPTION_2_BOTTOM_Y);
+		mEnemyPawnColorSettingColorPreview.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
 				mEnemyPawnColorSettingColorPicker.setVisible(true);
 			}
 		});
+
+		mEnemyPawnColorSettingLine = new GLine(this,
+				mEnemyPawnColorSettingLabel.getRight() + 20, OPTION_2_BOTTOM_Y,
+				mEnemyPawnColorSettingColorPreview.getLeft() - 20, OPTION_2_BOTTOM_Y, 3, true);
 
 		mEnemyPawnColorSettingColorPicker = new ColorPickerView(this, 400, 200);
 		mEnemyPawnColorSettingColorPicker.setColorPickCallBack(new ColorPickerView.ColorPickCallBack() {
@@ -155,30 +170,29 @@ public class SettingsView extends WindowView {
 				mEnemyPawnColorSettingColorPicker.setVisible(false);
 			}
 		});
-		mEnemyPawnColorSettingColorPicker.setY(mEnemyPawnColorSettingColorPreview.getBottom() + 25);
-		mEnemyPawnColorSettingColorPicker.setX(OPTION_LABELS_LEFT_FROM_LEFT);
+		mEnemyPawnColorSettingColorPicker.setYFromViewCenter(mEnemyPawnColorSettingColorPreview.getCenterY());
+		mEnemyPawnColorSettingColorPicker.setCenterHorizontal();
 		mEnemyPawnColorSettingColorPicker.setVisible(false);
 
-		// =========================================================================================
-		// Option 3
-		// =========================================================================================
+		// Option 3 ================================================================================
 
-		mWallColorSettingLabel = new GTitleView(this, OPTION_LABELS_LEFT_FROM_LEFT, 0, "Wall color:", Color.WHITE, 64);
-		mWallColorSettingLabel.setYFromViewCenter(OPTION_3_MIDDLE_Y);
+		mWallColorSettingLabel = new GTitleView(this, OPTION_FRAMES_LEFT + OPTION_FRAMES_MARGIN, 0, "Wall color:", Color.WHITE, 48);
+		mWallColorSettingLabel.setBottom(OPTION_3_BOTTOM_Y);
 
-		mWallColorSettingColorPreview = new ColorView(this, mWallColorSettingLabel.getRight() + OPTION_DESCRIPTOR_LEFT_FROM_LABEL_RIGHT, 0, 100, 100,
+		mWallColorSettingColorPreview = new ColorView(this, 0, 0, 100, 100,
 				getAppView().getSharedPreferences().getInt("wall_color", DEFAULT_WALL_COLOR), true);
-		mWallColorSettingColorPreview.setYFromViewCenter(OPTION_3_MIDDLE_Y);
-
-		mWallColorSettingChangeButton = new GButton(this, "Change", 300, 150, getWidth() - 300 - OPTION_BUTTON_RIGHT_FROM_RIGHT, 0,
-				GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE, true);
-		mWallColorSettingChangeButton.setYFromViewCenter(OPTION_3_MIDDLE_Y);
-		mWallColorSettingChangeButton.setOnClickAction(new GView.onClickAction() {
+		mWallColorSettingColorPreview.setRight(getWidth() - OPTION_FRAMES_LEFT - OPTION_FRAMES_MARGIN);
+		mWallColorSettingColorPreview.setBottom(OPTION_3_BOTTOM_Y);
+		mWallColorSettingColorPreview.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
 				mWallColorSettingColorPicker.setVisible(true);
 			}
 		});
+
+		mWallColorSettingLine = new GLine(this,
+				mWallColorSettingLabel.getRight() + 20, OPTION_3_BOTTOM_Y,
+				mWallColorSettingColorPreview.getLeft() - 20, OPTION_3_BOTTOM_Y, 3, true);
 
 		mWallColorSettingColorPicker = new ColorPickerView(this, 400, 200);
 		mWallColorSettingColorPicker.setColorPickCallBack(new ColorPickerView.ColorPickCallBack() {
@@ -194,9 +208,10 @@ public class SettingsView extends WindowView {
 				mWallColorSettingColorPicker.setVisible(false);
 			}
 		});
-		mWallColorSettingColorPicker.setY(mWallColorSettingColorPreview.getBottom() + 25);
-		mWallColorSettingColorPicker.setX(OPTION_LABELS_LEFT_FROM_LEFT);
+		mWallColorSettingColorPicker.setYFromViewCenter(mWallColorSettingColorPreview.getCenterY());
+		mWallColorSettingColorPicker.setCenterHorizontal();
 		mWallColorSettingColorPicker.setVisible(false);
+
 
 		// =========================================================================================
 		// Others

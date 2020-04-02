@@ -4,12 +4,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 
 import simon.app.quoridor.Core.GParent;
 import simon.app.quoridor.CustomViews.GView;
 import simon.app.quoridor.WindowViews.WindowView;
 
 public class ColorView extends GView {
+	private static final String TAG = "ColorView";
 	private int mBorderRadius = 10;
 	private int mWidth;
 	private int mHeight;
@@ -39,7 +41,11 @@ public class ColorView extends GView {
 		mBorderPaint.setColor(Color.WHITE);
 	}
 
-
+	@Override
+	public void performClick(int x, int y) {
+		Log.i(TAG, "performClick: ColorView");
+		super.performClick(x, y);
+	}
 
 	public void setBorderColor(int color) {
 		mBorderPaint.setColor(color);

@@ -306,8 +306,25 @@ public abstract class GView extends GParent implements Comparable<GView> {
 	 */
 	protected GParent getParent() {
 		return mParent;
-
 	}
+
+	public void setRight(int right) {
+		mX = right - getWidth();
+	}
+
+	public void setBottom(int bottom) {
+		mY = bottom - getHeight();
+	}
+
+	public int getCenterY() {
+		return mY + getHeight() / 2;
+	}
+
+	public int getCenterX() {
+		return mX + getWidth() / 2;
+	}
+
+
 
 
 }

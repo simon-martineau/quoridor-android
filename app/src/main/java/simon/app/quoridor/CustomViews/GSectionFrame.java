@@ -30,11 +30,12 @@ public class GSectionFrame extends GView {
 		super(gParent, x1, y1, register);
 		isParent = true;
 
+		setZIndex(-1);
 		mX2 = x2;
 		mY2 = y2;
 		mPaint.setStrokeWidth(width);
 		mPaint.setColor(Color.WHITE);
-
+		mPaint.setStyle(Paint.Style.STROKE);
 	}
 
 	public void setCaption(String caption, int textSize, int textColor) {
@@ -42,7 +43,7 @@ public class GSectionFrame extends GView {
 
 		mCaption = new GTitleView(this, 0, 0, caption, textColor, textSize);
 		mCaption.setZIndex(1);
-		mCaption.setYFromViewCenter(0);
+		mCaption.setYFromViewCenter(0 - textSize / 5);
 		mCaption.setX(50);
 	}
 
@@ -72,6 +73,13 @@ public class GSectionFrame extends GView {
 	public void draw(Canvas canvas) {
 		// Draw frame
 		canvas.drawRoundRect(getLeft(), getTop(), mX2, mY2, mBorderRadius, mBorderRadius, mPaint);
+
+		// TODO: Make this consistent
+		Paint tempPaint = new Paint();
+		tempPaint.setColor(Color.BLACK);
+		tempPaint.setStyle(Paint.Style.FILL);
+		canvas.drawRect(mCaption.getLeft() + getLeft() - 15, mCaption.getTop() + getTop(),
+				mCaption.getRight() + getLeft() + 25, mCaption.getBottom() + getTop(), tempPaint);
 
 		drawChildren(canvas);
 	}
