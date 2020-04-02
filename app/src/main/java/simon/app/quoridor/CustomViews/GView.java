@@ -180,8 +180,8 @@ public abstract class GView extends GParent implements Comparable<GView> {
 
 		canvas.save();
 		canvas.concat(translateMatrix);
-		for (GView gView : mGViews) {
-			gView.draw(canvas);
+		for (int i = mGViews.size() - 1; i >= 0; i--) {
+			mGViews.get(i).draw(canvas);
 		}
 		canvas.restore();
 	}
@@ -323,7 +323,6 @@ public abstract class GView extends GParent implements Comparable<GView> {
 	public int getCenterX() {
 		return mX + getWidth() / 2;
 	}
-
 
 
 

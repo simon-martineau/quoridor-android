@@ -14,6 +14,7 @@ public class GSectionFrame extends GView {
 	private Paint mPaint = new Paint();
 
 	private GTitleView mCaption;
+	private GRect mCaptionBackground;
 
 	/**
 	 * Constructor for the GSectionFrame
@@ -45,6 +46,10 @@ public class GSectionFrame extends GView {
 		mCaption.setZIndex(1);
 		mCaption.setYFromViewCenter(0 - textSize / 5);
 		mCaption.setX(50);
+
+		mCaptionBackground = new GRect(this, 0, 0, mCaption.getWidth()  + 20, mCaption.getHeight() + 40, true);
+		mCaptionBackground.setYFromViewCenter(0 - textSize / 5);
+		mCaptionBackground.setX(40);
 	}
 
 	public void setBorderRadius(int borderRadius) {
@@ -75,11 +80,11 @@ public class GSectionFrame extends GView {
 		canvas.drawRoundRect(getLeft(), getTop(), mX2, mY2, mBorderRadius, mBorderRadius, mPaint);
 
 		// TODO: Make this consistent
-		Paint tempPaint = new Paint();
-		tempPaint.setColor(Color.BLACK);
-		tempPaint.setStyle(Paint.Style.FILL);
-		canvas.drawRect(mCaption.getLeft() + getLeft() - 15, mCaption.getTop() + getTop(),
-				mCaption.getRight() + getLeft() + 25, mCaption.getBottom() + getTop(), tempPaint);
+//		Paint tempPaint = new Paint();
+//		tempPaint.setColor(Color.BLACK);
+//		tempPaint.setStyle(Paint.Style.FILL);
+//		canvas.drawRect(mCaption.getLeft() + getLeft() - 15, mCaption.getTop() + getTop(),
+//				mCaption.getRight() + getLeft() + 25, mCaption.getBottom() + getTop(), tempPaint);
 
 		drawChildren(canvas);
 	}
