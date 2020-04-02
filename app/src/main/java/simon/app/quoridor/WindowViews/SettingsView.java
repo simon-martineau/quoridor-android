@@ -26,7 +26,8 @@ public class SettingsView extends WindowView {
 	public static final int DEFAULT_ENEMY_PAWN_COLOR = Color.RED;
 	public static final int DEFAULT_WALL_COLOR = Color.GREEN;
 	public static final boolean DEFAULT_DRAW_PATH = false;
-
+	public static final boolean DEFAULT_MUSIC = true;
+	public static final boolean DEFAULT_SOUND_EFFECTS = true;
 
 	//==============================================================================================
 	// Constants
@@ -44,7 +45,10 @@ public class SettingsView extends WindowView {
 	private static final int OPTION_4_BOTTOM_Y = 950;
 	private static final int OPTION_SECTION_1_FRAME_BOTTOM = 1000;
 
-
+	private static final int OPTION_SECTION_2_FRAME_TOP = 1150;
+	private static final int OPTION_5_BOTTOM_Y = 1300;
+	private static final int OPTION_6_BOTTOM_Y = 1450;
+	private static final int OPTION_SECTION_2_FRAME_BOTTOM = 1500;
 
 
 	//==============================================================================================
@@ -52,7 +56,9 @@ public class SettingsView extends WindowView {
 	//==============================================================================================
 
 	GTitleView mTitleView;
+	GButton mBackButton;
 
+	// Group 1 =====================================================================================
 	GSectionFrame mSectionFrame1;
 
 	// Option 1
@@ -78,7 +84,17 @@ public class SettingsView extends WindowView {
 	GButton mDrawPathSettingButton;
 	GLine mDrawPathSettingLine;
 
-	GButton mBackButton;
+	// Group 2 =====================================================================================
+
+	// Option 5
+	GTitleView mMusicSettingLabel;
+	GButton mMusicSettingButton;
+	GLine mMusicSettingLine;
+
+	// Option 6
+	GTitleView mSoundEffectsSettingLabel;
+	GButton mSoundEffectsSettingButton;
+	GLine mSoundEffectsSettingLine;
 
 	/**
 	 * Constructor holding a reference to the AppView
@@ -246,9 +262,82 @@ public class SettingsView extends WindowView {
 			}
 		});
 
-		mWallColorSettingLine = new GLine(this,
+		mDrawPathSettingLine = new GLine(this,
 				mDrawPathSettingLabel.getRight() + 20, OPTION_4_BOTTOM_Y,
 				mDrawPathSettingButton.getLeft() - 20, OPTION_4_BOTTOM_Y, 3, true);
+
+		// =========================================================================================
+		// Section frame 2
+		// =========================================================================================
+
+		mSectionFrame1 = new GSectionFrame(this, OPTION_FRAMES_LEFT, OPTION_SECTION_2_FRAME_TOP,
+				getRight() - OPTION_FRAMES_RIGHT, OPTION_SECTION_2_FRAME_BOTTOM, 5, true);
+		mSectionFrame1.setCaption("Sound", 64, Color.WHITE);
+
+		// Option 5 ================================================================================
+
+		mMusicSettingLabel = new GTitleView(this, OPTION_FRAMES_LEFT + OPTION_FRAMES_MARGIN, 0, "Music:", Color.WHITE, 48);
+		mMusicSettingLabel.setBottom(OPTION_5_BOTTOM_Y);
+
+		boolean musicOn = getAppView().getSharedPreferences().getBoolean("music", DEFAULT_MUSIC);
+		int musicTextColor = musicOn ? Color.GREEN : Color.RED;
+		String musicText = musicOn ? "On" : "Off";
+		mMusicSettingButton = new GButton(this, musicText, 200, 110, 0, 0, Color.BLACK, musicTextColor, true);
+		mMusicSettingButton.setBorder(true);
+		mMusicSettingButton.setRight(getWidth() - OPTION_FRAMES_LEFT - OPTION_FRAMES_MARGIN);
+		mMusicSettingButton.setBottom(OPTION_5_BOTTOM_Y);
+		mMusicSettingButton.setOnClickAction(new GView.onClickAction() {
+			@Override
+			public void onClick(int x, int y) {
+				if (mMusicSettingButton.getText().equals("On")) {
+					mMusicSettingButton.setText("Off");
+					mMusicSettingButton.setTextColor(Color.RED);
+					setPrefBoolean("music", false);
+
+				} else {
+					mMusicSettingButton.setText("On");
+					mMusicSettingButton.setTextColor(Color.GREEN);
+					setPrefBoolean("music", true);
+				}
+			}
+		});
+
+		mMusicSettingLine = new GLine(this,
+				mMusicSettingLabel.getRight() + 20, OPTION_5_BOTTOM_Y,
+				mMusicSettingButton.getLeft() - 20, OPTION_5_BOTTOM_Y, 3, true);
+
+		// Option 5 ================================================================================
+
+		mSoundEffectsSettingLabel = new GTitleView(this, OPTION_FRAMES_LEFT + OPTION_FRAMES_MARGIN, 0, "Sound effects:", Color.WHITE, 48);
+		mSoundEffectsSettingLabel.setBottom(OPTION_6_BOTTOM_Y);
+
+		boolean soundEffectsOn = getAppView().getSharedPreferences().getBoolean("sound_effects", DEFAULT_MUSIC);
+		int soundEffectsTextColor = soundEffectsOn ? Color.GREEN : Color.RED;
+		String soundEffectsText = soundEffectsOn ? "On" : "Off";
+		mSoundEffectsSettingButton = new GButton(this, soundEffectsText, 200, 110, 0, 0, Color.BLACK, soundEffectsTextColor, true);
+		mSoundEffectsSettingButton.setBorder(true);
+		mSoundEffectsSettingButton.setRight(getWidth() - OPTION_FRAMES_LEFT - OPTION_FRAMES_MARGIN);
+		mSoundEffectsSettingButton.setBottom(OPTION_6_BOTTOM_Y);
+		mSoundEffectsSettingButton.setOnClickAction(new GView.onClickAction() {
+			@Override
+			public void onClick(int x, int y) {
+				if (mSoundEffectsSettingButton.getText().equals("On")) {
+					mSoundEffectsSettingButton.setText("Off");
+					mSoundEffectsSettingButton.setTextColor(Color.RED);
+					setPrefBoolean("sound_effects", false);
+
+				} else {
+					mSoundEffectsSettingButton.setText("On");
+					mSoundEffectsSettingButton.setTextColor(Color.GREEN);
+					setPrefBoolean("sound_effects", true);
+				}
+			}
+		});
+
+		mSoundEffectsSettingLine = new GLine(this,
+				mSoundEffectsSettingLabel.getRight() + 20, OPTION_6_BOTTOM_Y,
+				mSoundEffectsSettingButton.getLeft() - 20, OPTION_6_BOTTOM_Y, 3, true);
+
 
 
 		// =========================================================================================

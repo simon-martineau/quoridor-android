@@ -100,6 +100,8 @@ public class GameView extends WindowView {
 	private int mEnemyPawnColorPref;
 	private int mWallColorPref;
 	private boolean mDrawPathPref;
+	private boolean mMusicPref;
+	private boolean mSoundEffectsPref;
 
 
 
@@ -456,6 +458,8 @@ public class GameView extends WindowView {
 		mEnemyPawnColorPref = prefs.getInt("enemy_pawn_color", SettingsView.DEFAULT_ENEMY_PAWN_COLOR);
 		mWallColorPref = prefs.getInt("wall_color", SettingsView.DEFAULT_WALL_COLOR);
 		mDrawPathPref = prefs.getBoolean("draw_path", SettingsView.DEFAULT_DRAW_PATH);
+		mMusicPref = prefs.getBoolean("music", SettingsView.DEFAULT_MUSIC);
+		mSoundEffectsPref = prefs.getBoolean("sound_effects", SettingsView.DEFAULT_SOUND_EFFECTS);
 	}
 
 	//==============================================================================================
@@ -486,7 +490,9 @@ public class GameView extends WindowView {
 	public void onActivate() {
 		super.onActivate();
 		setUpViews();
-		mBackgroundMusicPlayer.start();
+		if (mMusicPref) {
+			mBackgroundMusicPlayer.start();
+		}
 	}
 
 	/**
@@ -495,7 +501,9 @@ public class GameView extends WindowView {
 	@Override
 	public void onDeactivate() {
 		super.onDeactivate();
-		mBackgroundMusicPlayer.pause();
+		if (mBackgroundMusicPlayer.isPlaying()) {
+			mBackgroundMusicPlayer.pause();
+		}
 	}
 
 	/**
@@ -835,7 +843,9 @@ public class GameView extends WindowView {
 	 * @param intensity The intensity of the sound
 	 */
 	private void playSound(int soundId, float intensity) {
-		mSoundPool.play(soundId, intensity, intensity, 1, 0, 1f);
+		if (mSoundEffectsPref) {
+			mSoundPool.play(soundId, intensity, intensity, 1, 0, 1f);
+		}
 	}
 
 	/**
