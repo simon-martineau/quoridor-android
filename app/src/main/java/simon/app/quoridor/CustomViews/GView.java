@@ -35,8 +35,8 @@ public abstract class GView implements Comparable<GView> {
 	/**
 	 * Callback for click event
 	 */
-	private onClickAction mOnClickAction;
-	private boolean hasOnClick = false;
+	protected onClickAction mOnClickAction; // TODO: Make this private again
+	protected boolean hasOnClick = false;
 
 
 	/**
@@ -144,7 +144,7 @@ public abstract class GView implements Comparable<GView> {
 			for (GView gView : mGViews) {
 				if (gView.isInRect(relX, relY)) {
 					gView.performClick(relX, relY);
-					return;
+					break;
 				}
 			}
 		}
@@ -251,6 +251,22 @@ public abstract class GView implements Comparable<GView> {
 	}
 
 	/**
+	 * Sets the x coordinate but from the center of the view.
+	 * @param x The x coordinates (pixels)
+	 */
+	public void setXFromViewCenter(int x) {
+		mX = x - getWidth() / 2;
+	}
+
+	/**
+	 * Sets the y coordinate but from the center of the view.
+	 * @param y The y coordinates (pixels)
+	 */
+	public void setYFromViewCenter(int y) {
+		mY = y - getHeight() / 2;
+	}
+
+	/**
 	 * Sets both x and y at the same time
 	 * @param x The x coordinate (pixels)
 	 * @param y The y coordinate (pixels)
@@ -259,6 +275,7 @@ public abstract class GView implements Comparable<GView> {
 		mX = x;
 		mY = y;
 	}
+
 
 	/**
 	 * Checks if the position is included in the view's rectangle. If mIsVisible is set to false,
@@ -381,9 +398,5 @@ public abstract class GView implements Comparable<GView> {
 }
 
 
-// TODO: Draw relative to parent in the following views:
-// TODO: GFreezeView**
-// TODO: GModalView**
-// TODO: GQuoridorView***
 
 

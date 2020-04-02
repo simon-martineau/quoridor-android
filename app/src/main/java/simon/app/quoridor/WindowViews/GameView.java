@@ -97,6 +97,8 @@ public class GameView extends WindowView {
 	// Preferences
 	//==============================================================================================
 	private int mPawnColorPref;
+	private int mEnemyPawnColorPref;
+	private int mWallColorPref;
 
 
 
@@ -297,11 +299,15 @@ public class GameView extends WindowView {
 		Log.i(TAG, "setUpViews: getWidth() = " + getWidth());
 		retrievePreferences();
 
+		mGViews.clear();
+
 		mGTitleView = new GTitleView(this, "8 bit Quoridor", Color.GREEN, 184f, mAppView.getWidth());
 		mGTitleView.setY(128);
 
 		mGQuoridorView = new GQuoridorView(this, mGame, 50, mGTitleView.getBottom() + 128, getWidth());
 		mGQuoridorView.setPlayerColor(1, mPawnColorPref);
+		mGQuoridorView.setPlayerColor(2, mEnemyPawnColorPref);
+		mGQuoridorView.setWallColor(mWallColorPref);
 		mGQuoridorView.setOnClickAction(new GQuoridorView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
@@ -324,9 +330,10 @@ public class GameView extends WindowView {
 						playSound(mBeginPlaceWallSoundId, 0.5f);
 						mToggleWallTypeButton.setVisible(true);
 						mConfirmWallButton.setVisible(true);
-						initiateWallPlacement(Quoridor.HORIZONTAL);
 						mPlaceWallButton.setText("Cancel");
 						mPlaceWallButton.setTextColor(Color.RED);
+						Log.i(TAG, "onClick: placeWallButton visible:" + mPlaceWallButton.isVisible());
+						initiateWallPlacement(Quoridor.HORIZONTAL);
 					} else {
 						mToggleWallTypeButton.setVisible(false);
 						mConfirmWallButton.setVisible(false);
@@ -440,7 +447,9 @@ public class GameView extends WindowView {
 	 */
 	private void retrievePreferences() {
 		SharedPreferences prefs = getAppView().getSharedPreferences();
-		mPawnColorPref = prefs.getInt("pawn_color", Color.WHITE);
+		mPawnColorPref = prefs.getInt("pawn_color", SettingsView.DEFAULT_PAWN_COLOR);
+		mEnemyPawnColorPref = prefs.getInt("enemy_pawn_color", SettingsView.DEFAULT_ENEMY_PAWN_COLOR);
+		mWallColorPref = prefs.getInt("wall_color", SettingsView.DEFAULT_WALL_COLOR);
 	}
 
 	//==============================================================================================

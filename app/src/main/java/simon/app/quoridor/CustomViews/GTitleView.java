@@ -36,11 +36,6 @@ public class GTitleView extends GView {
 
 	}
 
-//	@Override
-//	public void setCenterHorizontal() {
-//		setX(mWindowView.getWidth());
-//	}
-
 	public void setTypeFace(Typeface typeFace) {
 		mTypeFace = typeFace;
 		mPaint.setTypeface(mTypeFace);

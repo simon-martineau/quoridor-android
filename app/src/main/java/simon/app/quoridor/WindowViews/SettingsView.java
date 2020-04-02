@@ -5,8 +5,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.widget.Button;
 
 import simon.app.quoridor.Core.AppView;
+import simon.app.quoridor.CustomViews.Colors.ColorPickerView;
+import simon.app.quoridor.CustomViews.Colors.ColorView;
 import simon.app.quoridor.CustomViews.GButton;
 import simon.app.quoridor.CustomViews.GTitleView;
 import simon.app.quoridor.CustomViews.GView;
@@ -14,15 +17,51 @@ import simon.app.quoridor.Utils.MoreColors;
 
 public class SettingsView extends WindowView {
 	//==============================================================================================
+	// Default preferences
+	//==============================================================================================
+
+	public static final int DEFAULT_PAWN_COLOR = Color.BLUE;
+	public static final int DEFAULT_ENEMY_PAWN_COLOR = Color.RED;
+	public static final int DEFAULT_WALL_COLOR = Color.GREEN;
+
+
+	//==============================================================================================
+	// Constants
+	//==============================================================================================
+
+	private static final int OPTION_LABELS_LEFT_FROM_LEFT = 100;
+	private static final int OPTION_BUTTON_RIGHT_FROM_RIGHT = 100;
+	private static final int OPTION_DESCRIPTOR_LEFT_FROM_LABEL_RIGHT = 50;
+
+	private static final int OPTION_1_MIDDLE_Y = 500;
+	private static final int OPTION_2_MIDDLE_Y = 700;
+	private static final int OPTION_3_MIDDLE_Y = 900;
+
+
+	//==============================================================================================
 	// GViews
 	//==============================================================================================
 
 	GTitleView mTitleView;
+
+	// Option 1
 	GTitleView mPawnColorSettingLabel;
-	GButton mPawnColorSettingButtonGreen;
-	GButton mPawnColorSettingButtonWhite;
-	GButton mPawnColorSettingButtonBlue;
-	GButton mPawnColorSettingButtonYellow;
+	ColorView mPawnColorSettingColorPreview;
+	GButton mPawnColorSettingChangeButton;
+	ColorPickerView mPawnColorSettingColorPicker;
+
+	// Option 2
+	GTitleView mEnemyPawnColorSettingLabel;
+	ColorView mEnemyPawnColorSettingColorPreview;
+	GButton mEnemyPawnColorSettingChangeButton;
+	ColorPickerView mEnemyPawnColorSettingColorPicker;
+
+	// Option 2
+	GTitleView mWallColorSettingLabel;
+	ColorView mWallColorSettingColorPreview;
+	GButton mWallColorSettingChangeButton;
+	ColorPickerView mWallColorSettingColorPicker;
+
 
 	GButton mBackButton;
 
@@ -42,39 +81,126 @@ public class SettingsView extends WindowView {
 		mTitleView = new GTitleView(this, 0, 100, "Settings", Color.GREEN, 128);
 		mTitleView.setCenterHorizontal();
 
-		mPawnColorSettingLabel = new GTitleView(this, 50, 400, "Pawn color", Color.GREEN, 48);
+		// =========================================================================================
+		// Option 1
+		// =========================================================================================
 
-		mPawnColorSettingButtonBlue = new GButton(this, "Blue", 200, 100, 400, 400, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.BLUE);
-		mPawnColorSettingButtonBlue.setOnClickAction(new GView.onClickAction() {
+		mPawnColorSettingLabel = new GTitleView(this, OPTION_LABELS_LEFT_FROM_LEFT, 0, "Pawn color:", Color.WHITE, 64);
+		mPawnColorSettingLabel.setYFromViewCenter(OPTION_1_MIDDLE_Y);
+
+		mPawnColorSettingColorPreview = new ColorView(this, mPawnColorSettingLabel.getRight() + OPTION_DESCRIPTOR_LEFT_FROM_LABEL_RIGHT, 0, 100, 100,
+				getAppView().getSharedPreferences().getInt("pawn_color", DEFAULT_PAWN_COLOR));
+		mPawnColorSettingColorPreview.setYFromViewCenter(OPTION_1_MIDDLE_Y);
+
+		mPawnColorSettingChangeButton = new GButton(this, "Change", 300, 150, getWidth() - 300 - OPTION_BUTTON_RIGHT_FROM_RIGHT, 0,
+				GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+		mPawnColorSettingChangeButton.setYFromViewCenter(OPTION_1_MIDDLE_Y);
+		mPawnColorSettingChangeButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
-				setPawnColor(Color.BLUE);
+				mPawnColorSettingColorPicker.setVisible(true);
 			}
 		});
 
-		mPawnColorSettingButtonGreen = new GButton(this, "Orange", 200, 100, 650, 400, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, MoreColors.ORANGE);
-		mPawnColorSettingButtonGreen.setOnClickAction(new GView.onClickAction() {
+		mPawnColorSettingColorPicker = new ColorPickerView(this, 400, 200);
+		mPawnColorSettingColorPicker.setColorPickCallBack(new ColorPickerView.ColorPickCallBack() {
+			@Override
+			public void onColorPick(int color) {
+				setPrefInt("pawn_color", color);
+				mPawnColorSettingColorPreview.setColor(color);
+				mPawnColorSettingColorPicker.setVisible(false);
+			}
+
+			@Override
+			public void onDismiss() {
+				mPawnColorSettingColorPicker.setVisible(false);
+			}
+		});
+		mPawnColorSettingColorPicker.setY(mPawnColorSettingColorPreview.getBottom() + 25);
+		mPawnColorSettingColorPicker.setX(OPTION_LABELS_LEFT_FROM_LEFT);
+		mPawnColorSettingColorPicker.setVisible(false);
+
+		// =========================================================================================
+		// Option 2
+		// =========================================================================================
+
+		mEnemyPawnColorSettingLabel = new GTitleView(this, OPTION_LABELS_LEFT_FROM_LEFT, 0, "Enemy pawn color:", Color.WHITE, 64);
+		mEnemyPawnColorSettingLabel.setYFromViewCenter(OPTION_2_MIDDLE_Y);
+
+		mEnemyPawnColorSettingColorPreview = new ColorView(this, mEnemyPawnColorSettingLabel.getRight() + OPTION_DESCRIPTOR_LEFT_FROM_LABEL_RIGHT, 0, 100, 100,
+				getAppView().getSharedPreferences().getInt("enemy_pawn_color", DEFAULT_ENEMY_PAWN_COLOR));
+		mEnemyPawnColorSettingColorPreview.setYFromViewCenter(OPTION_2_MIDDLE_Y);
+
+		mEnemyPawnColorSettingChangeButton = new GButton(this, "Change", 300, 150, getWidth() - 300 - OPTION_BUTTON_RIGHT_FROM_RIGHT, 0,
+				GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+		mEnemyPawnColorSettingChangeButton.setYFromViewCenter(OPTION_2_MIDDLE_Y);
+		mEnemyPawnColorSettingChangeButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
-				setPawnColor(MoreColors.ORANGE);
+				mEnemyPawnColorSettingColorPicker.setVisible(true);
 			}
 		});
 
-		mPawnColorSettingButtonYellow = new GButton(this, "Yellow", 200, 100, 900, 400, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.YELLOW);
-		mPawnColorSettingButtonYellow.setOnClickAction(new GView.onClickAction() {
+		mEnemyPawnColorSettingColorPicker = new ColorPickerView(this, 400, 200);
+		mEnemyPawnColorSettingColorPicker.setColorPickCallBack(new ColorPickerView.ColorPickCallBack() {
+			@Override
+			public void onColorPick(int color) {
+				setPrefInt("enemy_pawn_color", color);
+				mEnemyPawnColorSettingColorPreview.setColor(color);
+				mEnemyPawnColorSettingColorPicker.setVisible(false);
+			}
+
+			@Override
+			public void onDismiss() {
+				mEnemyPawnColorSettingColorPicker.setVisible(false);
+			}
+		});
+		mEnemyPawnColorSettingColorPicker.setY(mEnemyPawnColorSettingColorPreview.getBottom() + 25);
+		mEnemyPawnColorSettingColorPicker.setX(OPTION_LABELS_LEFT_FROM_LEFT);
+		mEnemyPawnColorSettingColorPicker.setVisible(false);
+
+		// =========================================================================================
+		// Option 3
+		// =========================================================================================
+
+		mWallColorSettingLabel = new GTitleView(this, OPTION_LABELS_LEFT_FROM_LEFT, 0, "Wall color:", Color.WHITE, 64);
+		mWallColorSettingLabel.setYFromViewCenter(OPTION_3_MIDDLE_Y);
+
+		mWallColorSettingColorPreview = new ColorView(this, mWallColorSettingLabel.getRight() + OPTION_DESCRIPTOR_LEFT_FROM_LABEL_RIGHT, 0, 100, 100,
+				getAppView().getSharedPreferences().getInt("wall_color", DEFAULT_WALL_COLOR));
+		mWallColorSettingColorPreview.setYFromViewCenter(OPTION_3_MIDDLE_Y);
+
+		mWallColorSettingChangeButton = new GButton(this, "Change", 300, 150, getWidth() - 300 - OPTION_BUTTON_RIGHT_FROM_RIGHT, 0,
+				GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
+		mWallColorSettingChangeButton.setYFromViewCenter(OPTION_3_MIDDLE_Y);
+		mWallColorSettingChangeButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
-				setPawnColor(Color.YELLOW);
+				mWallColorSettingColorPicker.setVisible(true);
 			}
 		});
 
-		mPawnColorSettingButtonWhite = new GButton(this, "White", 200, 100, 1150, 400, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
-		mPawnColorSettingButtonWhite.setOnClickAction(new GView.onClickAction() {
+		mWallColorSettingColorPicker = new ColorPickerView(this, 400, 200);
+		mWallColorSettingColorPicker.setColorPickCallBack(new ColorPickerView.ColorPickCallBack() {
 			@Override
-			public void onClick(int x, int y) {
-				setPawnColor(Color.WHITE);
+			public void onColorPick(int color) {
+				setPrefInt("wall_color", color);
+				mWallColorSettingColorPreview.setColor(color);
+				mWallColorSettingColorPicker.setVisible(false);
+			}
+
+			@Override
+			public void onDismiss() {
+				mWallColorSettingColorPicker.setVisible(false);
 			}
 		});
+		mWallColorSettingColorPicker.setY(mWallColorSettingColorPreview.getBottom() + 25);
+		mWallColorSettingColorPicker.setX(OPTION_LABELS_LEFT_FROM_LEFT);
+		mWallColorSettingColorPicker.setVisible(false);
+
+		// =========================================================================================
+		// Others
+		// =========================================================================================
 
 		mBackButton = new GButton(this, "Back", 300, 150, 150 ,getHeight() - 450, GameView.DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE);
 		mBackButton.setOnClickAction(new GView.onClickAction() {
@@ -86,9 +212,9 @@ public class SettingsView extends WindowView {
 
 	}
 
-	private void setPawnColor(int color) {
+	private void setPrefInt(String key, int pref) {
 		SharedPreferences.Editor editor = mAppView.getSharedPreferences().edit();
-		editor.putInt("pawn_color", color);
+		editor.putInt(key, pref);
 		editor.apply();
 	}
 

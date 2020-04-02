@@ -53,8 +53,8 @@ public class GQuoridorView extends GView {
 
 	//// Colors
 	public int consoleMessageColor = Color.GREEN;
-	public int wallPreviewColor = Color.GREEN;
-	public int hoverColor = 0x3f001eff;
+	private int wallPreviewColor = Color.GREEN;
+	public int hoverColor = Color.BLUE;
 	public int wrapperColor = Color.WHITE;
 	public int backgroundColor = Color.BLACK;
 	public int gridColor = Color.rgb(50, 50, 50);
@@ -256,6 +256,7 @@ public class GQuoridorView extends GView {
 	private void drawHover(Canvas canvas, int x, int y) {
 		Paint hoverPaint = new Paint();
 		hoverPaint.setColor(hoverColor);
+		hoverPaint.setAlpha(80);
 		float left = getLeft() + gridMargin + (x - 1)*cellSize;
 		float top = getTop() + headerHeight + (9 - y)*cellSize;
 
@@ -407,7 +408,7 @@ public class GQuoridorView extends GView {
 
 
 		if (isWallPreviewInvalid()) wallPreviewColor = Color.RED;
-		else wallPreviewColor = Color.GREEN;
+		else wallPreviewColor = wallColor;
 
 
 		// Reset blink timer
@@ -425,7 +426,7 @@ public class GQuoridorView extends GView {
 			verticalWallPreview = new int[]{x, y};
 		}
 		if (isWallPreviewInvalid()) wallPreviewColor = Color.RED;
-		else wallPreviewColor = Color.GREEN;
+		else wallPreviewColor = wallColor;
 		wallBlinkTimer = wallBlinkDelay;
 		drawWallPreview = true;
 	}
@@ -486,9 +487,15 @@ public class GQuoridorView extends GView {
 	public void setPlayerColor(int playerNumber, int color) {
 		if (playerNumber == 1) {
 			playerOneColor = color;
+			hoverColor = color;
 		} else if (playerNumber == 2) {
 			playerTwoColor = color;
 		}
+	}
+
+	public void setWallColor(int color) {
+		wallColor = color;
+		wallPreviewColor = color;
 	}
 
 	public void linkQuoridorGame(Quoridor quoridor) {
