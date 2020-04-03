@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
+import android.media.MediaPlayer;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -12,6 +14,7 @@ import android.view.SurfaceView;
 import java.util.HashMap;
 import java.util.Map;
 
+import simon.app.quoridor.R;
 import simon.app.quoridor.WindowViews.GameView;
 import simon.app.quoridor.WindowViews.LoadingView;
 import simon.app.quoridor.WindowViews.MainMenuView;
@@ -57,6 +60,12 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 
 
 	//==============================================================================================
+	// MediaPlayers
+	//==============================================================================================
+	private MediaPlayer mMenuSongPlayer;
+
+
+	//==============================================================================================
 	// WindowViews
 	//==============================================================================================
 
@@ -90,6 +99,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 		getHolder().addCallback(this);
 
 		setUpWindowViews();
+		setUpAudio();
 		setActiveWindowView("loading screen");
 
 		setFocusable(true);
@@ -98,6 +108,25 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	//==============================================================================================
 	// WindowView methods
 	//==============================================================================================
+
+
+	private void setUpAudio() {
+		mMenuSongPlayer = MediaPlayer.create(getContext(), R.raw.menu_song);
+		mMenuSongPlayer.setVolume(0.5f, 0.5f);
+		mMenuSongPlayer.setLooping(true);
+	}
+
+	public void startMainMenuMusic() {
+		if (!mMenuSongPlayer.isPlaying() && getSharedPreferences(DATA_SETTINGS).getBoolean("music", SettingsView.DEFAULT_MUSIC)) {
+			mMenuSongPlayer.start();
+		}
+	}
+
+	public void stopMainMenuMusic() {
+		if (mMenuSongPlayer.isPlaying()) {
+			mMenuSongPlayer.pause();
+		}
+	}
 
 	private void setUpWindowViews() {
 
@@ -123,6 +152,12 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 		}
 
 		mWindowViews.get(key).onActivate();
+		if (key.equals("main menu") || key.equals("settings view")) {
+			startMainMenuMusic();
+		} else {
+			stopMainMenuMusic();
+		}
+
 		mActiveWindowView = key;
 	}
 
@@ -182,8 +217,6 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 		mGameThread = new GameThread(getHolder(), this);
 		mGameThread.setRunning(true);
 		mGameThread.start();
-
-		// activateCurrentWindow();
 	}
 
 	/**
@@ -192,6 +225,8 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		deactivateCurrentWindow();
+
+		stopMainMenuMusic();
 
 		boolean retry = true;
 		while (retry) {
@@ -204,6 +239,15 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 				e.printStackTrace();
 			}
 		}
+	}
+
+
+	public void onStop() {
+		stopMainMenuMusic();
+	}
+
+	public void onRestart() {
+		startMainMenuMusic();
 	}
 
 	//==============================================================================================

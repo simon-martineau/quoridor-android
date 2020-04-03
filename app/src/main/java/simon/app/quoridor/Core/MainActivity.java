@@ -34,7 +34,20 @@ public class MainActivity extends Activity {
 		surface.addView(mAppView);
 
 	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		mAppView.onStop();
+	}
+
+	@Override
+	protected void onRestart() {
+		super.onRestart();
+		mAppView.onRestart();
+	}
 }
+
 
 
 // TODO: Add loading bar sound effect

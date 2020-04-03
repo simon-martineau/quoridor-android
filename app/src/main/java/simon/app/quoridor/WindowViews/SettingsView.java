@@ -270,7 +270,7 @@ public class SettingsView extends WindowView {
 				mDrawPathSettingButton.getLeft() - 20, OPTION_4_BOTTOM_Y, 3, true);
 
 		// =========================================================================================
-		// Section frame 2
+		// Section frame 2 (Sounds)
 		// =========================================================================================
 
 		mSectionFrame1 = new GSectionFrame(this, OPTION_FRAMES_LEFT, OPTION_SECTION_2_FRAME_TOP,
@@ -295,11 +295,13 @@ public class SettingsView extends WindowView {
 				if (mMusicSettingButton.getText().equals("On")) {
 					mMusicSettingButton.setText("Off");
 					mMusicSettingButton.setTextColor(Color.RED);
+					getAppView().stopMainMenuMusic();
 					setPrefBoolean("music", false);
 
 				} else {
 					mMusicSettingButton.setText("On");
 					mMusicSettingButton.setTextColor(Color.GREEN);
+					getAppView().startMainMenuMusic();
 					setPrefBoolean("music", true);
 				}
 			}

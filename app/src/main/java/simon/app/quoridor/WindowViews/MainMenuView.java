@@ -89,7 +89,7 @@ public class MainMenuView extends WindowView {
 	private void setUpViews() {
 		mGViews.clear();
 
-		mStartGameButton = new GButton(this, "Start game", 400, 200, 0, getHeight() / 2 + 100,
+		mStartGameButton = new GButton(this, "Start game", 500, 200, 0, getHeight() / 2 + 100,
 				DEFAULT_BUTTON_BACKGROUND_COLOR, Color.GREEN, true);
 		mStartGameButton.setTextSize(64);
 		mStartGameButton.setCenterHorizontal();
@@ -100,7 +100,7 @@ public class MainMenuView extends WindowView {
 			}
 		});
 
-		mSettingsButton = new GButton(this, "Settings", 400, 200, 0, getHeight() / 2 + 400,
+		mSettingsButton = new GButton(this, "Settings", 500, 200, 0, getHeight() / 2 + 400,
 				DEFAULT_BUTTON_BACKGROUND_COLOR, Color.WHITE, true);
 		mSettingsButton.setTextSize(64);
 		mSettingsButton.setCenterHorizontal();
@@ -156,6 +156,7 @@ public class MainMenuView extends WindowView {
 		int y = (int) event.getY();
 
 		switch (event.getAction()) {
+
 			case MotionEvent.ACTION_DOWN:
 				dispatchTouchToViews(x, y);
 				break;
@@ -183,8 +184,8 @@ public class MainMenuView extends WindowView {
 			int eraserIndex = - rand.nextInt(50);
 
 			double factor = Math.random();
-			int size = (int) (32 + factor*64);
-			int alpha = (int) (20 + factor * 100);
+			int size = (int) (32 + factor*128);
+			int alpha = (int) (20 + factor * 150);
 
 			GNumberStream gNumberStream = new GNumberStream(this, x, y, size, color);
 			gNumberStream.setAlpha(alpha);
