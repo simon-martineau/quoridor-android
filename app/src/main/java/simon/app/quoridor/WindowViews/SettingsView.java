@@ -252,6 +252,7 @@ public class SettingsView extends WindowView {
 		mDrawPathSettingButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
+				getAppView().playSound(AppView.BASIC_BUTTON_SOUND);
 				if (mDrawPathSettingButton.getText().equals("Yes")) {
 					mDrawPathSettingButton.setText("No");
 					mDrawPathSettingButton.setTextColor(Color.RED);
@@ -292,6 +293,7 @@ public class SettingsView extends WindowView {
 		mMusicSettingButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
+				getAppView().playSound(AppView.BASIC_BUTTON_SOUND);
 				if (mMusicSettingButton.getText().equals("On")) {
 					mMusicSettingButton.setText("Off");
 					mMusicSettingButton.setTextColor(Color.RED);
@@ -301,8 +303,8 @@ public class SettingsView extends WindowView {
 				} else {
 					mMusicSettingButton.setText("On");
 					mMusicSettingButton.setTextColor(Color.GREEN);
-					getAppView().startMainMenuMusic();
 					setPrefBoolean("music", true);
+					getAppView().startMainMenuMusic();
 				}
 			}
 		});
@@ -326,6 +328,7 @@ public class SettingsView extends WindowView {
 		mSoundEffectsSettingButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
+				getAppView().playSound(AppView.BASIC_BUTTON_SOUND);
 				if (mSoundEffectsSettingButton.getText().equals("On")) {
 					mSoundEffectsSettingButton.setText("Off");
 					mSoundEffectsSettingButton.setTextColor(Color.RED);
@@ -353,6 +356,7 @@ public class SettingsView extends WindowView {
 		mBackButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
+				getAppView().playSound(AppView.BASIC_BUTTON_SOUND);
 				getAppView().swapToMainMenuView();
 			}
 		});

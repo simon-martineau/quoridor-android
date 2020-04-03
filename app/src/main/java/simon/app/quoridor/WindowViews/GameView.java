@@ -441,6 +441,7 @@ public class GameView extends WindowView {
 		mSettingsButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
+				getAppView().playSound(AppView.BASIC_BUTTON_SOUND);
 				getAppView().swapToMainMenuView();
 			}
 		});

@@ -96,6 +96,7 @@ public class MainMenuView extends WindowView {
 		mStartGameButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
+				getAppView().playSound(AppView.BASIC_BUTTON_SOUND);
 				getAppView().swapToGameView();
 			}
 		});
@@ -107,6 +108,7 @@ public class MainMenuView extends WindowView {
 		mSettingsButton.setOnClickAction(new GView.onClickAction() {
 			@Override
 			public void onClick(int x, int y) {
+				getAppView().playSound(AppView.BASIC_BUTTON_SOUND);
 				getAppView().swapToSettingsView();
 			}
 		});

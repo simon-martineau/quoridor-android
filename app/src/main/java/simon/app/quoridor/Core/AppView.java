@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -60,9 +61,13 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 
 
 	//==============================================================================================
-	// MediaPlayers
+	// Media
 	//==============================================================================================
 	private MediaPlayer mMenuSongPlayer;
+	private SoundPool mSoundPool;
+
+	public static final int BASIC_BUTTON_SOUND = 0;
+	private int mButtonSound;
 
 
 	//==============================================================================================
@@ -106,7 +111,7 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	//==============================================================================================
-	// WindowView methods
+	// Setup methods
 	//==============================================================================================
 
 
@@ -114,6 +119,34 @@ public class AppView extends SurfaceView implements SurfaceHolder.Callback {
 		mMenuSongPlayer = MediaPlayer.create(getContext(), R.raw.menu_song);
 		mMenuSongPlayer.setVolume(0.5f, 0.5f);
 		mMenuSongPlayer.setLooping(true);
+
+		mSoundPool = new SoundPool.Builder()
+				.setMaxStreams(10)
+				.build();
+
+		mButtonSound = mSoundPool.load(getContext(), R.raw.basic_button_sound, 1);
+	}
+
+
+	@SuppressWarnings("SwitchStatementWithTooFewBranches")
+	public void playSound(int sound, float intensity) {
+		if (getSharedPreferences(DATA_SETTINGS).getBoolean("sound_effects", SettingsView.DEFAULT_MUSIC)) {
+			switch (sound) {
+				case BASIC_BUTTON_SOUND:
+					mSoundPool.play(mButtonSound, intensity, intensity, 1, 0, 1);
+			}
+		}
+	}
+
+	@SuppressWarnings("SwitchStatementWithTooFewBranches")
+	public void playSound(int sound) {
+		float intensity = 1.0f;
+		if (getSharedPreferences(DATA_SETTINGS).getBoolean("sound_effects", SettingsView.DEFAULT_MUSIC)) {
+			switch (sound) {
+				case BASIC_BUTTON_SOUND:
+					mSoundPool.play(mButtonSound, intensity, intensity, 1, 0, 1);
+			}
+		}
 	}
 
 	public void startMainMenuMusic() {
